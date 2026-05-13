@@ -6,11 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -19,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
@@ -26,24 +26,12 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.cos
 import kotlin.math.sin
 
-private val wheelColors = listOf(
-    Color(0xFFE91E63), // Pink
-    Color(0xFF9C27B0), // Purple
-    Color(0xFF673AB7), // Deep Purple
-    Color(0xFF3F51B5), // Indigo
-    Color(0xFF2196F3), // Blue
-    Color(0xFF00BCD4), // Cyan
-    Color(0xFF009688), // Teal
-    Color(0xFF4CAF50), // Green
-    Color(0xFFFFEB3B), // Yellow
-    Color(0xFFFF9800), // Orange
-)
-
 @Composable
 fun SpinWheel(
     options: List<String>,
     rotationDegrees: Float,
     isSpinning: Boolean,
+    colorScheme: WheelColorScheme,
     modifier: Modifier = Modifier,
 ) {
     val animatable = remember { Animatable(0f) }
@@ -55,7 +43,7 @@ fun SpinWheel(
                 targetValue = rotationDegrees,
                 animationSpec = tween(
                     durationMillis = 3000,
-                    easing = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
+                    easing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
                 )
             )
         }
@@ -75,7 +63,7 @@ fun SpinWheel(
         modifier = modifier.size(300.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Wheel
+        // Wheel with shadow
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,12 +73,19 @@ fun SpinWheel(
             val centerY = size.height / 2
             val radius = minOf(centerX, centerY) - 10f
 
+            // Draw shadow beneath wheel
+            drawCircle(
+                color = Color.Black.copy(alpha = 0.15f),
+                radius = radius + 4f,
+                center = Offset(centerX + 2f, centerY + 4f)
+            )
+
             rotate(degrees = animatable.value) {
                 val segmentAngle = 360f / options.size
 
                 options.forEachIndexed { index, option ->
                     val startAngle = index * segmentAngle - 90f
-                    val color = wheelColors[index % wheelColors.size]
+                    val color = colorScheme.getColorForIndex(index)
 
                     // Draw segment
                     drawArc(
@@ -102,15 +97,15 @@ fun SpinWheel(
                         size = Size(radius * 2, radius * 2)
                     )
 
-                    // Draw border
+                    // Draw border (3dp thickness)
                     drawArc(
-                        color = Color.White,
+                        color = colorScheme.borderColor,
                         startAngle = startAngle,
                         sweepAngle = segmentAngle,
                         useCenter = true,
                         topLeft = Offset(centerX - radius, centerY - radius),
                         size = Size(radius * 2, radius * 2),
-                        style = Stroke(width = 2f)
+                        style = Stroke(width = 3.dp.toPx())
                     )
 
                     // Draw text
@@ -119,31 +114,72 @@ fun SpinWheel(
                     val textX = centerX + cos(Math.toRadians(textAngle.toDouble())).toFloat() * textRadius
                     val textY = centerY + sin(Math.toRadians(textAngle.toDouble())).toFloat() * textRadius
 
+                    textPaint.color = colorScheme.textColor.copy(alpha = 0.9f).toArgb()
                     drawContext.canvas.nativeCanvas.drawText(option, textX, textY + 12f, textPaint)
                 }
             }
 
-            // Center circle
+            // Outer border
             drawCircle(
-                color = Color.White,
-                radius = 30f,
-                center = Offset(centerX, centerY)
-            )
-            drawCircle(
-                color = Color(0xFF6650a4),
-                radius = 25f,
-                center = Offset(centerX, centerY)
+                color = colorScheme.borderColor,
+                radius = radius,
+                center = Offset(centerX, centerY),
+                style = Stroke(width = 3.dp.toPx())
             )
         }
 
-        // Pointer at top
-        Icon(
-            imageVector = Icons.Default.ArrowDropDown,
-            contentDescription = "指针",
-            tint = Color(0xFFE91E63),
+        // Triangle indicator at top
+        TriangleIndicator(
+            color = colorScheme.indicatorColor,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .size(40.dp)
+                .offset(y = 4.dp)
+                .size(width = 24.dp, height = 20.dp)
         )
     }
+}
+
+@Composable
+private fun TriangleIndicator(
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+
+        // Shadow
+        val shadowPath = Path().apply {
+            moveTo(width / 2f + 1f, height + 2f)
+            lineTo(1f, 1f + 2f)
+            lineTo(width - 1f, 1f + 2f)
+            close()
+        }
+        drawPath(
+            path = shadowPath,
+            color = Color.Black.copy(alpha = 0.2f),
+            style = Fill
+        )
+
+        // Triangle pointing down
+        val trianglePath = Path().apply {
+            moveTo(width / 2f, height)
+            lineTo(0f, 0f)
+            lineTo(width, 0f)
+            close()
+        }
+        drawPath(
+            path = trianglePath,
+            color = color,
+            style = Fill
+        )
+    }
+}
+
+private fun Color.toArgb(): Int {
+    val alpha = (this.alpha * 255).toInt()
+    val red = (this.red * 255).toInt()
+    val green = (this.green * 255).toInt()
+    val blue = (this.blue * 255).toInt()
+    return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
 }

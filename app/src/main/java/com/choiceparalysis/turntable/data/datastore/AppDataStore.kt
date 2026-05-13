@@ -11,4 +11,9 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ap
 object DataStoreKeys {
     val OPTION_LISTS = stringPreferencesKey("option_lists")
     val HISTORY = stringPreferencesKey("history")
+    val DYNAMIC_COLOR_ENABLED = stringPreferencesKey("dynamic_color_enabled")
+    val SELECTED_PRESET = stringPreferencesKey("selected_preset")
+    val CUSTOM_COLORS = stringPreferencesKey("custom_colors")
+    val CURRENT_OPTIONS = stringPreferencesKey("current_options")
+    val OPTION_GROUPS = stringPreferencesKey("option_groups")
 }
