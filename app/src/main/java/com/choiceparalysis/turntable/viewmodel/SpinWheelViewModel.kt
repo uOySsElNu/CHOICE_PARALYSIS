@@ -183,7 +183,10 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
             delay(3000)
             val currentOptions = _options.value
             if (currentOptions.isNotEmpty()) {
-                val selectedIndex = currentOptions.indices.random()
+                val segmentAngle = 360f / currentOptions.size
+                val normalizedRotation = ((_rotationDegrees.value % 360f) + 360f) % 360f
+                val selectedIndex = (normalizedRotation / segmentAngle).toInt() % currentOptions.size
+
                 _result.value = currentOptions[selectedIndex]
                 _isSpinning.value = false
 

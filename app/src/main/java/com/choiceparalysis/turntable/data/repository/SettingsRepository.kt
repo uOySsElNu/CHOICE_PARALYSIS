@@ -35,6 +35,25 @@ class SettingsRepository(private val context: Context) {
         runCatching { Json.decodeFromString<List<OptionGroup>>(json) }.getOrElse { emptyList() }
     }
 
+    val coinHeadsImage: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[DataStoreKeys.COIN_HEADS_IMAGE]
+    }
+
+    val coinTailsImage: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[DataStoreKeys.COIN_TAILS_IMAGE]
+    }
+
+    val diceImages: Flow<Map<Int, String?>> = context.dataStore.data.map { prefs ->
+        mapOf(
+            1 to prefs[DataStoreKeys.DICE_FACE_1_IMAGE],
+            2 to prefs[DataStoreKeys.DICE_FACE_2_IMAGE],
+            3 to prefs[DataStoreKeys.DICE_FACE_3_IMAGE],
+            4 to prefs[DataStoreKeys.DICE_FACE_4_IMAGE],
+            5 to prefs[DataStoreKeys.DICE_FACE_5_IMAGE],
+            6 to prefs[DataStoreKeys.DICE_FACE_6_IMAGE],
+        )
+    }
+
     suspend fun setDynamicColorEnabled(enabled: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[DataStoreKeys.DYNAMIC_COLOR_ENABLED] = enabled.toString()
@@ -76,6 +95,49 @@ class SettingsRepository(private val context: Context) {
             }.getOrElse { emptyList() }
             val updated = current.filter { it.id != id }
             prefs[DataStoreKeys.OPTION_GROUPS] = Json.encodeToString(updated)
+        }
+    }
+
+    suspend fun setCoinHeadsImage(uri: String?) {
+        context.dataStore.edit { prefs ->
+            if (uri != null) prefs[DataStoreKeys.COIN_HEADS_IMAGE] = uri
+            else prefs.remove(DataStoreKeys.COIN_HEADS_IMAGE)
+        }
+    }
+
+    suspend fun setCoinTailsImage(uri: String?) {
+        context.dataStore.edit { prefs ->
+            if (uri != null) prefs[DataStoreKeys.COIN_TAILS_IMAGE] = uri
+            else prefs.remove(DataStoreKeys.COIN_TAILS_IMAGE)
+        }
+    }
+
+    suspend fun setDiceFaceImage(face: Int, uri: String?) {
+        val key = when (face) {
+            1 -> DataStoreKeys.DICE_FACE_1_IMAGE
+            2 -> DataStoreKeys.DICE_FACE_2_IMAGE
+            3 -> DataStoreKeys.DICE_FACE_3_IMAGE
+            4 -> DataStoreKeys.DICE_FACE_4_IMAGE
+            5 -> DataStoreKeys.DICE_FACE_5_IMAGE
+            6 -> DataStoreKeys.DICE_FACE_6_IMAGE
+            else -> return
+        }
+        context.dataStore.edit { prefs ->
+            if (uri != null) prefs[key] = uri
+            else prefs.remove(key)
+        }
+    }
+
+    suspend fun clearAllCustomImages() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(DataStoreKeys.COIN_HEADS_IMAGE)
+            prefs.remove(DataStoreKeys.COIN_TAILS_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_1_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_2_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_3_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_4_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_5_IMAGE)
+            prefs.remove(DataStoreKeys.DICE_FACE_6_IMAGE)
         }
     }
 }
