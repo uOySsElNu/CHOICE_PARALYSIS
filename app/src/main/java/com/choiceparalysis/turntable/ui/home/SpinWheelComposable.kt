@@ -1,8 +1,8 @@
 package com.choiceparalysis.turntable.ui.home
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
+import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +43,7 @@ fun SpinWheel(
                 targetValue = rotationDegrees,
                 animationSpec = tween(
                     durationMillis = 3000,
-                    easing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
+                    easing = StandardEasing.EaseOutQuart
                 )
             )
         }

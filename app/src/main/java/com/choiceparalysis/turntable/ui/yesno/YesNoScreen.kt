@@ -5,6 +5,8 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
+import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -87,7 +89,11 @@ fun YesNoScreen(
 
         AnimatedVisibility(
             visibleState = visibleState,
-            enter = fadeIn(tween(500)) + scaleIn(tween(500))
+            enter = fadeIn(tween(400, easing = StandardEasing.EaseOutCubic)) +
+                    scaleIn(tween(400, easing = StandardEasing.EaseOutCubic)) +
+                    slideInVertically(
+                        tween(400, easing = StandardEasing.EaseOutCubic)
+                    ) { it / 3 }
         ) {
             result?.let { yesNoResult ->
                 Card(

@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -167,8 +168,10 @@ fun SpinWheelScreen(
             // Expandable options editor
             AnimatedVisibility(
                 visible = optionsEditorOpen,
-                enter = expandVertically(tween(300)) + fadeIn(tween(200)),
-                exit = shrinkVertically(tween(250)) + fadeOut(tween(150))
+                enter = expandVertically(tween(300, easing = StandardEasing.EaseOutCubic)) +
+                        fadeIn(tween(250, easing = StandardEasing.EaseOutCubic)),
+                exit = shrinkVertically(tween(250, easing = StandardEasing.EaseInCubic)) +
+                       fadeOut(tween(200, easing = StandardEasing.EaseInCubic))
             ) {
                 OptionsEditorPanel(
                     options = options,
