@@ -202,7 +202,7 @@ fun SettingsScreen(
                             8. 联系我们
 
                             如有任何隐私相关问题，请在 GitHub 上提交 Issue：
-                            https://github.com/uOySsElNu/CHOICEPARALYSIS/issues
+                            https://github.com/uOySsElNu/CHOICE_PARALYSIS/issues
                         """.trimIndent()
                     )
                 }
@@ -264,7 +264,7 @@ fun SettingsScreen(
                             6. 源代码
 
                             本应用完整源代码可在以下地址获取：
-                            https://github.com/uOySsElNu/CHOICEPARALYSIS
+                            https://github.com/uOySsElNu/CHOICE_PARALYSIS
 
                             7. 适用法律
 
