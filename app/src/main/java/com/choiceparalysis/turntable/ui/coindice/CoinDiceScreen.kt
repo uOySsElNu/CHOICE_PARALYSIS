@@ -38,7 +38,7 @@ import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.toBitmap
-import com.choiceparalysis.turntable.ui.components.AnimatedResult
+import com.choiceparalysis.turntable.ui.components.ResultToast
 import com.choiceparalysis.turntable.viewmodel.CoinDiceViewModel
 import com.choiceparalysis.turntable.viewmodel.CoinSide
 
@@ -111,122 +111,129 @@ fun CoinDiceScreen(
         viewModel.clearResults()
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    // Determine toast message
+    val toastMessage = when (mode) {
+        CoinDiceMode.COIN -> coinResult?.let {
+            "${it.displayName} ${if (it == CoinSide.HEADS) "正面朝上" else "反面朝上"}"
+        }
+        CoinDiceMode.DICE -> diceValue?.let { "点数: $it" }
+    }
+
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "硬币 & 骰子",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = { showCustomizationSheet = true }) {
-                Icon(
-                    Icons.Default.Palette,
-                    contentDescription = "自定义图片",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mode Selector
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            CoinDiceMode.entries.forEach { coinDiceMode ->
-                OutlinedButton(
-                    onClick = {
-                        if (mode != coinDiceMode) {
-                            mode = coinDiceMode
-                        }
-                    },
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "硬币 & 骰子",
+                    style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = coinDiceMode.displayName,
-                        fontWeight = if (mode == coinDiceMode) FontWeight.Bold else FontWeight.Normal
+                )
+                IconButton(onClick = { showCustomizationSheet = true }) {
+                    Icon(
+                        Icons.Default.Palette,
+                        contentDescription = "自定义图片",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mode Selector
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                CoinDiceMode.entries.forEach { coinDiceMode ->
+                    OutlinedButton(
+                        onClick = {
+                            if (mode != coinDiceMode) {
+                                mode = coinDiceMode
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = coinDiceMode.displayName,
+                            fontWeight = if (mode == coinDiceMode) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Coin or Dice
+            when (mode) {
+                CoinDiceMode.COIN -> {
+                    Coin3DFlip(
+                        result = coinResult,
+                        isAnimating = isAnimating,
+                        headsImage = headsBitmap,
+                        tailsImage = tailsBitmap,
+                        onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+
+                    Button(
+                        onClick = { viewModel.flipCoin() },
+                        enabled = !isAnimating,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(
+                            text = if (isAnimating) "翻转中..." else "抛硬币",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+
+                CoinDiceMode.DICE -> {
+                    Dice3DRoll(
+                        value = diceValue,
+                        isAnimating = isAnimating,
+                        faceImages = diceBitmaps,
+                        onAnimationComplete = { viewModel.onDiceRollAnimationComplete() },
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+
+                    Button(
+                        onClick = { viewModel.rollDice() },
+                        enabled = !isAnimating,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(
+                            text = if (isAnimating) "滚动中..." else "掷骰子",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Coin or Dice
-        when (mode) {
-            CoinDiceMode.COIN -> {
-                Coin3DFlip(
-                    result = coinResult,
-                    isAnimating = isAnimating,
-                    headsImage = headsBitmap,
-                    tailsImage = tailsBitmap,
-                    onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
-                Button(
-                    onClick = { viewModel.flipCoin() },
-                    enabled = !isAnimating,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Text(
-                        text = if (isAnimating) "翻转中..." else "抛硬币",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                coinResult?.let { result ->
-                    AnimatedResult(
-                        result = result.displayName,
-                        subtitle = if (result == CoinSide.HEADS) "正面朝上" else "反面朝上"
-                    )
-                }
-            }
-
-            CoinDiceMode.DICE -> {
-                Dice3DRoll(
-                    value = diceValue,
-                    isAnimating = isAnimating,
-                    faceImages = diceBitmaps,
-                    onAnimationComplete = { viewModel.onDiceRollAnimationComplete() },
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
-                Button(
-                    onClick = { viewModel.rollDice() },
-                    enabled = !isAnimating,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Text(
-                        text = if (isAnimating) "滚动中..." else "掷骰子",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                diceValue?.let { value ->
-                    AnimatedResult(
-                        result = value.toString(),
-                        subtitle = "点数: $value"
-                    )
-                }
-            }
+        // Result Toast
+        toastMessage?.let { message ->
+            ResultToast(
+                result = message,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 80.dp),
+                onDismiss = { viewModel.clearResults() }
+            )
         }
     }
 

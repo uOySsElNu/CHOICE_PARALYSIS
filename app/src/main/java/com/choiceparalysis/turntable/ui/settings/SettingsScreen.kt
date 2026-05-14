@@ -160,43 +160,47 @@ fun SettingsScreen(
                 )
             },
             text = {
-                Text(
-                    text = """
-                        最后更新日期：2026年5月14日
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = """
+                            最后更新日期：2026年5月14日
 
-                        选择困难症助手（以下简称"本应用"）尊重并保护您的隐私。本隐私政策说明了我们如何收集、使用和保护您的个人信息。
+                            选择困难症助手（以下简称"本应用"）尊重并保护您的隐私。本隐私政策说明了我们如何收集、使用和保护您的个人信息。
 
-                        1. 信息收集
+                            1. 信息收集
 
-                        本应用不收集任何个人身份信息。所有数据（包括选项列表、历史记录等）均存储在您的设备本地，不会上传到任何服务器。
+                            本应用不收集任何个人身份信息。所有数据（包括选项列表、历史记录等）均存储在您的设备本地，不会上传到任何服务器。
 
-                        2. 数据存储
+                            2. 数据存储
 
-                        • 选项列表：您创建的决策选项存储在设备本地
-                        • 历史记录：决策历史记录存储在设备本地
-                        • 设置偏好：应用设置存储在设备本地
+                            • 选项列表：您创建的决策选项存储在设备本地
+                            • 历史记录：决策历史记录存储在设备本地
+                            • 设置偏好：应用设置存储在设备本地
 
-                        3. 数据安全
+                            3. 数据安全
 
-                        所有数据均存储在应用私有目录中，其他应用无法访问。您可以随时通过应用内功能删除所有数据。
+                            所有数据均存储在应用私有目录中，其他应用无法访问。您可以随时通过应用内功能删除所有数据。
 
-                        4. 第三方服务
+                            4. 第三方服务
 
-                        本应用不集成任何第三方分析、广告或追踪服务。
+                            本应用不集成任何第三方分析、广告或追踪服务。
 
-                        5. 权限说明
+                            5. 权限说明
 
-                        本应用仅请求必要的存储权限，用于保存和读取用户自定义的图片资源。
+                            本应用仅请求必要的存储权限，用于保存和读取用户自定义的图片资源。
 
-                        6. 政策更新
+                            6. 政策更新
 
-                        我们可能会不时更新本隐私政策。更新后的政策将在应用内发布。
+                            我们可能会不时更新本隐私政策。更新后的政策将在应用内发布。
 
-                        7. 联系我们
+                            7. 联系我们
 
-                        如有任何隐私相关问题，请通过应用商店联系我们。
-                    """.trimIndent()
-                )
+                            如有任何隐私相关问题，请通过应用商店联系我们。
+                        """.trimIndent()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = { showPrivacyPolicy = false }) {
@@ -217,41 +221,45 @@ fun SettingsScreen(
                 )
             },
             text = {
-                Text(
-                    text = """
-                        最后更新日期：2026年5月14日
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = """
+                            最后更新日期：2026年5月14日
 
-                        欢迎使用选择困难症助手。使用本应用即表示您同意以下条款：
+                            欢迎使用选择困难症助手。使用本应用即表示您同意以下条款：
 
-                        1. 服务说明
+                            1. 服务说明
 
-                        本应用是一款决策辅助工具，提供转盘、硬币、骰子、是非选择等决策方式。本应用仅供娱乐和辅助决策使用，不保证决策结果的合理性或准确性。
+                            本应用是一款决策辅助工具，提供转盘、硬币、骰子、是非选择等决策方式。本应用仅供娱乐和辅助决策使用，不保证决策结果的合理性或准确性。
 
-                        2. 用户责任
+                            2. 用户责任
 
-                        • 您应合理使用本应用，不得将其用于任何非法目的
-                        • 您应对自己的决策负责，本应用仅提供辅助参考
-                        • 您不得尝试反编译、修改或破解本应用
+                            • 您应合理使用本应用，不得将其用于任何非法目的
+                            • 您应对自己的决策负责，本应用仅提供辅助参考
+                            • 您不得尝试反编译、修改或破解本应用
 
-                        3. 知识产权
+                            3. 知识产权
 
-                        本应用的所有内容、代码、设计均受知识产权法律保护。未经授权，不得复制、修改或分发。
+                            本应用的所有内容、代码、设计均受知识产权法律保护。未经授权，不得复制、修改或分发。
 
-                        4. 免责声明
+                            4. 免责声明
 
-                        • 本应用按"现状"提供，不作任何明示或暗示的保证
-                        • 我们不对因使用本应用而产生的任何损失承担责任
-                        • 本应用的决策结果仅供娱乐参考，不构成任何建议
+                            • 本应用按"现状"提供，不作任何明示或暗示的保证
+                            • 我们不对因使用本应用而产生的任何损失承担责任
+                            • 本应用的决策结果仅供娱乐参考，不构成任何建议
 
-                        5. 条款更新
+                            5. 条款更新
 
-                        我们保留随时修改本使用条款的权利。继续使用本应用即表示您同意修改后的条款。
+                            我们保留随时修改本使用条款的权利。继续使用本应用即表示您同意修改后的条款。
 
-                        6. 适用法律
+                            6. 适用法律
 
-                        本条款受中华人民共和国法律管辖。
-                    """.trimIndent()
-                )
+                            本条款受中华人民共和国法律管辖。
+                        """.trimIndent()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = { showTermsOfUse = false }) {
@@ -272,83 +280,87 @@ fun SettingsScreen(
                 )
             },
             text = {
-                Text(
-                    text = """
-                        本应用使用了以下开源库：
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = """
+                            本应用使用了以下开源库：
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Android Jetpack Compose
-                        版权所有 © Android Open Source Project
-                        许可证：Apache License 2.0
+                            Android Jetpack Compose
+                            版权所有 © Android Open Source Project
+                            许可证：Apache License 2.0
 
-                        Jetpack Compose 是 Android 的现代工具包，用于构建原生 UI。
+                            Jetpack Compose 是 Android 的现代工具包，用于构建原生 UI。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Material Design 3
-                        版权所有 © Google LLC
-                        许可证：Apache License 2.0
+                            Material Design 3
+                            版权所有 © Google LLC
+                            许可证：Apache License 2.0
 
-                        Material Design 是 Google 的设计系统，用于创建高质量的数字体验。
+                            Material Design 是 Google 的设计系统，用于创建高质量的数字体验。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Coil
-                        版权所有 © Coil Contributors
-                        许可证：Apache License 2.0
+                            Coil
+                            版权所有 © Coil Contributors
+                            许可证：Apache License 2.0
 
-                        Coil 是一个 Android 图片加载库，使用 Kotlin 协程构建。
+                            Coil 是一个 Android 图片加载库，使用 Kotlin 协程构建。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Kotlin
-                        版权所有 © JetBrains s.r.o.
-                        许可证：Apache License 2.0
+                            Kotlin
+                            版权所有 © JetBrains s.r.o.
+                            许可证：Apache License 2.0
 
-                        Kotlin 是一种现代、简洁、安全的编程语言。
+                            Kotlin 是一种现代、简洁、安全的编程语言。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Kotlinx Serialization
-                        版权所有 © JetBrains s.r.o.
-                        许可证：Apache License 2.0
+                            Kotlinx Serialization
+                            版权所有 © JetBrains s.r.o.
+                            许可证：Apache License 2.0
 
-                        Kotlinx Serialization 是 Kotlin 的序列化库。
+                            Kotlinx Serialization 是 Kotlin 的序列化库。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        AndroidX DataStore
-                        版权所有 © Android Open Source Project
-                        许可证：Apache License 2.0
+                            AndroidX DataStore
+                            版权所有 © Android Open Source Project
+                            许可证：Apache License 2.0
 
-                        DataStore 是一种数据存储解决方案，用于替代 SharedPreferences。
+                            DataStore 是一种数据存储解决方案，用于替代 SharedPreferences。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        AndroidX Navigation
-                        版权所有 © Android Open Source Project
-                        许可证：Apache License 2.0
+                            AndroidX Navigation
+                            版权所有 © Android Open Source Project
+                            许可证：Apache License 2.0
 
-                        Navigation 组件用于处理应用内的导航。
+                            Navigation 组件用于处理应用内的导航。
 
-                        ━━━━━━━━━━━━━━━━━━━━━━━━
+                            ━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        Apache License 2.0 摘要：
+                            Apache License 2.0 摘要：
 
-                        您可以自由地：
-                        • 使用、复制和分发本软件
-                        • 修改本软件
-                        • 在商业项目中使用本软件
+                            您可以自由地：
+                            • 使用、复制和分发本软件
+                            • 修改本软件
+                            • 在商业项目中使用本软件
 
-                        条件：
-                        • 保留版权声明和许可证
-                        • 标注修改内容
+                            条件：
+                            • 保留版权声明和许可证
+                            • 标注修改内容
 
-                        详细许可证文本请访问：
-                        https://www.apache.org/licenses/LICENSE-2.0
-                    """.trimIndent()
-                )
+                            详细许可证文本请访问：
+                            https://www.apache.org/licenses/LICENSE-2.0
+                        """.trimIndent()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = { showOpenSourceLicenses = false }) {

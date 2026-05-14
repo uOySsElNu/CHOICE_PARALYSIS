@@ -184,8 +184,15 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
             val currentOptions = _options.value
             if (currentOptions.isNotEmpty()) {
                 val segmentAngle = 360f / currentOptions.size
+                // Normalize rotation to 0-360 range
                 val normalizedRotation = ((_rotationDegrees.value % 360f) + 360f) % 360f
-                val selectedIndex = (normalizedRotation / segmentAngle).toInt() % currentOptions.size
+                // The indicator is at the top (0 degrees), wheel rotates clockwise
+                // So we need to find which segment is under the indicator after rotation
+                // The segment at 0 degrees (top) is the one that starts at -90 degrees in the drawing
+                // After rotation, the segment under the indicator is determined by:
+                // (360 - normalizedRotation) gives us the angle from the indicator to the starting point
+                val indicatorAngle = (360f - normalizedRotation) % 360f
+                val selectedIndex = ((indicatorAngle / segmentAngle).toInt()) % currentOptions.size
 
                 _result.value = currentOptions[selectedIndex]
                 _isSpinning.value = false

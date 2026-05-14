@@ -59,7 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.choiceparalysis.turntable.ui.components.AnimatedResult
+import com.choiceparalysis.turntable.ui.components.ResultToast
 import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -142,11 +142,6 @@ fun SpinWheelScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Result
-            AnimatedResult(result = result)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
             // Options editor toggle button
             ElevatedButton(
                 onClick = { viewModel.toggleOptionsEditor() },
@@ -193,6 +188,17 @@ fun SpinWheelScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+
+        // Result Toast
+        result?.let { resultText ->
+            ResultToast(
+                result = resultText,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 80.dp),
+                onDismiss = { viewModel.clearResult() }
+            )
+        }
     }
 
     // Settings bottom sheet
