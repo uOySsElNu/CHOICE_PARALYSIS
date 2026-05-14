@@ -36,8 +36,16 @@ fun SpinWheel(
 ) {
     val animatable = remember { Animatable(0f) }
 
+    // Snap to final position when composable is created with existing rotation
+    LaunchedEffect(Unit) {
+        if (rotationDegrees > 0 && !isSpinning) {
+            animatable.snapTo(rotationDegrees)
+        }
+    }
+
+    // Animate only when user initiates a spin
     LaunchedEffect(rotationDegrees) {
-        if (rotationDegrees > 0) {
+        if (isSpinning && rotationDegrees > 0) {
             animatable.snapTo(0f)
             animatable.animateTo(
                 targetValue = rotationDegrees,

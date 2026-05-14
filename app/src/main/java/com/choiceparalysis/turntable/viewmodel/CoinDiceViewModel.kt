@@ -3,7 +3,9 @@ package com.choiceparalysis.turntable.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.DecisionMethod
+import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
@@ -31,6 +33,7 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
 
     private val _pendingCoinResult = MutableStateFlow<CoinSide?>(null)
+    val pendingCoinResult: StateFlow<CoinSide?> = _pendingCoinResult.asStateFlow()
     private val _pendingDiceValue = MutableStateFlow<Int?>(null)
 
     // Custom image URIs
@@ -40,8 +43,8 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
     private val _customCoinTailsUri = MutableStateFlow<String?>(null)
     val customCoinTailsUri: StateFlow<String?> = _customCoinTailsUri.asStateFlow()
 
-    private val _customDiceUris = MutableStateFlow<Map<Int, String?>>(emptyMap())
-    val customDiceUris: StateFlow<Map<Int, String?>> = _customDiceUris.asStateFlow()
+    private val _coinPresets = MutableStateFlow<List<CoinPreset>>(emptyList())
+    val coinPresets: StateFlow<List<CoinPreset>> = _coinPresets.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -51,7 +54,10 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
             settingsRepository.coinTailsImage.collect { _customCoinTailsUri.value = it }
         }
         viewModelScope.launch {
-            settingsRepository.diceImages.collect { _customDiceUris.value = it }
+            settingsRepository.coinPresets.collect { _coinPresets.value = it }
+        }
+        viewModelScope.launch {
+            settingsRepository.ensureDefaultCoinPreset()
         }
     }
 
@@ -104,6 +110,7 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
     fun clearResults() {
         _coinResult.value = null
         _diceValue.value = null
+        _isAnimating.value = false
     }
 
     fun setCustomCoinImage(side: CoinSide, uri: String?) {
@@ -115,15 +122,33 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun setCustomDiceFace(face: Int, uri: String?) {
-        viewModelScope.launch {
-            settingsRepository.setDiceFaceImage(face, uri)
-        }
-    }
-
     fun clearAllImages() {
         viewModelScope.launch {
             settingsRepository.clearAllCustomImages()
+        }
+    }
+
+    fun saveCoinPreset(name: String) {
+        viewModelScope.launch {
+            val headsUri = _customCoinHeadsUri.value ?: return@launch
+            val tailsUri = _customCoinTailsUri.value ?: return@launch
+            settingsRepository.saveCoinPreset(
+                CoinPreset(name = name, headsImagePath = headsUri, tailsImagePath = tailsUri)
+            )
+        }
+    }
+
+    fun deleteCoinPreset(id: String) {
+        if (id == DEFAULT_PRESET_ID) return
+        viewModelScope.launch {
+            settingsRepository.deleteCoinPreset(id)
+        }
+    }
+
+    fun loadCoinPreset(preset: CoinPreset) {
+        viewModelScope.launch {
+            settingsRepository.setCoinHeadsImage(preset.headsImagePath)
+            settingsRepository.setCoinTailsImage(preset.tailsImagePath)
         }
     }
 }

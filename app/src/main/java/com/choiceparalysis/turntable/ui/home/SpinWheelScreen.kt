@@ -46,6 +46,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,9 +58,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.choiceparalysis.turntable.ui.components.ResultToast
 import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,6 +83,7 @@ fun SpinWheelScreen(
     var showSaveGroupDialog by remember { mutableStateOf(false) }
     var showLoadGroupDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -188,16 +191,13 @@ fun SpinWheelScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
 
-        // Result Toast
+    // Show Android Toast for result
+    LaunchedEffect(result) {
         result?.let { resultText ->
-            ResultToast(
-                result = resultText,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 80.dp),
-                onDismiss = { viewModel.clearResult() }
-            )
+            Toast.makeText(context, resultText, Toast.LENGTH_SHORT).show()
+            viewModel.clearResult()
         }
     }
 

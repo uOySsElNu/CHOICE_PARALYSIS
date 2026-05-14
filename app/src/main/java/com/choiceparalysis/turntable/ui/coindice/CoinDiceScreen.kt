@@ -17,6 +17,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
+import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,12 +42,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.toBitmap
-import com.choiceparalysis.turntable.ui.components.ResultToast
+import android.graphics.BitmapFactory
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.viewmodel.CoinDiceViewModel
 import com.choiceparalysis.turntable.viewmodel.CoinSide
 
@@ -54,16 +65,24 @@ fun CoinDiceScreen(
 ) {
     var mode by remember { mutableStateOf(CoinDiceMode.COIN) }
     val coinResult by viewModel.coinResult.collectAsState()
+    val pendingCoinResult by viewModel.pendingCoinResult.collectAsState()
     val diceValue by viewModel.diceValue.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val customCoinHeadsUri by viewModel.customCoinHeadsUri.collectAsState()
     val customCoinTailsUri by viewModel.customCoinTailsUri.collectAsState()
-    val customDiceUris by viewModel.customDiceUris.collectAsState()
     var showCustomizationSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
-    // Load coin images
+    // Default coin images
+    val defaultHeadsBitmap = remember {
+        BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads).asImageBitmap()
+    }
+    val defaultTailsBitmap = remember {
+        BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_tails).asImageBitmap()
+    }
+
+    // Load coin images with fallback to defaults
     val headsBitmap by produceState<ImageBitmap?>(null, customCoinHeadsUri) {
         value = customCoinHeadsUri?.let { uri ->
             val loader = ImageLoader(context)
@@ -74,7 +93,7 @@ fun CoinDiceScreen(
             if (result is SuccessResult) {
                 result.image.toBitmap().asImageBitmap()
             } else null
-        }
+        } ?: defaultHeadsBitmap
     }
 
     val tailsBitmap by produceState<ImageBitmap?>(null, customCoinTailsUri) {
@@ -87,23 +106,7 @@ fun CoinDiceScreen(
             if (result is SuccessResult) {
                 result.image.toBitmap().asImageBitmap()
             } else null
-        }
-    }
-
-    // Load dice images
-    val diceBitmaps by produceState<Map<Int, ImageBitmap>>(emptyMap(), customDiceUris) {
-        value = customDiceUris.mapValues { (_, uri) ->
-            uri?.let { uriString ->
-                val loader = ImageLoader(context)
-                val request = ImageRequest.Builder(context)
-                    .data(uriString)
-                    .build()
-                val result = loader.execute(request)
-                if (result is SuccessResult) {
-                    result.image.toBitmap().asImageBitmap()
-                } else null
-            }
-        }.filterValues { it != null }.mapValues { it.value!! }
+        } ?: defaultTailsBitmap
     }
 
     // Clear results when switching modes
@@ -114,7 +117,7 @@ fun CoinDiceScreen(
     // Determine toast message
     val toastMessage = when (mode) {
         CoinDiceMode.COIN -> coinResult?.let {
-            "${it.displayName} ${if (it == CoinSide.HEADS) "正面朝上" else "反面朝上"}"
+            if (it == CoinSide.HEADS) "正面朝上" else "反面朝上"
         }
         CoinDiceMode.DICE -> diceValue?.let { "点数: $it" }
     }
@@ -172,68 +175,81 @@ fun CoinDiceScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Coin or Dice
-            when (mode) {
-                CoinDiceMode.COIN -> {
-                    Coin3DFlip(
-                        result = coinResult,
-                        isAnimating = isAnimating,
-                        headsImage = headsBitmap,
-                        tailsImage = tailsBitmap,
-                        onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
+            // Coin or Dice with transition animation
+            AnimatedContent(
+                targetState = mode,
+                transitionSpec = {
+                    (fadeIn(tween(500, easing = StandardEasing.EaseInOutQuart)) +
+                     scaleIn(tween(500, easing = StandardEasing.EaseInOutQuart))) togetherWith
+                    (fadeOut(tween(500, easing = StandardEasing.EaseInOutQuart)) +
+                     scaleOut(tween(500, easing = StandardEasing.EaseInOutQuart))) using
+                    SizeTransform(clip = false)
+                },
+                label = "modeSwitch"
+            ) { targetMode ->
+                when (targetMode) {
+                    CoinDiceMode.COIN -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Coin3DFlip(
+                                result = coinResult,
+                                pendingResult = pendingCoinResult,
+                                isAnimating = isAnimating,
+                                headsImage = headsBitmap,
+                                tailsImage = tailsBitmap,
+                                onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
+                                modifier = Modifier.padding(bottom = 24.dp)
+                            )
 
-                    Button(
-                        onClick = { viewModel.flipCoin() },
-                        enabled = !isAnimating,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    ) {
-                        Text(
-                            text = if (isAnimating) "翻转中..." else "抛硬币",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                            Button(
+                                onClick = { viewModel.flipCoin() },
+                                enabled = !isAnimating,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                            ) {
+                                Text(
+                                    text = if (isAnimating) "翻转中..." else "抛硬币",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
                     }
-                }
 
-                CoinDiceMode.DICE -> {
-                    Dice3DRoll(
-                        value = diceValue,
-                        isAnimating = isAnimating,
-                        faceImages = diceBitmaps,
-                        onAnimationComplete = { viewModel.onDiceRollAnimationComplete() },
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
+                    CoinDiceMode.DICE -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Dice3DRoll(
+                                value = diceValue,
+                                isAnimating = isAnimating,
+                                onAnimationComplete = { viewModel.onDiceRollAnimationComplete() },
+                                modifier = Modifier.padding(bottom = 24.dp)
+                            )
 
-                    Button(
-                        onClick = { viewModel.rollDice() },
-                        enabled = !isAnimating,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    ) {
-                        Text(
-                            text = if (isAnimating) "滚动中..." else "掷骰子",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                            Button(
+                                onClick = { viewModel.rollDice() },
+                                enabled = !isAnimating,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                            ) {
+                                Text(
+                                    text = if (isAnimating) "滚动中..." else "掷骰子",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
 
-        // Result Toast
+    // Show Android Toast for result
+    LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
-            ResultToast(
-                result = message,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 80.dp),
-                onDismiss = { viewModel.clearResults() }
-            )
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.clearResults()
         }
     }
 

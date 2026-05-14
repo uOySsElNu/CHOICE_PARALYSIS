@@ -18,10 +18,5 @@ object DataStoreKeys {
     val OPTION_GROUPS = stringPreferencesKey("option_groups")
     val COIN_HEADS_IMAGE = stringPreferencesKey("coin_heads_image")
     val COIN_TAILS_IMAGE = stringPreferencesKey("coin_tails_image")
-    val DICE_FACE_1_IMAGE = stringPreferencesKey("dice_face_1_image")
-    val DICE_FACE_2_IMAGE = stringPreferencesKey("dice_face_2_image")
-    val DICE_FACE_3_IMAGE = stringPreferencesKey("dice_face_3_image")
-    val DICE_FACE_4_IMAGE = stringPreferencesKey("dice_face_4_image")
-    val DICE_FACE_5_IMAGE = stringPreferencesKey("dice_face_5_image")
-    val DICE_FACE_6_IMAGE = stringPreferencesKey("dice_face_6_image")
+    val COIN_PRESETS = stringPreferencesKey("coin_presets")
 }

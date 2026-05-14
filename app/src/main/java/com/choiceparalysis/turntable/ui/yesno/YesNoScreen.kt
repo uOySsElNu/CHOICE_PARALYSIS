@@ -13,13 +13,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.choiceparalysis.turntable.ui.components.ResultToast
 import com.choiceparalysis.turntable.viewmodel.YesNoResult
 import com.choiceparalysis.turntable.viewmodel.YesNoViewModel
 
@@ -31,6 +33,7 @@ fun YesNoScreen(
     val result by viewModel.result.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val customQuestion by viewModel.customQuestion.collectAsState()
+    val context = LocalContext.current
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -75,17 +78,14 @@ fun YesNoScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
 
-        // Result Toast
+    // Show Android Toast for result
+    LaunchedEffect(result) {
         result?.let { yesNoResult ->
             val displayText = "${yesNoResult.emoji} ${yesNoResult.displayName}"
-            ResultToast(
-                result = displayText,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 80.dp),
-                onDismiss = { viewModel.clearResult() }
-            )
+            Toast.makeText(context, displayText, Toast.LENGTH_SHORT).show()
+            viewModel.clearResult()
         }
     }
 }

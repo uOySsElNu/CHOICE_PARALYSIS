@@ -1,11 +1,16 @@
 package com.choiceparalysis.turntable.data.repository
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import androidx.datastore.preferences.core.edit
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.datastore.DataStoreKeys
 import com.choiceparalysis.turntable.data.datastore.dataStore
+import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.OptionGroup
+import com.choiceparalysis.turntable.ui.coindice.CircularCropUtil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -43,15 +48,9 @@ class SettingsRepository(private val context: Context) {
         prefs[DataStoreKeys.COIN_TAILS_IMAGE]
     }
 
-    val diceImages: Flow<Map<Int, String?>> = context.dataStore.data.map { prefs ->
-        mapOf(
-            1 to prefs[DataStoreKeys.DICE_FACE_1_IMAGE],
-            2 to prefs[DataStoreKeys.DICE_FACE_2_IMAGE],
-            3 to prefs[DataStoreKeys.DICE_FACE_3_IMAGE],
-            4 to prefs[DataStoreKeys.DICE_FACE_4_IMAGE],
-            5 to prefs[DataStoreKeys.DICE_FACE_5_IMAGE],
-            6 to prefs[DataStoreKeys.DICE_FACE_6_IMAGE],
-        )
+    val coinPresets: Flow<List<CoinPreset>> = context.dataStore.data.map { prefs ->
+        val json = prefs[DataStoreKeys.COIN_PRESETS] ?: "[]"
+        runCatching { Json.decodeFromString<List<CoinPreset>>(json) }.getOrElse { emptyList() }
     }
 
     suspend fun setDynamicColorEnabled(enabled: Boolean) {
@@ -112,32 +111,60 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
-    suspend fun setDiceFaceImage(face: Int, uri: String?) {
-        val key = when (face) {
-            1 -> DataStoreKeys.DICE_FACE_1_IMAGE
-            2 -> DataStoreKeys.DICE_FACE_2_IMAGE
-            3 -> DataStoreKeys.DICE_FACE_3_IMAGE
-            4 -> DataStoreKeys.DICE_FACE_4_IMAGE
-            5 -> DataStoreKeys.DICE_FACE_5_IMAGE
-            6 -> DataStoreKeys.DICE_FACE_6_IMAGE
-            else -> return
-        }
-        context.dataStore.edit { prefs ->
-            if (uri != null) prefs[key] = uri
-            else prefs.remove(key)
-        }
-    }
-
     suspend fun clearAllCustomImages() {
         context.dataStore.edit { prefs ->
             prefs.remove(DataStoreKeys.COIN_HEADS_IMAGE)
             prefs.remove(DataStoreKeys.COIN_TAILS_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_1_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_2_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_3_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_4_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_5_IMAGE)
-            prefs.remove(DataStoreKeys.DICE_FACE_6_IMAGE)
         }
+    }
+
+    suspend fun saveCoinPreset(preset: CoinPreset) {
+        context.dataStore.edit { prefs ->
+            val current = runCatching {
+                Json.decodeFromString<List<CoinPreset>>(prefs[DataStoreKeys.COIN_PRESETS] ?: "[]")
+            }.getOrElse { emptyList() }
+            val updated = current.filter { it.id != preset.id } + preset
+            prefs[DataStoreKeys.COIN_PRESETS] = Json.encodeToString(updated)
+        }
+    }
+
+    suspend fun deleteCoinPreset(id: String) {
+        context.dataStore.edit { prefs ->
+            val current = runCatching {
+                Json.decodeFromString<List<CoinPreset>>(prefs[DataStoreKeys.COIN_PRESETS] ?: "[]")
+            }.getOrElse { emptyList() }
+            val updated = current.filter { it.id != id }
+            prefs[DataStoreKeys.COIN_PRESETS] = Json.encodeToString(updated)
+        }
+    }
+
+    companion object {
+        const val DEFAULT_PRESET_ID = "default_tom_jerry"
+    }
+
+    suspend fun ensureDefaultCoinPreset() {
+        val presets = coinPresets.first()
+        if (presets.any { it.id == DEFAULT_PRESET_ID }) return
+
+        // Load drawable resources and crop to circles
+        val headsBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads)
+        val tailsBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_tails)
+
+        val croppedHeads = CircularCropUtil.cropToCircle(headsBitmap, 0.5f, 0.5f, 0.5f)
+        val croppedTails = CircularCropUtil.cropToCircle(tailsBitmap, 0.5f, 0.5f, 0.5f)
+
+        val headsPath = CircularCropUtil.saveToInternalStorage(context, croppedHeads, "default_heads.png")
+        val tailsPath = CircularCropUtil.saveToInternalStorage(context, croppedTails, "default_tails.png")
+
+        headsBitmap.recycle()
+        tailsBitmap.recycle()
+
+        val defaultPreset = CoinPreset(
+            id = DEFAULT_PRESET_ID,
+            name = "Tom & Jerry",
+            headsImagePath = headsPath,
+            tailsImagePath = tailsPath,
+        )
+        saveCoinPreset(defaultPreset)
     }
 }
