@@ -64,12 +64,12 @@ Choice Paralysis is an open-source Android app designed for people who struggle 
 
 ### Installation
 
-Download the latest APK from [Releases](https://github.com/uOySsElNu/CHOICEPARALYSIS/releases) and install on your Android device.
+Download the latest APK from [Releases](https://github.com/uOySsElNu/CHOICE_PARALYSIS/releases) and install on your Android device.
 
 Or build from source:
 
 ```bash
-git clone https://github.com/uOySsElNu/CHOICEPARALYSIS.git
+git clone https://github.com/uOySsElNu/CHOICE_PARALYSIS.git
 ```
 
 Open in Android Studio and run on device or emulator (API 34+).
@@ -140,12 +140,12 @@ Open in Android Studio and run on device or emulator (API 34+).
 
 ### 安装方法
 
-从 [Releases](https://github.com/uOySsElNu/CHOICEPARALYSIS/releases) 页面下载最新 APK 安装到 Android 设备。
+从 [Releases](https://github.com/uOySsElNu/CHOICE_PARALYSIS/releases) 页面下载最新 APK 安装到 Android 设备。
 
 或从源码构建：
 
 ```bash
-git clone https://github.com/uOySsElNu/CHOICEPARALYSIS.git
+git clone https://github.com/uOySsElNu/CHOICE_PARALYSIS.git
 ```
 
 使用 Android Studio 打开项目，在设备或模拟器上运行（API 34+）。
