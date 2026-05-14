@@ -28,6 +28,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
+import coil3.toBitmap
 import com.choiceparalysis.turntable.ui.components.AnimatedResult
 import com.choiceparalysis.turntable.viewmodel.CoinDiceViewModel
 import com.choiceparalysis.turntable.viewmodel.CoinSide
@@ -70,7 +72,7 @@ fun CoinDiceScreen(
                 .build()
             val result = loader.execute(request)
             if (result is SuccessResult) {
-                (result.image as? ImageBitmap)
+                result.image.toBitmap().asImageBitmap()
             } else null
         }
     }
@@ -83,7 +85,7 @@ fun CoinDiceScreen(
                 .build()
             val result = loader.execute(request)
             if (result is SuccessResult) {
-                (result.image as? ImageBitmap)
+                result.image.toBitmap().asImageBitmap()
             } else null
         }
     }
@@ -98,7 +100,7 @@ fun CoinDiceScreen(
                     .build()
                 val result = loader.execute(request)
                 if (result is SuccessResult) {
-                    (result.image as? ImageBitmap)
+                    result.image.toBitmap().asImageBitmap()
                 } else null
             }
         }.filterValues { it != null }.mapValues { it.value!! }
