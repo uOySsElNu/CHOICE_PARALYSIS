@@ -9,6 +9,7 @@ import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class YesNoResult(val displayName: String, val emoji: String) {
@@ -39,7 +40,7 @@ class YesNoViewModel(application: Application) : AndroidViewModel(application) {
         _result.value = null
 
         viewModelScope.launch {
-            kotlinx.coroutines.delay(1000) // Animation time
+            delay(1000) // Animation time
             val random = Math.random()
             val result = when {
                 random < 0.45 -> YesNoResult.YES

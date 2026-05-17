@@ -6,6 +6,7 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -176,15 +177,17 @@ fun Dice3DRoll(
     val showTop = if (isSpinning) spinTop else topVal
     val showRight = if (isSpinning) spinRight else rightVal
 
-    Canvas(
-        modifier = modifier
-            .size(225.dp)
-            .graphicsLayer {
-                translationY = bounceAnim.value + breathAnim.value * -6f
-                scaleX = scaleAnim.value * popAnim.value
-                scaleY = scaleAnim.value * popAnim.value
-            }
-    ) {
+    BoxWithConstraints(modifier = modifier) {
+        val diceSize = minOf(maxWidth, 225.dp)
+        Canvas(
+            modifier = Modifier
+                .size(diceSize)
+                .graphicsLayer {
+                    translationY = bounceAnim.value + breathAnim.value * -6f
+                    scaleX = scaleAnim.value * popAnim.value
+                    scaleY = scaleAnim.value * popAnim.value
+                }
+        ) {
         val sizeCube = size.width * 0.35f
         val depth = sizeCube * 0.6f
         val cx = size.width / 2f - depth * 0.5f
@@ -255,6 +258,7 @@ fun Dice3DRoll(
         if (isAnimating && rotationAnim.value < 300f) {
             val alpha = 0.2f * (1f - rotationAnim.value / 300f)
             drawRect(Color.White.copy(alpha), topLeft = frontTL, size = Size(sizeCube * 2, sizeCube * 2))
+        }
         }
     }
 }

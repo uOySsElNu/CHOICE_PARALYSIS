@@ -19,4 +19,6 @@ object DataStoreKeys {
     val COIN_HEADS_IMAGE = stringPreferencesKey("coin_heads_image")
     val COIN_TAILS_IMAGE = stringPreferencesKey("coin_tails_image")
     val COIN_PRESETS = stringPreferencesKey("coin_presets")
+    val OPTION_WEIGHTS = stringPreferencesKey("option_weights")
+    val FOLLOW_SYSTEM_THEME = stringPreferencesKey("follow_system_theme")
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -11,11 +12,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.navigation.AppDestinations
 import com.choiceparalysis.turntable.navigation.AppNavGraph
 import com.choiceparalysis.turntable.ui.theme.CHOICEPARALYSISTheme
@@ -25,7 +29,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CHOICEPARALYSISTheme {
+            val context = LocalContext.current
+            val followSystem by SettingsRepository(context).followSystemTheme
+                .collectAsState(initial = true)
+            val darkTheme = if (followSystem) isSystemInDarkTheme() else false
+            CHOICEPARALYSISTheme(darkTheme = darkTheme) {
                 ChoiceParalysisApp()
             }
         }

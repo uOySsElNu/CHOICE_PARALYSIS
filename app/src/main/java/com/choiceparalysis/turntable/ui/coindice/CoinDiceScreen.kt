@@ -1,11 +1,14 @@
 package com.choiceparalysis.turntable.ui.coindice
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -22,11 +25,12 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
@@ -74,38 +80,45 @@ fun CoinDiceScreen(
 
     val context = LocalContext.current
 
-    // Default coin images
-    val defaultHeadsBitmap = remember {
-        BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads).asImageBitmap()
+    // Shake detection: only triggers dice roll
+    DisposableEffect(mode, isAnimating) {
+        val shakeDetector = ShakeDetector(context) {
+            if (!isAnimating && mode == CoinDiceMode.DICE) {
+                viewModel.rollDice()
+            }
+        }
+        shakeDetector.start()
+        onDispose { shakeDetector.stop() }
     }
-    val defaultTailsBitmap = remember {
-        BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_tails).asImageBitmap()
+
+    // Default coin images（IO 线程加载，不阻塞主线程）
+    val defaultHeadsBitmap by produceState<ImageBitmap?>(null) {
+        value = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads).asImageBitmap()
+        }
+    }
+    val defaultTailsBitmap by produceState<ImageBitmap?>(null) {
+        value = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_tails).asImageBitmap()
+        }
     }
 
     // Load coin images with fallback to defaults
-    val headsBitmap by produceState<ImageBitmap?>(null, customCoinHeadsUri) {
+    val headsBitmap by produceState<ImageBitmap?>(null, customCoinHeadsUri, defaultHeadsBitmap) {
         value = customCoinHeadsUri?.let { uri ->
             val loader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(uri)
-                .build()
-            val result = loader.execute(request)
-            if (result is SuccessResult) {
-                result.image.toBitmap().asImageBitmap()
-            } else null
+            val request = ImageRequest.Builder(context).data(uri).build()
+            val result = withContext(Dispatchers.IO) { loader.execute(request) }
+            if (result is SuccessResult) result.image.toBitmap().asImageBitmap() else null
         } ?: defaultHeadsBitmap
     }
 
-    val tailsBitmap by produceState<ImageBitmap?>(null, customCoinTailsUri) {
+    val tailsBitmap by produceState<ImageBitmap?>(null, customCoinTailsUri, defaultTailsBitmap) {
         value = customCoinTailsUri?.let { uri ->
             val loader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(uri)
-                .build()
-            val result = loader.execute(request)
-            if (result is SuccessResult) {
-                result.image.toBitmap().asImageBitmap()
-            } else null
+            val request = ImageRequest.Builder(context).data(uri).build()
+            val result = withContext(Dispatchers.IO) { loader.execute(request) }
+            if (result is SuccessResult) result.image.toBitmap().asImageBitmap() else null
         } ?: defaultTailsBitmap
     }
 
@@ -128,7 +141,8 @@ fun CoinDiceScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -173,16 +187,17 @@ fun CoinDiceScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Coin or Dice with transition animation
+            // Coin or Dice with slide transition
             AnimatedContent(
                 targetState = mode,
                 transitionSpec = {
-                    (fadeIn(tween(500, easing = StandardEasing.EaseInOutQuart)) +
-                     scaleIn(tween(500, easing = StandardEasing.EaseInOutQuart))) togetherWith
-                    (fadeOut(tween(500, easing = StandardEasing.EaseInOutQuart)) +
-                     scaleOut(tween(500, easing = StandardEasing.EaseInOutQuart))) using
+                    val direction = if (targetState.ordinal > initialState.ordinal) 1 else -1
+                    (slideInHorizontally(tween(400, easing = StandardEasing.EaseOutQuart)) { it * direction } +
+                     fadeIn(tween(300))) togetherWith
+                    (slideOutHorizontally(tween(400, easing = StandardEasing.EaseOutQuart)) { -it * direction } +
+                     fadeOut(tween(300))) using
                     SizeTransform(clip = false)
                 },
                 label = "modeSwitch"
@@ -197,6 +212,7 @@ fun CoinDiceScreen(
                                 headsImage = headsBitmap,
                                 tailsImage = tailsBitmap,
                                 onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
+                                onDragFlipComplete = { viewModel.flipCoinDirectly(it) },
                                 modifier = Modifier.padding(bottom = 24.dp)
                             )
 

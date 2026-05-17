@@ -12,6 +12,7 @@ import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.ui.home.TimeBasedColorGenerator
 import com.choiceparalysis.turntable.ui.home.WheelColorScheme
 import com.choiceparalysis.turntable.ui.home.WheelDesign
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,14 +26,11 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
     private val settingsRepository = SettingsRepository(application)
     private val historyRepository = HistoryRepository(application)
 
-    private val _isSpinning = MutableStateFlow(false)
-    val isSpinning: StateFlow<Boolean> = _isSpinning.asStateFlow()
-
     private val _result = MutableStateFlow<String?>(null)
     val result: StateFlow<String?> = _result.asStateFlow()
 
-    private val _rotationDegrees = MutableStateFlow(0f)
-    val rotationDegrees: StateFlow<Float> = _rotationDegrees.asStateFlow()
+    private val _isAnimating = MutableStateFlow(false)
+    val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
 
     private val _optionsEditorOpen = MutableStateFlow(false)
     val optionsEditorOpen: StateFlow<Boolean> = _optionsEditorOpen.asStateFlow()
@@ -40,15 +38,18 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
     private val _options = MutableStateFlow(listOf("Yes", "No"))
     val options: StateFlow<List<String>> = _options.asStateFlow()
 
+    private val _weights = MutableStateFlow(listOf(1, 1))
+    val weights: StateFlow<List<Int>> = _weights.asStateFlow()
+
     // Settings flows
-    val dynamicColorEnabled: StateFlow<Boolean> = settingsRepository.dynamicColorEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    private val _dynamicColorEnabled = MutableStateFlow(true)
+    val dynamicColorEnabled: StateFlow<Boolean> = _dynamicColorEnabled.asStateFlow()
 
     val selectedPresetName: StateFlow<String> = settingsRepository.selectedPreset
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "CLASSIC_RAINBOW")
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "CLASSIC_RAINBOW")
 
-    val customColors: StateFlow<List<Int>> = settingsRepository.customColors
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _customColors = MutableStateFlow<List<Int>>(emptyList())
+    val customColors: StateFlow<List<Int>> = _customColors.asStateFlow()
 
     val optionGroups: StateFlow<List<OptionGroup>> = settingsRepository.optionGroups
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -63,22 +64,35 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         buildColorScheme(dynamic, preset, custom, opts.size)
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
+        SharingStarted.Eagerly,
         TimeBasedColorGenerator.generateColorScheme(2)
     )
 
     init {
-        // Load persisted options
         viewModelScope.launch {
             settingsRepository.currentOptions.collect { loaded ->
                 _options.value = loaded
             }
         }
-        // Refresh dynamic colors every minute
+        viewModelScope.launch {
+            settingsRepository.currentWeights.collect { loaded ->
+                _weights.value = loaded
+            }
+        }
+        viewModelScope.launch {
+            settingsRepository.dynamicColorEnabled.collect { enabled ->
+                _dynamicColorEnabled.value = enabled
+            }
+        }
+        viewModelScope.launch {
+            settingsRepository.customColors.collect { colors ->
+                _customColors.value = colors
+            }
+        }
         viewModelScope.launch {
             while (true) {
                 delay(60_000)
-                if (dynamicColorEnabled.value) {
+                if (_dynamicColorEnabled.value) {
                     _options.value = _options.value.toList()
                 }
             }
@@ -92,12 +106,16 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         optionCount: Int,
     ): WheelColorScheme = when {
         dynamic -> TimeBasedColorGenerator.generateColorScheme(optionCount)
-        custom.isNotEmpty() -> WheelColorScheme(
-            segmentColors = custom.take(optionCount).map { Color(it) },
-            borderColor = Color.White,
-            textColor = Color.White,
-            indicatorColor = Color(custom.firstOrNull() ?: 0xFF6200EA.toInt()),
-        )
+        custom.isNotEmpty() -> {
+            val design = runCatching { WheelDesign.valueOf(preset) }.getOrNull()
+                ?: WheelDesign.CLASSIC_RAINBOW
+            WheelColorScheme(
+                segmentColors = custom.take(optionCount).map { Color(it) },
+                borderColor = Color.White,
+                textColor = Color.White,
+                indicatorColor = design.indicatorColor,
+            )
+        }
         else -> {
             val design = runCatching { WheelDesign.valueOf(preset) }.getOrNull()
                 ?: WheelDesign.CLASSIC_RAINBOW
@@ -114,6 +132,10 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         _optionsEditorOpen.value = !_optionsEditorOpen.value
     }
 
+    fun setAnimating(value: Boolean) {
+        _isAnimating.value = value
+    }
+
     fun updateOptions(newOptions: List<String>) {
         _options.value = newOptions
         viewModelScope.launch { settingsRepository.setCurrentOptions(newOptions) }
@@ -123,6 +145,8 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         val current = _options.value
         if (current.size < 10) {
             updateOptions(current + "选项${current.size + 1}")
+            _weights.value = _weights.value + 1
+            viewModelScope.launch { settingsRepository.setCurrentWeights(_weights.value) }
         }
     }
 
@@ -131,6 +155,12 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         if (current.size > 2 && index in current.indices) {
             current.removeAt(index)
             updateOptions(current)
+            val w = _weights.value.toMutableList()
+            if (index in w.indices && w.size > 2) {
+                w.removeAt(index)
+                _weights.value = w
+                viewModelScope.launch { settingsRepository.setCurrentWeights(w) }
+            }
         }
     }
 
@@ -142,23 +172,52 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun updateWeight(index: Int, weight: Int) {
+        val current = _weights.value.toMutableList()
+        while (current.size <= index) current.add(1)
+        current[index] = weight.coerceIn(1, 10)
+        _weights.value = current
+        viewModelScope.launch { settingsRepository.setCurrentWeights(current) }
+    }
+
     fun saveOptionGroup(name: String) {
         viewModelScope.launch {
             settingsRepository.saveOptionGroup(
-                OptionGroup(name = name, options = _options.value)
+                OptionGroup(name = name, options = _options.value, weights = _weights.value)
             )
         }
     }
 
     fun loadOptionGroup(group: OptionGroup) {
         updateOptions(group.options)
+        val w = group.weights.ifEmpty { group.options.map { 1 } }
+        _weights.value = w
+        viewModelScope.launch { settingsRepository.setCurrentWeights(w) }
     }
 
     fun deleteOptionGroup(id: String) {
         viewModelScope.launch { settingsRepository.deleteOptionGroup(id) }
     }
 
+    fun onSpinResult(selectedOption: String) {
+        _result.value = selectedOption
+        viewModelScope.launch {
+            historyRepository.addEntry(
+                HistoryEntry(
+                    method = DecisionMethod.SPIN_WHEEL,
+                    options = _options.value,
+                    result = selectedOption,
+                )
+            )
+        }
+    }
+
+    fun clearResult() {
+        _result.value = null
+    }
+
     suspend fun setDynamicColorEnabled(enabled: Boolean) {
+        _dynamicColorEnabled.value = enabled
         settingsRepository.setDynamicColorEnabled(enabled)
     }
 
@@ -167,50 +226,27 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     suspend fun setCustomColors(colors: List<Int>) {
+        _customColors.value = colors
         settingsRepository.setCustomColors(colors)
     }
 
-    fun spin() {
-        if (_isSpinning.value || _options.value.isEmpty()) return
-
-        _isSpinning.value = true
-        _result.value = null
-
-        val randomDegrees = (720..1440).random().toFloat() + (0..360).random().toFloat()
-        _rotationDegrees.value = _rotationDegrees.value + randomDegrees
-
-        viewModelScope.launch {
-            delay(3000)
-            val currentOptions = _options.value
-            if (currentOptions.isNotEmpty()) {
-                val segmentAngle = 360f / currentOptions.size
-                // Normalize rotation to 0-360 range
-                val normalizedRotation = ((_rotationDegrees.value % 360f) + 360f) % 360f
-                // The indicator is at the top (0 degrees), wheel rotates clockwise
-                // So we need to find which segment is under the indicator after rotation
-                // The segment at 0 degrees (top) is the one that starts at -90 degrees in the drawing
-                // After rotation, the segment under the indicator is determined by:
-                // (360 - normalizedRotation) gives us the angle from the indicator to the starting point
-                val indicatorAngle = (360f - normalizedRotation) % 360f
-                val selectedIndex = ((indicatorAngle / segmentAngle).toInt()) % currentOptions.size
-
-                _result.value = currentOptions[selectedIndex]
-                _isSpinning.value = false
-
-                historyRepository.addEntry(
-                    HistoryEntry(
-                        method = DecisionMethod.SPIN_WHEEL,
-                        options = currentOptions,
-                        result = currentOptions[selectedIndex],
-                    )
-                )
-            } else {
-                _isSpinning.value = false
-            }
+    fun updateOptionColor(index: Int, color: Int) {
+        val current = _customColors.value.toMutableList()
+        val design = runCatching { WheelDesign.valueOf(selectedPresetName.value) }.getOrNull()
+            ?: WheelDesign.CLASSIC_RAINBOW
+        while (current.size <= index) {
+            current.add(design.getColorForIndex(current.size).toArgb())
         }
+        current[index] = color
+        _customColors.value = current
+        viewModelScope.launch { settingsRepository.setCustomColors(current) }
     }
+}
 
-    fun clearResult() {
-        _result.value = null
-    }
+private fun Color.toArgb(): Int {
+    val a = (alpha * 255).roundToInt()
+    val r = (red * 255).roundToInt()
+    val g = (green * 255).roundToInt()
+    val b = (blue * 255).roundToInt()
+    return (a shl 24) or (r shl 16) or (g shl 8) or b
 }

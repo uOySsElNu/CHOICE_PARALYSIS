@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -29,7 +31,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
 import kotlinx.coroutines.launch
 
@@ -52,6 +58,7 @@ fun WheelSettingsSheet(
     val options by viewModel.options.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
+    var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -60,6 +67,7 @@ fun WheelSettingsSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
@@ -150,7 +158,6 @@ fun WheelSettingsSheet(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
                         )
-                        // Simple color swatch (full color picker is out of scope for bottom sheet)
                         val color = if (index < customColors.size) {
                             Color(customColors[index])
                         } else {
@@ -162,6 +169,7 @@ fun WheelSettingsSheet(
                                 .clip(CircleShape)
                                 .background(color)
                                 .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                                .clickable { colorPickerIndex = index }
                         )
                     }
                 }
@@ -183,6 +191,24 @@ fun WheelSettingsSheet(
                 )
             }
         }
+    }
+
+    // Color picker dialog
+    val editingIndex = colorPickerIndex
+    if (editingIndex != null) {
+        val currentColor = if (editingIndex < customColors.size) {
+            Color(customColors[editingIndex])
+        } else {
+            WheelDesign.CLASSIC_RAINBOW.getColorForIndex(editingIndex)
+        }
+        ColorPickerDialog(
+            initialColor = currentColor,
+            onConfirm = { color ->
+                scope.launch { viewModel.updateOptionColor(editingIndex, color.toArgb()) }
+                colorPickerIndex = null
+            },
+            onDismiss = { colorPickerIndex = null }
+        )
     }
 }
 
@@ -230,4 +256,12 @@ private fun PresetThemeChip(
             style = MaterialTheme.typography.labelMedium
         )
     }
+}
+
+private fun Color.toArgb(): Int {
+    val a = (alpha * 255).roundToInt()
+    val r = (red * 255).roundToInt()
+    val g = (green * 255).roundToInt()
+    val b = (blue * 255).roundToInt()
+    return (a shl 24) or (r shl 16) or (g shl 8) or b
 }

@@ -84,6 +84,22 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /** Drag-triggered flip: record result without triggering button animation */
+    fun flipCoinDirectly(result: CoinSide) {
+        _pendingCoinResult.value = result
+        _coinResult.value = result
+
+        viewModelScope.launch {
+            historyRepository.addEntry(
+                HistoryEntry(
+                    method = DecisionMethod.COIN_FLIP,
+                    options = listOf("正面", "反面"),
+                    result = result.displayName,
+                )
+            )
+        }
+    }
+
     fun rollDice() {
         if (_isAnimating.value) return
         _isAnimating.value = true

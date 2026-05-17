@@ -48,8 +48,7 @@ private fun PreviewClassicRainbowWheel() {
                 )
                 SpinWheel(
                     options = listOf("选项1", "选项2", "选项3", "选项4", "选项5"),
-                    rotationDegrees = 0f,
-                    isSpinning = false,
+                    weights = listOf(1, 1, 1, 1, 1),
                     colorScheme = WheelDesign.CLASSIC_RAINBOW.toColorScheme(),
                     modifier = Modifier.size(300.dp)
                 )
@@ -84,8 +83,7 @@ private fun PreviewMonochromeWheel() {
                 )
                 SpinWheel(
                     options = listOf("吃火锅", "吃烧烤", "吃日料", "吃西餐"),
-                    rotationDegrees = 0f,
-                    isSpinning = false,
+                    weights = listOf(1, 1, 1, 1),
                     colorScheme = WheelDesign.MONOCHROME.toColorScheme(),
                     modifier = Modifier.size(300.dp)
                 )
@@ -120,8 +118,7 @@ private fun PreviewWarmSunsetWheel() {
                 )
                 SpinWheel(
                     options = listOf("看电影", "打游戏", "看书", "运动", "睡觉", "逛街"),
-                    rotationDegrees = 0f,
-                    isSpinning = false,
+                    weights = listOf(1, 1, 1, 1, 1, 1),
                     colorScheme = WheelDesign.WARM_SUNSET.toColorScheme(),
                     modifier = Modifier.size(300.dp)
                 )
@@ -156,8 +153,7 @@ private fun PreviewOceanBreezeWheel() {
                 )
                 SpinWheel(
                     options = listOf("咖啡", "奶茶", "果汁", "可乐", "柠檬水"),
-                    rotationDegrees = 0f,
-                    isSpinning = false,
+                    weights = listOf(1, 1, 1, 1, 1),
                     colorScheme = WheelDesign.OCEAN_BREEZE.toColorScheme(),
                     modifier = Modifier.size(300.dp)
                 )
@@ -192,8 +188,7 @@ private fun PreviewMinimalWheel() {
                 )
                 SpinWheel(
                     options = listOf("是", "否", "也许", "不知道"),
-                    rotationDegrees = 0f,
-                    isSpinning = false,
+                    weights = listOf(1, 1, 1, 1),
                     colorScheme = WheelDesign.MINIMAL.toColorScheme(),
                     modifier = Modifier.size(300.dp)
                 )

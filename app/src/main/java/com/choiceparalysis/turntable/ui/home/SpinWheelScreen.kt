@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
@@ -56,11 +58,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
+import kotlin.math.roundToInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
 
@@ -72,16 +76,18 @@ fun SpinWheelScreen(
     onNavigateToSettings: () -> Unit = {},
 ) {
     val options by viewModel.options.collectAsState()
-    val isSpinning by viewModel.isSpinning.collectAsState()
+    val weights by viewModel.weights.collectAsState()
+    val isAnimating by viewModel.isAnimating.collectAsState()
     val result by viewModel.result.collectAsState()
-    val rotationDegrees by viewModel.rotationDegrees.collectAsState()
     val colorScheme by viewModel.colorScheme.collectAsState()
     val optionsEditorOpen by viewModel.optionsEditorOpen.collectAsState()
     val dynamicColorEnabled by viewModel.dynamicColorEnabled.collectAsState()
+    val customColors by viewModel.customColors.collectAsState()
     val optionGroups by viewModel.optionGroups.collectAsState()
     var showSettingsSheet by remember { mutableStateOf(false) }
     var showSaveGroupDialog by remember { mutableStateOf(false) }
     var showLoadGroupDialog by remember { mutableStateOf(false) }
+    var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -118,16 +124,21 @@ fun SpinWheelScreen(
             // Spin Wheel
             SpinWheel(
                 options = options,
-                rotationDegrees = rotationDegrees,
-                isSpinning = isSpinning,
+                weights = weights,
                 colorScheme = colorScheme,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
+                onSpinResult = { selected -> viewModel.onSpinResult(selected) },
+                onSpinStart = { viewModel.setAnimating(true) },
+                onSpinEnd = { viewModel.setAnimating(false) },
+                onResultDragged = {
+                    Toast.makeText(context, "你在干嘛？！", Toast.LENGTH_SHORT).show()
+                }
             )
 
             // Spin Button
             Button(
-                onClick = { viewModel.spin() },
-                enabled = !isSpinning && options.isNotEmpty(),
+                onClick = { triggerSpinWheelSpin() },
+                enabled = !isAnimating && options.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -137,7 +148,7 @@ fun SpinWheelScreen(
                 )
             ) {
                 Text(
-                    text = if (isSpinning) "转动中..." else "开始转动",
+                    text = if (isAnimating) "转动中..." else "开始转动",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -173,11 +184,18 @@ fun SpinWheelScreen(
             ) {
                 OptionsEditorPanel(
                     options = options,
+                    weights = weights,
                     colorScheme = colorScheme,
                     dynamicColorEnabled = dynamicColorEnabled,
+                    customColors = customColors,
                     onUpdateOption = { index, name -> viewModel.updateOptionName(index, name) },
                     onRemoveOption = { viewModel.removeOption(it) },
                     onAddOption = { viewModel.addOption() },
+                    onColorClick = { colorPickerIndex = it },
+                    onDynamicColorClick = {
+                        Toast.makeText(context, "动态色彩已开启", Toast.LENGTH_SHORT).show()
+                    },
+                    onUpdateWeight = { index, weight -> viewModel.updateWeight(index, weight) },
                     onSaveGroup = { showSaveGroupDialog = true },
                     onLoadGroup = { showLoadGroupDialog = true },
                     modifier = Modifier.padding(top = 8.dp)
@@ -232,16 +250,39 @@ fun SpinWheelScreen(
             onDelete = { viewModel.deleteOptionGroup(it) }
         )
     }
+
+    // Color picker dialog
+    val editingIndex = colorPickerIndex
+    if (editingIndex != null) {
+        val currentColor = if (editingIndex < customColors.size) {
+            Color(customColors[editingIndex])
+        } else {
+            colorScheme.getColorForIndex(editingIndex)
+        }
+        ColorPickerDialog(
+            initialColor = currentColor,
+            onConfirm = { color ->
+                viewModel.updateOptionColor(editingIndex, color.toArgb())
+                colorPickerIndex = null
+            },
+            onDismiss = { colorPickerIndex = null }
+        )
+    }
 }
 
 @Composable
 private fun OptionsEditorPanel(
     options: List<String>,
+    weights: List<Int>,
     colorScheme: WheelColorScheme,
     dynamicColorEnabled: Boolean,
+    customColors: List<Int>,
     onUpdateOption: (Int, String) -> Unit,
     onRemoveOption: (Int) -> Unit,
     onAddOption: () -> Unit,
+    onColorClick: (Int) -> Unit,
+    onDynamicColorClick: () -> Unit,
+    onUpdateWeight: (Int, Int) -> Unit,
     onSaveGroup: () -> Unit,
     onLoadGroup: () -> Unit,
     modifier: Modifier = Modifier,
@@ -262,12 +303,23 @@ private fun OptionsEditorPanel(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Color indicator
-                    val segmentColor = colorScheme.getColorForIndex(index)
+                    val segmentColor = if (!dynamicColorEnabled && index < customColors.size) {
+                        Color(customColors[index])
+                    } else {
+                        colorScheme.getColorForIndex(index)
+                    }
                     Box(
                         modifier = Modifier
                             .size(24.dp)
                             .clip(CircleShape)
                             .background(if (dynamicColorEnabled) segmentColor.copy(alpha = 0.5f) else segmentColor)
+                            .clickable {
+                                if (dynamicColorEnabled) {
+                                    onDynamicColorClick()
+                                } else {
+                                    onColorClick(index)
+                                }
+                            }
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -291,6 +343,27 @@ private fun OptionsEditorPanel(
                             else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
                         )
                     }
+                }
+                // Weight slider
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 32.dp, end = 8.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "权重: ${weights.getOrElse(index) { 1 }}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.width(48.dp)
+                    )
+                    Slider(
+                        value = (weights.getOrElse(index) { 1 }).toFloat(),
+                        onValueChange = { onUpdateWeight(index, it.toInt()) },
+                        valueRange = 1f..10f,
+                        steps = 8,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
 
@@ -427,4 +500,12 @@ private fun LoadGroupDialog(
             }
         }
     )
+}
+
+private fun Color.toArgb(): Int {
+    val a = (alpha * 255).roundToInt()
+    val r = (red * 255).roundToInt()
+    val g = (green * 255).roundToInt()
+    val b = (blue * 255).roundToInt()
+    return (a shl 24) or (r shl 16) or (g shl 8) or b
 }

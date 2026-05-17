@@ -21,6 +21,10 @@ class SettingsRepository(private val context: Context) {
         prefs[DataStoreKeys.DYNAMIC_COLOR_ENABLED]?.toBooleanStrictOrNull() ?: true
     }
 
+    val followSystemTheme: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[DataStoreKeys.FOLLOW_SYSTEM_THEME]?.toBooleanStrictOrNull() ?: true
+    }
+
     val selectedPreset: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[DataStoreKeys.SELECTED_PRESET] ?: "CLASSIC_RAINBOW"
     }
@@ -33,6 +37,11 @@ class SettingsRepository(private val context: Context) {
     val currentOptions: Flow<List<String>> = context.dataStore.data.map { prefs ->
         val json = prefs[DataStoreKeys.CURRENT_OPTIONS] ?: "[\"Yes\",\"No\"]"
         runCatching { Json.decodeFromString<List<String>>(json) }.getOrElse { listOf("Yes", "No") }
+    }
+
+    val currentWeights: Flow<List<Int>> = context.dataStore.data.map { prefs ->
+        val json = prefs[DataStoreKeys.OPTION_WEIGHTS] ?: "[1,1]"
+        runCatching { Json.decodeFromString<List<Int>>(json) }.getOrElse { listOf(1, 1) }
     }
 
     val optionGroups: Flow<List<OptionGroup>> = context.dataStore.data.map { prefs ->
@@ -59,6 +68,12 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    suspend fun setFollowSystemTheme(follow: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[DataStoreKeys.FOLLOW_SYSTEM_THEME] = follow.toString()
+        }
+    }
+
     suspend fun setSelectedPreset(preset: String) {
         context.dataStore.edit { prefs ->
             prefs[DataStoreKeys.SELECTED_PRESET] = preset
@@ -74,6 +89,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun setCurrentOptions(options: List<String>) {
         context.dataStore.edit { prefs ->
             prefs[DataStoreKeys.CURRENT_OPTIONS] = Json.encodeToString(options)
+        }
+    }
+
+    suspend fun setCurrentWeights(weights: List<Int>) {
+        context.dataStore.edit { prefs ->
+            prefs[DataStoreKeys.OPTION_WEIGHTS] = Json.encodeToString(weights)
         }
     }
 
