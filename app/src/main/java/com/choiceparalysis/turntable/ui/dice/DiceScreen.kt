@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.choiceparalysis.turntable.ui.coindice.Dice3DRoll
 import com.choiceparalysis.turntable.ui.coindice.ShakeDetector
-import com.choiceparalysis.turntable.audio.AudioHapticManager
-import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.viewmodel.DiceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,8 +59,6 @@ fun DiceScreen(
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
-            val audioHaptic = AudioHapticManager.getInstance(context)
-            audioHaptic.playFeedback(SoundEffect.DICE_TAP)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             viewModel.clearResult()
         }

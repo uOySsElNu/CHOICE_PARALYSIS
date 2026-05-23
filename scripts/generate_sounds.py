@@ -213,41 +213,43 @@ def generate_dice_bounce():
 
 
 def generate_dice_roll():
-    """Realistic quick dice roll - multiple rapid bounces with rattle, ~1s."""
+    """Realistic dice roll on hard table - pure impact noise, no tonal elements."""
     duration = 1.0
     samples = []
-    # Bounce events: (time, amplitude, freq)
+    random.seed(42)  # reproducible
+    # Bounce events: (time, amplitude)
     bounces = [
-        (0.00, 1.0, 300),   # first hit
-        (0.08, 0.85, 280),  # second
-        (0.14, 0.7, 320),   # third
-        (0.20, 0.6, 260),   # fourth
-        (0.28, 0.5, 350),   # fifth
-        (0.36, 0.4, 290),   # sixth
-        (0.45, 0.3, 310),   # seventh
-        (0.55, 0.22, 270),  # settling
-        (0.65, 0.15, 340),  # settling
-        (0.78, 0.1, 300),   # final tap
+        (0.00, 1.0),
+        (0.07, 0.9),
+        (0.13, 0.75),
+        (0.19, 0.6),
+        (0.26, 0.5),
+        (0.34, 0.4),
+        (0.43, 0.3),
+        (0.53, 0.22),
+        (0.64, 0.15),
+        (0.76, 0.1),
     ]
     for i in range(int(SAMPLE_RATE * duration)):
         t = i / SAMPLE_RATE
         s = 0.0
-        for bt, amp, freq in bounces:
+        for bt, amp in bounces:
             if t >= bt:
                 dt = t - bt
-                # Each bounce: sharp attack + fast decay
-                env = math.exp(-dt * 25) * amp
-                # Impact body
-                s += sine(freq, dt) * 0.5 * env
-                # Noise burst for hard surface texture
-                s += noise() * 0.3 * math.exp(-dt * 40) * amp
-                # High freq click for hard impact
-                s += sine(1800, dt) * 0.1 * math.exp(-dt * 50) * amp
-        # Background rattle (dice sliding on surface)
-        if t < 0.6:
-            rattle_env = math.exp(-t * 5) * 0.08
-            s += noise() * rattle_env
-        samples.append(s * 0.8)
+                # Sharp noise burst = hard plastic/hitting wood table
+                burst_env = math.exp(-dt * 60) * amp
+                s += noise() * burst_env * 0.8
+                # Filtered noise band for "clack" body (2k-5k)
+                s += (sine(2500, dt) + sine(3800, dt) + sine(4500, dt)) * 0.05 * burst_env
+                # Subtle low thud from table resonance
+                s += noise() * math.exp(-dt * 20) * amp * 0.15
+        # Sliding/rattling between bounces
+        if t < 0.5:
+            for bt2, amp2 in bounces:
+                if t >= bt2 and t < bt2 + 0.04:
+                    dt2 = t - bt2
+                    s += noise() * math.exp(-dt2 * 30) * amp2 * 0.2
+        samples.append(s * 0.85)
     return samples
 
 
