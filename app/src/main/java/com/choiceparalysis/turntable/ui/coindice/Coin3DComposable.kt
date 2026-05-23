@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -34,6 +35,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.audio.AudioHapticManager
+import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import com.choiceparalysis.turntable.viewmodel.CoinSide
 import kotlinx.coroutines.delay
@@ -89,6 +92,19 @@ fun Coin3DFlip(
     LaunchedEffect(Unit) {
         delay(100)
         canvasReady = true
+    }
+
+    // Tick sound every 180° during coin rotation
+    val audioHaptic = AudioHapticManager.getInstance(androidx.compose.ui.platform.LocalContext.current)
+    LaunchedEffect(Unit) {
+        var lastHalf = (rotation.value / 180f).toInt()
+        snapshotFlow { rotation.value }.collect { angle ->
+            val currentHalf = (angle / 180f).toInt()
+            if (currentHalf != lastHalf) {
+                audioHaptic.playFeedback(SoundEffect.COIN_SPIN)
+                lastHalf = currentHalf
+            }
+        }
     }
 
     // SpinWheel 风格逐帧速度追踪

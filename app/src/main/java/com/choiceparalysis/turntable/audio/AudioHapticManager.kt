@@ -23,6 +23,9 @@ enum class SoundEffect(val resId: Int) {
     YESNO_CHIME(R.raw.yesno_chime),
     ELIMINATION_DRUM(R.raw.elimination_drum),
     WINNER_CHEER(R.raw.winner_cheer),
+    WHEEL_TICK(R.raw.wheel_tick),
+    COIN_SPIN(R.raw.coin_spin),
+    DICE_BOUNCE(R.raw.dice_bounce),
 }
 
 class AudioHapticManager private constructor(private val context: Context) {
@@ -166,6 +169,22 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 500)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 700)
             }
+            SoundEffect.WHEEL_TICK -> {
+                // Mechanical tick: single sharp tick for segment boundary crossing
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f, 0)
+            }
+            SoundEffect.COIN_SPIN -> {
+                // Metallic spin: light tick for each half rotation
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 20)
+            }
+            SoundEffect.DICE_BOUNCE -> {
+                // Bounce impact: low tick for each bounce landing
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 0)
+            }
         }
 
         vibrator.vibrate(composition.compose())
@@ -205,6 +224,15 @@ class AudioHapticManager private constructor(private val context: Context) {
                     longArrayOf(0, 150, 80, 30, 50, 30, 50, 30),
                     intArrayOf(150, 0, 255, 0, 200, 0, 255, 0), -1
                 ))
+            }
+            SoundEffect.WHEEL_TICK -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
+            }
+            SoundEffect.COIN_SPIN -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(10, 130))
+            }
+            SoundEffect.DICE_BOUNCE -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(12, 180))
             }
         }
     }

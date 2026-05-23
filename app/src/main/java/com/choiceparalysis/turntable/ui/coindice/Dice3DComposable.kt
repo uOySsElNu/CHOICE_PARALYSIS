@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,7 +22,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.audio.AudioHapticManager
+import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -86,6 +90,20 @@ fun Dice3DRoll(
     var spinTop by remember { mutableIntStateOf(2) }
     var spinRight by remember { mutableIntStateOf(3) }
     var isSpinning by remember { mutableStateOf(false) }
+
+    // Bounce sound on each landing during dice roll
+    val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
+    LaunchedEffect(Unit) {
+        var wasNegative = false
+        snapshotFlow { bounceAnim.value }.collect { value ->
+            val isNegative = value < -2f
+            if (wasNegative && !isNegative) {
+                // Transition from negative to zero/positive = bounce landing
+                audioHaptic.playFeedback(SoundEffect.DICE_BOUNCE)
+            }
+            wasNegative = isNegative
+        }
+    }
 
     // Sync result from ViewModel + pop animation
     LaunchedEffect(value) {

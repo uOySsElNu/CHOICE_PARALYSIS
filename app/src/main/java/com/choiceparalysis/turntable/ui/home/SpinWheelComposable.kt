@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +75,18 @@ fun SpinWheel(
             if (indicatorAngle < acc) return i
         }
         return segmentAngles.indices.last
+    }
+
+    // Tick sound on segment boundary crossing during spin
+    LaunchedEffect(Unit) {
+        var lastSegment = segmentIndexAt(animatable.value)
+        snapshotFlow { animatable.value }.collect { rotation ->
+            val currentSegment = segmentIndexAt(rotation)
+            if (currentSegment != lastSegment) {
+                audioHaptic.playFeedback(SoundEffect.WHEEL_TICK)
+                lastSegment = currentSegment
+            }
+        }
     }
 
     // Button-initiated spin

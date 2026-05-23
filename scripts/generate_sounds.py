@@ -159,6 +159,59 @@ def generate_winner_cheer():
     return samples
 
 
+def generate_wheel_tick():
+    """Short mechanical tick - for wheel passing segment boundaries."""
+    duration = 0.04
+    samples = []
+    for i in range(int(SAMPLE_RATE * duration)):
+        t = i / SAMPLE_RATE
+        env = math.exp(-t * 120)
+        # Sharp click at ~2kHz
+        s = sine(2000, t) * 0.5 * env
+        # Add noise for mechanical texture
+        s += noise() * 0.3 * math.exp(-t * 150)
+        # Slight low freq body
+        s += sine(400, t) * 0.2 * math.exp(-t * 100)
+        samples.append(s * 0.7)
+    return samples
+
+
+def generate_coin_spin():
+    """Metallic whoosh - for coin spinning in air."""
+    duration = 0.08
+    samples = []
+    for i in range(int(SAMPLE_RATE * duration)):
+        t = i / SAMPLE_RATE
+        env = math.exp(-t * 35)
+        # High freq whirring
+        s = sine(3500, t) * 0.4 * env
+        # Slightly detuned for shimmer
+        s += sine(3550, t) * 0.3 * env
+        # Noise for air texture
+        s += noise() * 0.25 * math.exp(-t * 40)
+        # Mid freq body
+        s += sine(1500, t) * 0.15 * env
+        samples.append(s * 0.7)
+    return samples
+
+
+def generate_dice_bounce():
+    """Short bouncy tap - for dice hitting surface."""
+    duration = 0.06
+    samples = []
+    for i in range(int(SAMPLE_RATE * duration)):
+        t = i / SAMPLE_RATE
+        env = math.exp(-t * 80)
+        # Low thud
+        s = sine(250, t) * 0.6 * env
+        # Noise burst for impact
+        s += noise() * 0.35 * math.exp(-t * 100)
+        # Slight high click
+        s += sine(1200, t) * 0.15 * math.exp(-t * 90)
+        samples.append(s * 0.75)
+    return samples
+
+
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     print("Generating sound effects...")
@@ -169,6 +222,9 @@ def main():
     write_wav('yesno_chime.wav', generate_yesno_chime())
     write_wav('elimination_drum.wav', generate_elimination_drum())
     write_wav('winner_cheer.wav', generate_winner_cheer())
+    write_wav('wheel_tick.wav', generate_wheel_tick())
+    write_wav('coin_spin.wav', generate_coin_spin())
+    write_wav('dice_bounce.wav', generate_dice_bounce())
 
     print("\nDone! Replace .mp3 files with these .wav files.")
     print("Remember to update SoundEffect enum resId references if extension changes.")
