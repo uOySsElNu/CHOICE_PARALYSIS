@@ -1,7 +1,6 @@
 #!/bin/bash
-# Generate sound effects using SoX (Sound eXchange)
+# Generate sound effects using SoX
 # Requires: sox in PATH
-# Usage: bash scripts/generate_sounds.sh
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -14,73 +13,92 @@ RATE=44100
 echo "Generating sound effects with SoX..."
 
 # ============================================================
-# DICE ROLL: realistic dice thrown on wood table
-# Key: few bounces, long gaps, heavy thuds, ~1s total
+# DICE ROLL: realistic dice on hard table
+#
+# Real dice characteristics:
+# - 3-5 bounces, irregular timing (80-180ms gaps)
+# - Each "clack" = noise burst, 2-5kHz bandpass (the click)
+# + low-mid body (200-500Hz rumble from table)
+# - Sharp 1ms attack, 30-60ms decay
+# - Total ~1.2 seconds
+# - Slight room reverb
 # ============================================================
 TMP=$(mktemp -d)
 
-# Each hit: noise bandpassed to 150-400Hz (heavy thud body)
-# + a sharp transient at 1kHz (hard surface click)
-# Duration per hit: 0.08s (longer for more weight)
-
-# Hit 1: initial impact (loudest, heaviest)
-$SOX -n -r $RATE -b 16 "$TMP/h1.wav" \
-    synth 0.08 noise bandpass 250 200 \
-    compand 0.001,0.02 -60,-60,-20,-5 0 -90 \
-    fade 0 0 0.08 0.03 \
-    gain +2
-
-# Hit 2: second bounce (slightly softer)
-$SOX -n -r $RATE -b 16 "$TMP/h2.wav" \
-    synth 0.07 noise bandpass 230 180 \
-    compand 0.001,0.02 -60,-60,-20,-5 0 -90 \
-    fade 0 0 0.07 0.025 \
-    gain -2
-
-# Hit 3: third bounce
-$SOX -n -r $RATE -b 16 "$TMP/h3.wav" \
-    synth 0.06 noise bandpass 260 200 \
-    compand 0.001,0.02 -60,-60,-20,-5 0 -90 \
-    fade 0 0 0.06 0.02 \
+# --- Click layers (high-mid freq, the "clack" of plastic on hard surface) ---
+# Click 1: loudest, ~50ms
+$SOX -n -r $RATE -b 16 "$TMP/c1.wav" \
+    synth 0.05 noise \
+    highpass 800 \
+    bandpass 3000 2500 \
+    fade t 0.001 0 0.04 \
     gain -6
 
-# Hit 4: fourth bounce (settling)
-$SOX -n -r $RATE -b 16 "$TMP/h4.wav" \
-    synth 0.05 noise bandpass 220 170 \
-    compand 0.001,0.02 -60,-60,-20,-5 0 -90 \
-    fade 0 0 0.05 0.015 \
-    gain -12
+# Click 2: slightly softer
+$SOX -n -r $RATE -b 16 "$TMP/c2.wav" \
+    synth 0.045 noise \
+    highpass 800 \
+    bandpass 2800 2200 \
+    fade t 0.001 0 0.035 \
+    gain -10
 
-# Hit 5: final tiny tap (dice settling)
-$SOX -n -r $RATE -b 16 "$TMP/h5.wav" \
-    synth 0.04 noise bandpass 200 150 \
-    compand 0.001,0.01 -60,-60,-20,-5 0 -90 \
-    fade 0 0 0.04 0.01 \
+# Click 3: medium
+$SOX -n -r $RATE -b 16 "$TMP/c3.wav" \
+    synth 0.04 noise \
+    highpass 800 \
+    bandpass 3200 2600 \
+    fade t 0.001 0 0.03 \
+    gain -14
+
+# Click 4: soft
+$SOX -n -r $RATE -b 16 "$TMP/c4.wav" \
+    synth 0.035 noise \
+    highpass 800 \
+    bandpass 2500 2000 \
+    fade t 0.001 0 0.025 \
     gain -18
 
-# Silence gaps between bounces (realistic timing)
-# Gap 1: ~120ms (hand release to first table hit)
-$SOX -n -r $RATE -b 16 "$TMP/g1.wav" trim 0 0.08
-# Gap 2: ~100ms (first bounce)
-$SOX -n -r $RATE -b 16 "$TMP/g2.wav" trim 0 0.06
-# Gap 3: ~80ms (bounces getting faster)
-$SOX -n -r $RATE -b 16 "$TMP/g3.wav" trim 0 0.05
-# Gap 4: ~60ms (settling)
-$SOX -n -r $RATE -b 16 "$TMP/g4.wav" trim 0 0.04
+# Click 5: very soft (settle)
+$SOX -n -r $RATE -b 16 "$TMP/c5.wav" \
+    synth 0.03 noise \
+    highpass 800 \
+    bandpass 2200 1800 \
+    fade t 0.001 0 0.02 \
+    gain -24
 
-# Concatenate: hit-gap-hit-gap-...
-$SOX "$TMP/h1.wav" "$TMP/g1.wav" \
-     "$TMP/h2.wav" "$TMP/g2.wav" \
-     "$TMP/h3.wav" "$TMP/g3.wav" \
-     "$TMP/h4.wav" "$TMP/g4.wav" \
-     "$TMP/h5.wav" \
-     "$TMP/concat.wav"
+# --- Body layer (low-mid freq, table resonance) ---
+# Generate a low rumble that underlies the whole event
+$SOX -n -r $RATE -b 16 "$TMP/body.wav" \
+    synth 1.2 noise \
+    lowpass 600 \
+    bandpass 300 250 \
+    fade t 0.01 0 0.8 \
+    gain -20
 
-# Pad to 1 second, add room reverb
-$SOX "$TMP/concat.wav" "$OUT_DIR/dice_roll.wav" \
-    pad 0 0.3 \
-    compand 0.01,0.04 -60,-60,-25,-10,-15,-5 0 -90 0.03 \
-    reverb 20 50 100 \
+# --- Silence gaps (irregular timing) ---
+$SOX -n -r $RATE -b 16 "$TMP/g1.wav" trim 0 0.12
+$SOX -n -r $RATE -b 16 "$TMP/g2.wav" trim 0 0.09
+$SOX -n -r $RATE -b 16 "$TMP/g3.wav" trim 0 0.07
+$SOX -n -r $RATE -b 16 "$TMP/g4.wav" trim 0 0.05
+
+# --- Concatenate clicks with gaps ---
+$SOX "$TMP/c1.wav" "$TMP/g1.wav" \
+     "$TMP/c2.wav" "$TMP/g2.wav" \
+     "$TMP/c3.wav" "$TMP/g3.wav" \
+     "$TMP/c4.wav" "$TMP/g4.wav" \
+     "$TMP/c5.wav" \
+     "$TMP/clicks.wav"
+
+# Pad clicks to match body length
+$SOX "$TMP/clicks.wav" "$TMP/clicks_padded.wav" pad 0 0.3 trim 0 1.2
+
+# --- Mix clicks + body ---
+$SOX -m "$TMP/clicks_padded.wav" "$TMP/body.wav" "$TMP/mixed.wav"
+
+# --- Final processing: compression + room reverb ---
+$SOX "$TMP/mixed.wav" "$OUT_DIR/dice_roll.wav" \
+    compand 0.005,0.03 -60,-60,-30,-15,-20,-8 0 -90 0.02 \
+    reverb 25 50 100 \
     gain -n \
     rate $RATE
 
@@ -88,40 +106,37 @@ rm -rf "$TMP"
 echo "  dice_roll.wav: done"
 
 # ============================================================
-# WHEEL TICK: short mechanical click
+# WHEEL TICK
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/wheel_tick.wav" \
     synth 0.035 noise \
     bandpass 1800 1200 \
-    compand 0.001,0.01 -60,-60,-20,-10 0 -90 \
-    fade 0 0 0.035 0.015 \
+    fade t 0.001 0 0.03 \
     gain -n
 echo "  wheel_tick.wav: done"
 
 # ============================================================
-# COIN SPIN: metallic whoosh per half rotation
+# COIN SPIN
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/coin_spin.wav" \
     synth 0.07 noise \
     bandpass 3000 2000 \
-    compand 0.001,0.02 -60,-60,-25,-12 0 -90 \
-    fade 0 0 0.07 0.025 \
+    fade t 0.001 0 0.06 \
     gain -n
 echo "  coin_spin.wav: done"
 
 # ============================================================
-# DICE BOUNCE: single quick bounce impact
+# DICE BOUNCE (single hit)
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/dice_bounce.wav" \
     synth 0.05 noise \
-    bandpass 400 350 \
-    compand 0.001,0.01 -60,-60,-20,-10 0 -90 \
-    fade 0 0 0.05 0.02 \
+    bandpass 2500 2000 \
+    fade t 0.001 0 0.04 \
     gain -n
 echo "  dice_bounce.wav: done"
 
 # ============================================================
-# SPIN DING: metallic bell ding
+# SPIN DING
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/spin_ding.wav" \
     synth 0.8 sine 880 sine 2640 \
@@ -130,29 +145,27 @@ $SOX -n -r $RATE -b 16 "$OUT_DIR/spin_ding.wav" \
 echo "  spin_ding.wav: done"
 
 # ============================================================
-# COIN CLINK: short metallic impact
+# COIN CLINK
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/coin_clink.wav" \
     synth 0.12 noise \
     bandpass 3500 2500 \
-    compand 0.001,0.01 -60,-60,-20,-8 0 -90 \
-    fade 0 0 0.12 0.05 \
+    fade t 0.001 0 0.1 \
     gain -n
 echo "  coin_clink.wav: done"
 
 # ============================================================
-# DICE TAP: single wooden tap
+# DICE TAP
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/dice_tap.wav" \
     synth 0.1 noise \
-    bandpass 300 250 \
-    compand 0.001,0.01 -60,-60,-20,-10 0 -90 \
-    fade 0 0 0.1 0.04 \
+    bandpass 2500 2000 \
+    fade t 0.001 0 0.08 \
     gain -n
 echo "  dice_tap.wav: done"
 
 # ============================================================
-# YESNO CHIME: ascending mystery chord
+# YESNO CHIME
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/yesno_chime.wav" \
     synth 1.0 sine 523 sine 659 sine 784 \
@@ -162,18 +175,17 @@ $SOX -n -r $RATE -b 16 "$OUT_DIR/yesno_chime.wav" \
 echo "  yesno_chime.wav: done"
 
 # ============================================================
-# ELIMINATION DRUM: tense low boom
+# ELIMINATION DRUM
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/elimination_drum.wav" \
     synth 0.4 sine 80 noise \
     bandpass 120 80 \
-    compand 0.001,0.05 -60,-60,-30,-10 0 -90 \
     fade 0 0 0.4 0.25 \
     gain -n
 echo "  elimination_drum.wav: done"
 
 # ============================================================
-# WINNER CHEER: celebration chord
+# WINNER CHEER
 # ============================================================
 $SOX -n -r $RATE -b 16 "$OUT_DIR/winner_cheer.wav" \
     synth 1.2 sine 262 sine 330 sine 392 sine 523 noise \
@@ -184,5 +196,5 @@ $SOX -n -r $RATE -b 16 "$OUT_DIR/winner_cheer.wav" \
 echo "  winner_cheer.wav: done"
 
 echo ""
-echo "Done! All WAV files generated in $OUT_DIR"
+echo "Done! All WAV files generated."
 ls -lh "$OUT_DIR"/*.wav
