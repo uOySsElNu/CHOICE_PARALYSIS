@@ -57,6 +57,7 @@ class AudioHapticManager private constructor(private val context: Context) {
 
     private val soundMap = mutableMapOf<SoundEffect, Int>()
     private var loaded = false
+    private var loadPending = 0
 
     private val vibrator: Vibrator by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -78,14 +79,22 @@ class AudioHapticManager private constructor(private val context: Context) {
         scope.launch {
             settingsRepository.hapticEnabled.collect { _hapticEnabled.value = it }
         }
+        // Pre-load sounds so first play() doesn't fail due to async loading
+        loadSounds()
     }
 
     fun loadSounds() {
-        if (loaded) return
+        if (loaded || loadPending > 0) return
+        loadPending = SoundEffect.entries.size
+        soundPool.setOnLoadCompleteListener { _, _, _ ->
+            loadPending--
+            if (loadPending <= 0) {
+                loaded = true
+            }
+        }
         SoundEffect.entries.forEach { effect ->
             soundMap[effect] = soundPool.load(context, effect.resId, 1)
         }
-        loaded = true
     }
 
     /**
@@ -99,7 +108,16 @@ class AudioHapticManager private constructor(private val context: Context) {
                 if (!loaded) loadSounds()
                 val soundId = soundMap[effect]
                 if (soundId != null && soundId != 0) {
-                    soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                    val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                    // If play returns 0, sound not loaded yet - retry once after short delay
+                    if (streamId == 0) {
+                        scope.launch {
+                            kotlinx.coroutines.delay(50)
+                            try {
+                                soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                            } catch (_: Exception) {}
+                        }
+                    }
                 }
             }
         } catch (_: Exception) {}
