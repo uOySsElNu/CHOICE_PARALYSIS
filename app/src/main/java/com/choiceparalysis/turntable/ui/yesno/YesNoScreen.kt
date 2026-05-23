@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.choiceparalysis.turntable.viewmodel.YesNoResult
+import com.choiceparalysis.turntable.audio.AudioHapticManager
+import com.choiceparalysis.turntable.audio.HapticType
+import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.viewmodel.YesNoViewModel
 
 @Composable
@@ -83,6 +86,9 @@ fun YesNoScreen(
     // Show Android Toast for result
     LaunchedEffect(result) {
         result?.let { yesNoResult ->
+            val audioHaptic = AudioHapticManager.getInstance(context)
+            audioHaptic.playSound(SoundEffect.YESNO_CHIME)
+            audioHaptic.performHaptic(HapticType.RESULT_HIT)
             val displayText = "${yesNoResult.emoji} ${yesNoResult.displayName}"
             Toast.makeText(context, displayText, Toast.LENGTH_SHORT).show()
             viewModel.clearResult()
