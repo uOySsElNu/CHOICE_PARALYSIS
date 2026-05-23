@@ -213,22 +213,21 @@ def generate_dice_bounce():
 
 
 def generate_dice_roll():
-    """Realistic dice roll on hard table - pure impact noise, no tonal elements."""
+    """Realistic dice roll on table - heavy thuds with mid-low body."""
     duration = 1.0
     samples = []
-    random.seed(42)  # reproducible
-    # Bounce events: (time, amplitude)
+    random.seed(42)
     bounces = [
         (0.00, 1.0),
-        (0.07, 0.9),
-        (0.13, 0.75),
-        (0.19, 0.6),
-        (0.26, 0.5),
-        (0.34, 0.4),
-        (0.43, 0.3),
-        (0.53, 0.22),
-        (0.64, 0.15),
-        (0.76, 0.1),
+        (0.07, 0.85),
+        (0.13, 0.7),
+        (0.19, 0.55),
+        (0.26, 0.45),
+        (0.34, 0.35),
+        (0.43, 0.25),
+        (0.53, 0.18),
+        (0.64, 0.12),
+        (0.76, 0.08),
     ]
     for i in range(int(SAMPLE_RATE * duration)):
         t = i / SAMPLE_RATE
@@ -236,20 +235,23 @@ def generate_dice_roll():
         for bt, amp in bounces:
             if t >= bt:
                 dt = t - bt
-                # Sharp noise burst = hard plastic/hitting wood table
-                burst_env = math.exp(-dt * 60) * amp
-                s += noise() * burst_env * 0.8
-                # Filtered noise band for "clack" body (2k-5k)
-                s += (sine(2500, dt) + sine(3800, dt) + sine(4500, dt)) * 0.05 * burst_env
-                # Subtle low thud from table resonance
-                s += noise() * math.exp(-dt * 20) * amp * 0.15
-        # Sliding/rattling between bounces
-        if t < 0.5:
-            for bt2, amp2 in bounces:
-                if t >= bt2 and t < bt2 + 0.04:
-                    dt2 = t - bt2
-                    s += noise() * math.exp(-dt2 * 30) * amp2 * 0.2
-        samples.append(s * 0.85)
+                # --- Low-mid body: the "thud" of plastic hitting wood ---
+                # Low freq rumble (100-300Hz) = table resonance
+                thud_env = math.exp(-dt * 15) * amp
+                s += sine(150, dt) * 0.25 * thud_env
+                s += sine(220, dt) * 0.2 * thud_env
+                s += sine(100, dt) * 0.15 * thud_env
+                # --- Noise burst with bandpass = the "clack" of plastic ---
+                # Raw noise shaped to remove extreme highs
+                n = noise()
+                s += n * math.exp(-dt * 35) * amp * 0.5
+                # --- Mid freq click (800-1500Hz) = hard surface contact ---
+                click_env = math.exp(-dt * 45) * amp
+                s += sine(900, dt) * 0.15 * click_env
+                s += sine(1200, dt) * 0.1 * click_env
+                # --- Very short high freq (2kHz) = initial attack transient ---
+                s += sine(2000, dt) * 0.04 * math.exp(-dt * 80) * amp
+        samples.append(s * 0.9)
     return samples
 
 
