@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.ThumbsUpDown
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
@@ -43,7 +44,7 @@ data class HubCard(
 
 private val hubCards = listOf(
     HubCard("转盘", "转动命运之轮", Icons.Default.Autorenew, Routes.SPIN_WHEEL),
-    HubCard("硬币", "抛一枚命运硬币", Icons.Default.Casino, Routes.COIN),
+    HubCard("硬币", "抛一枚命运硬币", Icons.Default.MonetizationOn, Routes.COIN),
     HubCard("骰子", "掷出你的答案", Icons.Default.Casino, Routes.DICE),
     HubCard("Yes/No", "让宇宙替你决定", Icons.Default.ThumbsUpDown, Routes.YES_NO),
     HubCard("指尖轮盘", "多人淘汰，谁是天选", Icons.Default.TouchApp, Routes.FINGER_ROULETTE),

@@ -3,7 +3,40 @@
     "allow": [
       "Bash(./gradlew assembleDebug)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(./gradlew compileDebugKotlin)",
+      "Bash(git tag *)",
+      "Bash(gh release *)",
+      "Bash(where gh *)",
+      "Bash(winget install *)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI:/c/Users/m1368/AppData/Local/Programs/GitHub CLI\")",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(./gradlew assembleRelease)",
+      "Bash(keytool -genkeypair -v -keystore release-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias choiceparalysis -storepass choice123 -keypass choice123 -dname 'CN=Choice Paralysis, OU=Dev, O=ChoiceParalysis, L=Unknown, ST=Unknown, C=CN')",
+      "WebSearch",
+      "Bash(pip show *)",
+      "Bash(pip install *)",
+      "Bash(python *)",
+      "Bash(./gradlew :app:compileDebugKotlin)",
+      "Bash(dir \"D:\\\\Android\\\\Projects\\\\CHOICEPARALYSIS\")",
+      "Bash(dir \"D:\\\\Android\\\\Projects\\\\CHOICEPARALYSIS\\\\docs\")",
+      "Bash(dir \"D:\\\\Android\\\\Projects\\\\CHOICEPARALYSIS\\\\docs\\\\superpowers\")",
+      "Bash(./gradlew test *)",
+      "Bash(ping *)",
+      "Bash(gh api *)",
+      "Bash(git reset *)",
+      "Bash(./gradlew clean *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(git commit *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "mimo-image-recognition"
+  ]
 }

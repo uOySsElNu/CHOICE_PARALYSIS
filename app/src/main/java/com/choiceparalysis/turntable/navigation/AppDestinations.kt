@@ -11,9 +11,9 @@ enum class BottomNavDestinations(
     val icon: ImageVector,
     val route: String,
 ) {
-    HUB("首页", Icons.Default.Home, "hub"),
-    HISTORY("历史记录", Icons.Default.History, "history"),
-    SETTINGS("设置", Icons.Default.Settings, "settings"),
+    HUB("首页", Icons.Default.Home, Routes.HUB),
+    HISTORY("历史记录", Icons.Default.History, Routes.HISTORY),
+    SETTINGS("设置", Icons.Default.Settings, Routes.SETTINGS),
 }
 
 object Routes {
