@@ -38,7 +38,20 @@
       "Bash(grep -r \"activity-compose\" app/build.gradle*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:kenney.nl)",
-      "Bash(./gradlew assembleDebug --stacktrace)"
+      "Bash(./gradlew assembleDebug --stacktrace)",
+      "Bash(where sox *)",
+      "Bash(where ffmpeg *)",
+      "Bash(sox --version)",
+      "Bash(ffmpeg -version)",
+      "Bash(where choco *)",
+      "Bash(where winget *)",
+      "Bash(where scoop *)",
+      "Bash(curl -L -o /tmp/sox.zip \"https://sourceforge.net/projects/sox/files/sox/14.4.2/sox-14.4.2-win32.zip/download\")",
+      "Bash(cd /tmp)",
+      "Bash(unzip -o sox.zip -d sox_extract)",
+      "Bash(export PATH=\"$SOX_DIR:$PATH\")",
+      "Bash(export PATH=\"/tmp/sox_extract/sox-14.4.2:$PATH\")",
+      "Bash(bash scripts/generate_sounds.sh)"
     ]
   },
   "enabledMcpjsonServers": [
