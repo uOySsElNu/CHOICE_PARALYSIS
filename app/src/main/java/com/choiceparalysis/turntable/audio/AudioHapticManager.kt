@@ -26,6 +26,7 @@ enum class SoundEffect(val resId: Int) {
     WHEEL_TICK(R.raw.wheel_tick),
     COIN_SPIN(R.raw.coin_spin),
     DICE_BOUNCE(R.raw.dice_bounce),
+    DICE_ROLL(R.raw.dice_roll),
 }
 
 class AudioHapticManager private constructor(private val context: Context) {
@@ -185,6 +186,20 @@ class AudioHapticManager private constructor(private val context: Context) {
                 composition
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 0)
             }
+            SoundEffect.DICE_ROLL -> {
+                // Full dice roll: rapid decreasing impacts matching 1s animation
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 1.0f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 80)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 140)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 200)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 280)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 360)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.2f, 450)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.15f, 550)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.1f, 650)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.08f, 780)
+            }
         }
 
         vibrator.vibrate(composition.compose())
@@ -233,6 +248,12 @@ class AudioHapticManager private constructor(private val context: Context) {
             }
             SoundEffect.DICE_BOUNCE -> {
                 vibrator.vibrate(VibrationEffect.createOneShot(12, 180))
+            }
+            SoundEffect.DICE_ROLL -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 30, 50, 30, 60, 30, 80, 40, 90, 50, 100, 60, 130, 80, 130, 120),
+                    intArrayOf(255, 0, 200, 0, 160, 0, 130, 0, 100, 0, 80, 0, 60, 0, 40, 0), -1
+                ))
             }
         }
     }

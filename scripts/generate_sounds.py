@@ -212,6 +212,45 @@ def generate_dice_bounce():
     return samples
 
 
+def generate_dice_roll():
+    """Realistic quick dice roll - multiple rapid bounces with rattle, ~1s."""
+    duration = 1.0
+    samples = []
+    # Bounce events: (time, amplitude, freq)
+    bounces = [
+        (0.00, 1.0, 300),   # first hit
+        (0.08, 0.85, 280),  # second
+        (0.14, 0.7, 320),   # third
+        (0.20, 0.6, 260),   # fourth
+        (0.28, 0.5, 350),   # fifth
+        (0.36, 0.4, 290),   # sixth
+        (0.45, 0.3, 310),   # seventh
+        (0.55, 0.22, 270),  # settling
+        (0.65, 0.15, 340),  # settling
+        (0.78, 0.1, 300),   # final tap
+    ]
+    for i in range(int(SAMPLE_RATE * duration)):
+        t = i / SAMPLE_RATE
+        s = 0.0
+        for bt, amp, freq in bounces:
+            if t >= bt:
+                dt = t - bt
+                # Each bounce: sharp attack + fast decay
+                env = math.exp(-dt * 25) * amp
+                # Impact body
+                s += sine(freq, dt) * 0.5 * env
+                # Noise burst for hard surface texture
+                s += noise() * 0.3 * math.exp(-dt * 40) * amp
+                # High freq click for hard impact
+                s += sine(1800, dt) * 0.1 * math.exp(-dt * 50) * amp
+        # Background rattle (dice sliding on surface)
+        if t < 0.6:
+            rattle_env = math.exp(-t * 5) * 0.08
+            s += noise() * rattle_env
+        samples.append(s * 0.8)
+    return samples
+
+
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     print("Generating sound effects...")
@@ -225,6 +264,7 @@ def main():
     write_wav('wheel_tick.wav', generate_wheel_tick())
     write_wav('coin_spin.wav', generate_coin_spin())
     write_wav('dice_bounce.wav', generate_dice_bounce())
+    write_wav('dice_roll.wav', generate_dice_roll())
 
     print("\nDone! Replace .mp3 files with these .wav files.")
     print("Remember to update SoundEffect enum resId references if extension changes.")

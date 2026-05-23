@@ -13,7 +13,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -91,19 +90,8 @@ fun Dice3DRoll(
     var spinRight by remember { mutableIntStateOf(3) }
     var isSpinning by remember { mutableStateOf(false) }
 
-    // Bounce sound on each landing during dice roll
+    // Full dice roll sound at animation start
     val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
-    LaunchedEffect(Unit) {
-        var wasNegative = false
-        snapshotFlow { bounceAnim.value }.collect { value ->
-            val isNegative = value < -2f
-            if (wasNegative && !isNegative) {
-                // Transition from negative to zero/positive = bounce landing
-                audioHaptic.playFeedback(SoundEffect.DICE_BOUNCE)
-            }
-            wasNegative = isNegative
-        }
-    }
 
     // Sync result from ViewModel + pop animation
     LaunchedEffect(value) {
@@ -126,6 +114,7 @@ fun Dice3DRoll(
     LaunchedEffect(isAnimating) {
         if (!isAnimating) return@LaunchedEffect
 
+        audioHaptic.playFeedback(SoundEffect.DICE_ROLL)
         breathAnim.stop()
         bounceAnim.snapTo(0f)
         rotationAnim.snapTo(0f)
