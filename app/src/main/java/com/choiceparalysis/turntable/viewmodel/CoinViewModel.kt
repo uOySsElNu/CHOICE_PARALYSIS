@@ -5,10 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.DecisionMethod
-import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
+import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,24 +19,19 @@ enum class CoinSide(val displayName: String) {
     TAILS("反面")
 }
 
-class CoinDiceViewModel(application: Application) : AndroidViewModel(application) {
+class CoinViewModel(application: Application) : AndroidViewModel(application) {
     private val historyRepository = HistoryRepository(application)
     private val settingsRepository = SettingsRepository(application)
 
     private val _coinResult = MutableStateFlow<CoinSide?>(null)
     val coinResult: StateFlow<CoinSide?> = _coinResult.asStateFlow()
 
-    private val _diceValue = MutableStateFlow<Int?>(null)
-    val diceValue: StateFlow<Int?> = _diceValue.asStateFlow()
-
     private val _isAnimating = MutableStateFlow(false)
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
 
     private val _pendingCoinResult = MutableStateFlow<CoinSide?>(null)
     val pendingCoinResult: StateFlow<CoinSide?> = _pendingCoinResult.asStateFlow()
-    private val _pendingDiceValue = MutableStateFlow<Int?>(null)
 
-    // Custom image URIs
     private val _customCoinHeadsUri = MutableStateFlow<String?>(null)
     val customCoinHeadsUri: StateFlow<String?> = _customCoinHeadsUri.asStateFlow()
 
@@ -72,7 +67,6 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
         val result = _pendingCoinResult.value ?: return
         _coinResult.value = result
         _isAnimating.value = false
-
         viewModelScope.launch {
             historyRepository.addEntry(
                 HistoryEntry(
@@ -84,11 +78,9 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /** Drag-triggered flip: record result without triggering button animation */
     fun flipCoinDirectly(result: CoinSide) {
         _pendingCoinResult.value = result
         _coinResult.value = result
-
         viewModelScope.launch {
             historyRepository.addEntry(
                 HistoryEntry(
@@ -100,32 +92,8 @@ class CoinDiceViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun rollDice() {
-        if (_isAnimating.value) return
-        _isAnimating.value = true
-        _diceValue.value = null
-        _pendingDiceValue.value = (1..6).random()
-    }
-
-    fun onDiceRollAnimationComplete() {
-        val result = _pendingDiceValue.value ?: return
-        _diceValue.value = result
-        _isAnimating.value = false
-
-        viewModelScope.launch {
-            historyRepository.addEntry(
-                HistoryEntry(
-                    method = DecisionMethod.DICE_ROLL,
-                    options = listOf("1", "2", "3", "4", "5", "6"),
-                    result = result.toString(),
-                )
-            )
-        }
-    }
-
-    fun clearResults() {
+    fun clearResult() {
         _coinResult.value = null
-        _diceValue.value = null
         _isAnimating.value = false
     }
 

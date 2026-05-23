@@ -1,4 +1,4 @@
-package com.choiceparalysis.turntable.ui.coindice
+package com.choiceparalysis.turntable.ui.components
 
 import android.content.Context
 import android.graphics.Bitmap

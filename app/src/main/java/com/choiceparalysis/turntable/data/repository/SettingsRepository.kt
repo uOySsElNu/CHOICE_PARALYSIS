@@ -8,7 +8,7 @@ import com.choiceparalysis.turntable.data.datastore.DataStoreKeys
 import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.OptionGroup
-import com.choiceparalysis.turntable.ui.coindice.CircularCropUtil
+import com.choiceparalysis.turntable.ui.components.CircularCropUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

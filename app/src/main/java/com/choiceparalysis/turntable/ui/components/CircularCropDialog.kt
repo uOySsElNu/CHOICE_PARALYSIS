@@ -1,4 +1,4 @@
-package com.choiceparalysis.turntable.ui.coindice
+package com.choiceparalysis.turntable.ui.components
 
 import android.net.Uri
 import androidx.compose.foundation.Image

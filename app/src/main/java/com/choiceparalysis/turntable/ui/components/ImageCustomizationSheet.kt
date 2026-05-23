@@ -1,4 +1,4 @@
-package com.choiceparalysis.turntable.ui.coindice
+package com.choiceparalysis.turntable.ui.components
 
 import android.content.Intent
 import android.net.Uri
@@ -63,13 +63,13 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
-import com.choiceparalysis.turntable.viewmodel.CoinDiceViewModel
+import com.choiceparalysis.turntable.viewmodel.CoinViewModel
 import com.choiceparalysis.turntable.viewmodel.CoinSide
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ImageCustomizationSheet(
-    viewModel: CoinDiceViewModel,
+    viewModel: CoinViewModel,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
