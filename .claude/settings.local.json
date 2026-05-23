@@ -51,7 +51,9 @@
       "Bash(unzip -o sox.zip -d sox_extract)",
       "Bash(export PATH=\"$SOX_DIR:$PATH\")",
       "Bash(export PATH=\"/tmp/sox_extract/sox-14.4.2:$PATH\")",
-      "Bash(bash scripts/generate_sounds.sh)"
+      "Bash(bash scripts/generate_sounds.sh)",
+      "Bash(explorer D:\\\\\\\\Android\\\\\\\\Projects\\\\\\\\CHOICEPARALYSIS\\\\\\\\app\\\\\\\\src\\\\\\\\main\\\\\\\\res\\\\\\\\raw *)",
+      "Bash(cmd.exe *)"
     ]
   },
   "enabledMcpjsonServers": [
