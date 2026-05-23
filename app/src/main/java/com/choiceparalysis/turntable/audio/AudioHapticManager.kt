@@ -95,16 +95,21 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     fun playSound(effect: SoundEffect) {
-        if (!_soundEnabled.value) return
-        if (audioManager.ringerMode == AudioManager.RINGER_MODE_SILENT) return
-        if (!loaded) loadSounds()
-        val soundId = soundMap[effect] ?: return
-        soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+        try {
+            if (!_soundEnabled.value) return
+            if (audioManager.ringerMode == AudioManager.RINGER_MODE_SILENT) return
+            if (!loaded) loadSounds()
+            val soundId = soundMap[effect] ?: return
+            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+        } catch (_: Exception) {
+            // Gracefully handle sound playback failures
+        }
     }
 
     fun performHaptic(type: HapticType, view: View? = null) {
-        if (!_hapticEnabled.value) return
-        when (type) {
+        try {
+            if (!_hapticEnabled.value) return
+            when (type) {
             HapticType.SPIN_TICK -> {
                 view?.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
                     ?: vibrateTick()
@@ -128,6 +133,9 @@ class AudioHapticManager private constructor(private val context: Context) {
             HapticType.WINNER -> {
                 vibratePattern(longArrayOf(0, 100, 50, 100, 50, 200))
             }
+        }
+        } catch (_: Exception) {
+            // Gracefully handle haptic failures
         }
     }
 

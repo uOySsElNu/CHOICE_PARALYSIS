@@ -33,7 +33,9 @@
       "Bash(git reset *)",
       "Bash(./gradlew clean *)",
       "mcp__ide__getDiagnostics",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(grep -r \"activity.compose\" app/build.gradle*)",
+      "Bash(grep -r \"activity-compose\" app/build.gradle*)"
     ]
   },
   "enabledMcpjsonServers": [
