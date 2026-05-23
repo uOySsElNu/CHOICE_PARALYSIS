@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.choiceparalysis.turntable.audio.AudioHapticManager
-import com.choiceparalysis.turntable.audio.HapticType
 import com.choiceparalysis.turntable.audio.SoundEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,8 +73,7 @@ fun FingerRouletteScreen(
     val winnerScale = remember { Animatable(1f) }
     LaunchedEffect(winnerId) {
         if (winnerId != null) {
-            audioHaptic.playSound(SoundEffect.WINNER_CHEER)
-            audioHaptic.performHaptic(HapticType.WINNER)
+            audioHaptic.playFeedback(SoundEffect.WINNER_CHEER)
             winnerScale.animateTo(2f, tween(600))
             winnerScale.animateTo(1.5f, tween(300))
         }
@@ -86,8 +84,7 @@ fun FingerRouletteScreen(
     LaunchedEffect(fingers) {
         val eliminatedCount = fingers.count { it.isEliminated }
         if (eliminatedCount > lastEliminatedCount && phase == RoulettePhase.PLAYING) {
-            audioHaptic.playSound(SoundEffect.ELIMINATION_DRUM)
-            audioHaptic.performHaptic(HapticType.ELIMINATION)
+            audioHaptic.playFeedback(SoundEffect.ELIMINATION_DRUM)
         }
         lastEliminatedCount = eliminatedCount
     }

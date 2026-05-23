@@ -7,8 +7,6 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.view.HapticFeedbackConstants
-import android.view.View
 import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -25,15 +23,6 @@ enum class SoundEffect(val resId: Int) {
     YESNO_CHIME(R.raw.yesno_chime),
     ELIMINATION_DRUM(R.raw.elimination_drum),
     WINNER_CHEER(R.raw.winner_cheer),
-}
-
-enum class HapticType {
-    SPIN_TICK,
-    RESULT_HIT,
-    COIN_FLIP,
-    DICE_BOUNCE,
-    ELIMINATION,
-    WINNER,
 }
 
 class AudioHapticManager private constructor(private val context: Context) {
@@ -75,6 +64,7 @@ class AudioHapticManager private constructor(private val context: Context) {
         }
     }
 
+    private val supportsComposition = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     init {
@@ -94,65 +84,146 @@ class AudioHapticManager private constructor(private val context: Context) {
         loaded = true
     }
 
-    fun playSound(effect: SoundEffect) {
+    /**
+     * Unified feedback: plays sound and haptic simultaneously.
+     * Haptic pattern is designed to match the sound envelope.
+     */
+    fun playFeedback(effect: SoundEffect) {
         try {
-            if (!_soundEnabled.value) return
-            if (audioManager.ringerMode == AudioManager.RINGER_MODE_SILENT) return
-            if (!loaded) loadSounds()
-            val soundId = soundMap[effect] ?: return
-            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-        } catch (_: Exception) {
-            // Gracefully handle sound playback failures
+            // Sound
+            if (_soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT) {
+                if (!loaded) loadSounds()
+                val soundId = soundMap[effect]
+                if (soundId != null && soundId != 0) {
+                    soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                }
+            }
+        } catch (_: Exception) {}
+
+        try {
+            // Haptic - synced with sound envelope
+            if (_hapticEnabled.value) {
+                playHapticFor(effect)
+            }
+        } catch (_: Exception) {}
+    }
+
+    private fun playHapticFor(effect: SoundEffect) {
+        if (supportsComposition) {
+            playCompositionHaptic(effect)
+        } else {
+            playLegacyHaptic(effect)
         }
     }
 
-    fun performHaptic(type: HapticType, view: View? = null) {
+    /**
+     * Composition API (API 30+): uses haptic primitives that match each sound's character.
+     * These primitives drive the X-axis linear motor with precise timing.
+     */
+    private fun playCompositionHaptic(effect: SoundEffect) {
+        val composition = VibrationEffect.startComposition()
+
+        when (effect) {
+            SoundEffect.SPIN_DING -> {
+                // Metallic ding: sharp click at impact, matching the 0.8s decay
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 80)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 200)
+            }
+            SoundEffect.COIN_CLINK -> {
+                // Short metallic clink: two quick ticks matching the 0.15s burst
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.9f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.7f, 40)
+            }
+            SoundEffect.DICE_TAP -> {
+                // Wooden tap: low thud matching the 0.12s impact
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 30)
+            }
+            SoundEffect.YESNO_CHIME -> {
+                // Mysterious chime: slow rise matching the ascending notes over 1.0s
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.7f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 350)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 500)
+            }
+            SoundEffect.ELIMINATION_DRUM -> {
+                // Tense drum: heavy impact matching the 0.4s boom
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD, 0.8f, 60)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.4f, 150)
+            }
+            SoundEffect.WINNER_CHEER -> {
+                // Celebration: quick rise + triple clicks matching the 1.2s chord
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE, 0.6f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 200)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.8f, 350)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 500)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 700)
+            }
+        }
+
+        vibrator.vibrate(composition.compose())
+    }
+
+    /**
+     * Legacy fallback (pre-API 30): waveform-based patterns.
+     */
+    private fun playLegacyHaptic(effect: SoundEffect) {
+        when (effect) {
+            SoundEffect.SPIN_DING -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 30, 80, 15),
+                    intArrayOf(255, 0, 180, 0), -1
+                ))
+            }
+            SoundEffect.COIN_CLINK -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(20, 220))
+            }
+            SoundEffect.DICE_TAP -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
+            }
+            SoundEffect.YESNO_CHIME -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 200, 100, 200),
+                    intArrayOf(100, 0, 255, 0), -1
+                ))
+            }
+            SoundEffect.ELIMINATION_DRUM -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 40, 30, 80),
+                    intArrayOf(255, 0, 200, 0), -1
+                ))
+            }
+            SoundEffect.WINNER_CHEER -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 150, 80, 30, 50, 30, 50, 30),
+                    intArrayOf(150, 0, 255, 0, 200, 0, 255, 0), -1
+                ))
+            }
+        }
+    }
+
+    /**
+     * Haptic-only feedback (no sound). Used for continuous touch feedback like spin wheel drag.
+     */
+    fun tick() {
         try {
             if (!_hapticEnabled.value) return
-            when (type) {
-            HapticType.SPIN_TICK -> {
-                view?.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
-                    ?: vibrateTick()
+            if (supportsComposition) {
+                vibrator.vibrate(VibrationEffect.startComposition()
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 0)
+                    .compose()
+                )
+            } else {
+                vibrator.vibrate(VibrationEffect.createOneShot(10, 150))
             }
-            HapticType.RESULT_HIT -> {
-                view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    ?: vibrateHeavy()
-            }
-            HapticType.COIN_FLIP -> {
-                view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                    ?: vibrateMedium()
-            }
-            HapticType.DICE_BOUNCE -> {
-                view?.performHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
-                    ?: vibrateTick()
-            }
-            HapticType.ELIMINATION -> {
-                view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    ?: vibrateHeavy()
-            }
-            HapticType.WINNER -> {
-                vibratePattern(longArrayOf(0, 100, 50, 100, 50, 200))
-            }
-        }
-        } catch (_: Exception) {
-            // Gracefully handle haptic failures
-        }
-    }
-
-    private fun vibrateTick() {
-        vibrator.vibrate(VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-
-    private fun vibrateMedium() {
-        vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-
-    private fun vibrateHeavy() {
-        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-    }
-
-    private fun vibratePattern(pattern: LongArray) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
+        } catch (_: Exception) {}
     }
 
     fun release() {

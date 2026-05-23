@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.choiceparalysis.turntable.audio.AudioHapticManager
-import com.choiceparalysis.turntable.audio.HapticType
 import com.choiceparalysis.turntable.audio.SoundEffect
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -89,8 +88,7 @@ fun SpinWheel(
         val idx = segmentIndexAt(animatable.value)
         settledResult = options[idx]
         onSpinResult(options[idx])
-        audioHaptic.playSound(SoundEffect.SPIN_DING)
-        audioHaptic.performHaptic(HapticType.RESULT_HIT)
+        audioHaptic.playFeedback(SoundEffect.SPIN_DING)
     }
 
     // Result-drag detection: fires AFTER drag stops, with debounce
@@ -169,7 +167,7 @@ fun SpinWheel(
                                 velocities.add(delta / dt * 1000f)
                                 if (velocities.size > 5) velocities.removeAt(0)
                                 prevTime = now
-                                audioHaptic.performHaptic(HapticType.SPIN_TICK)
+                                audioHaptic.tick()
                                 change.consume()
                             },
                             onDragEnd = {
@@ -199,8 +197,7 @@ fun SpinWheel(
                                         val idx = segmentIndexAt(animatable.value)
                                         settledResult = options[idx]
                                         onSpinResult(options[idx])
-                                        audioHaptic.playSound(SoundEffect.SPIN_DING)
-                                        audioHaptic.performHaptic(HapticType.RESULT_HIT)
+                                        audioHaptic.playFeedback(SoundEffect.SPIN_DING)
                                     }
                                 }
                             }
