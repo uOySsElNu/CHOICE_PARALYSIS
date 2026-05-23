@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
-import com.choiceparalysis.turntable.navigation.AppDestinations
 import com.choiceparalysis.turntable.navigation.AppNavGraph
+import com.choiceparalysis.turntable.navigation.BottomNavDestinations
 import com.choiceparalysis.turntable.ui.theme.CHOICEPARALYSISTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,18 +45,13 @@ class MainActivity : ComponentActivity() {
 fun ChoiceParalysisApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: AppDestinations.SPIN_WHEEL.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: BottomNavDestinations.HUB.route
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            AppDestinations.entries.forEach { dest ->
+            BottomNavDestinations.entries.forEach { dest ->
                 item(
-                    icon = {
-                        Icon(
-                            dest.icon,
-                            contentDescription = dest.label
-                        )
-                    },
+                    icon = { Icon(dest.icon, contentDescription = dest.label) },
                     label = { Text(dest.label) },
                     selected = currentRoute == dest.route,
                     onClick = {
