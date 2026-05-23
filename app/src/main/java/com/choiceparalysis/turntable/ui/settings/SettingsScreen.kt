@@ -179,7 +179,7 @@ fun SettingsScreen(
                     headlineContent = { Text("版本") },
                     trailingContent = {
                         Text(
-                            text = "1.3.0",
+                            text = "1.5.0",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
