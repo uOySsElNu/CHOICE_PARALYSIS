@@ -187,18 +187,13 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 0)
             }
             SoundEffect.DICE_ROLL -> {
-                // Full dice roll: rapid decreasing impacts matching 1s animation
+                // 5 impacts matching real recording: 0ms, 180ms, 350ms, 500ms, 630ms
                 composition
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 1.0f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 80)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 140)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 200)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 280)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 360)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.2f, 450)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.15f, 550)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.1f, 650)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.08f, 780)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 180)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.45f, 350)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
             }
         }
 
@@ -250,9 +245,10 @@ class AudioHapticManager private constructor(private val context: Context) {
                 vibrator.vibrate(VibrationEffect.createOneShot(12, 180))
             }
             SoundEffect.DICE_ROLL -> {
+                // 5 impacts at 0, 180, 350, 500, 630ms
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 30, 50, 30, 60, 30, 80, 40, 90, 50, 100, 60, 130, 80, 130, 120),
-                    intArrayOf(255, 0, 200, 0, 160, 0, 130, 0, 100, 0, 80, 0, 60, 0, 40, 0), -1
+                    longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
+                    intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
                 ))
             }
         }

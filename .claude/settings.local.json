@@ -56,7 +56,16 @@
       "Bash(cmd.exe *)",
       "WebFetch(domain:freesound.org)",
       "WebFetch(domain:pixabay.com)",
-      "WebFetch(domain:api.github.com)"
+      "WebFetch(domain:api.github.com)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n stat)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n stats)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n spectrogram -o /tmp/dice_spec.png)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n remix - stat)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n rate 44100 spectrogram -x 500 -y 257 -l -o /tmp/dice_spec.png)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n remix - trim 0 0.1 stat)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n remix - trim 0.1 0.2 stat)",
+      "Bash(sox D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/dice_roll.wav -n remix - trim 0.3 0.3 stat)",
+      "Bash(sox /tmp/dice_roll_real.wav -n stats)"
     ]
   },
   "enabledMcpjsonServers": [
