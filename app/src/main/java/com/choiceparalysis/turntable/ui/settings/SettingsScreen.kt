@@ -52,6 +52,8 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val settingsRepository = remember { SettingsRepository(context) }
     val followSystemTheme by settingsRepository.followSystemTheme.collectAsState(initial = true)
+    val soundEnabled by settingsRepository.soundEnabled.collectAsState(initial = true)
+    val hapticEnabled by settingsRepository.hapticEnabled.collectAsState(initial = true)
 
     Column(
         modifier = modifier
@@ -69,6 +71,54 @@ fun SettingsScreen(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Sound & Haptic section
+        Text(
+            text = "音效与震动",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column {
+                ListItem(
+                    headlineContent = { Text("音效") },
+                    supportingContent = { Text("决策时播放音效") },
+                    trailingContent = {
+                        Switch(
+                            checked = soundEnabled,
+                            onCheckedChange = { value ->
+                                scope.launch { settingsRepository.setSoundEnabled(value) }
+                            }
+                        )
+                    }
+                )
+                ListItem(
+                    headlineContent = { Text("震动") },
+                    supportingContent = { Text("决策时触觉反馈") },
+                    trailingContent = {
+                        Switch(
+                            checked = hapticEnabled,
+                            onCheckedChange = { value ->
+                                scope.launch { settingsRepository.setHapticEnabled(value) }
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Display section
         Text(

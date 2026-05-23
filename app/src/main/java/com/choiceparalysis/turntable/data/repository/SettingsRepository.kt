@@ -25,6 +25,14 @@ class SettingsRepository(private val context: Context) {
         prefs[DataStoreKeys.FOLLOW_SYSTEM_THEME]?.toBooleanStrictOrNull() ?: true
     }
 
+    val soundEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[DataStoreKeys.SOUND_ENABLED]?.toBooleanStrictOrNull() ?: true
+    }
+
+    val hapticEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[DataStoreKeys.HAPTIC_ENABLED]?.toBooleanStrictOrNull() ?: true
+    }
+
     val selectedPreset: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[DataStoreKeys.SELECTED_PRESET] ?: "CLASSIC_RAINBOW"
     }
@@ -71,6 +79,18 @@ class SettingsRepository(private val context: Context) {
     suspend fun setFollowSystemTheme(follow: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[DataStoreKeys.FOLLOW_SYSTEM_THEME] = follow.toString()
+        }
+    }
+
+    suspend fun setSoundEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[DataStoreKeys.SOUND_ENABLED] = enabled.toString()
+        }
+    }
+
+    suspend fun setHapticEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[DataStoreKeys.HAPTIC_ENABLED] = enabled.toString()
         }
     }
 

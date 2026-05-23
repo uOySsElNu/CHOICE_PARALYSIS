@@ -21,4 +21,6 @@ object DataStoreKeys {
     val COIN_PRESETS = stringPreferencesKey("coin_presets")
     val OPTION_WEIGHTS = stringPreferencesKey("option_weights")
     val FOLLOW_SYSTEM_THEME = stringPreferencesKey("follow_system_theme")
+    val SOUND_ENABLED = stringPreferencesKey("sound_enabled")
+    val HAPTIC_ENABLED = stringPreferencesKey("haptic_enabled")
 }
