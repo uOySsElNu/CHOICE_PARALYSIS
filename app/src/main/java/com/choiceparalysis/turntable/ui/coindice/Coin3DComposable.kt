@@ -72,7 +72,6 @@ fun Coin3DFlip(
     onDragFlipComplete: (CoinSide) -> Unit = {},
 ) {
     val rotation = remember { Animatable(0f) }
-    val bounce = remember { Animatable(0f) }
     val scale = remember { Animatable(1f) }
     val highlight = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
@@ -126,16 +125,6 @@ fun Coin3DFlip(
         val remainder = ((rotation.value % 360f) + 360f) % 360f
         val totalRotation = rotation.value + 1800f - remainder + endAngle
 
-        // 弹跳动画
-        launch {
-            bounce.snapTo(0f)
-            bounce.animateTo(0f, keyframes {
-                durationMillis = 2000
-                0f at 0
-                (-20f) at 1600
-                0f at 2000 using StandardEasing.EaseOutQuart
-            })
-        }
         // 缩放动画
         launch {
             scale.snapTo(1f)
@@ -320,7 +309,6 @@ fun Coin3DFlip(
                 }
                 .graphicsLayer {
                     rotationY = rotation.value
-                    translationY = bounce.value
                     scaleX = scale.value
                     scaleY = scale.value
                     cameraDistance = 12f * density

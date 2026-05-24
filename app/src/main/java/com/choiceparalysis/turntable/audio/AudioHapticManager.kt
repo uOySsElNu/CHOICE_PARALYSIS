@@ -18,18 +18,13 @@ import kotlinx.coroutines.launch
 
 enum class SoundEffect(val resId: Int) {
     SPIN_DING(R.raw.spin_ding),
-    COIN_CLINK(R.raw.coin_clink),
     DICE_TAP(R.raw.dice_tap),
     YESNO_CHIME(R.raw.yesno_chime),
     ELIMINATION_DRUM(R.raw.elimination_drum),
     WINNER_CHEER(R.raw.winner_cheer),
     WHEEL_TICK(R.raw.wheel_tick),
-    COIN_SPIN(R.raw.coin_spin),
     DICE_BOUNCE(R.raw.dice_bounce),
     DICE_ROLL(R.raw.dice_roll),
-    COIN_FLIP(R.raw.coin_flip),
-    COIN_AIR(R.raw.coin_air),
-    COIN_LAND(R.raw.coin_land),
     COIN_BUTTON(R.raw.coin_button),
     COIN_DRAG(R.raw.coin_drag),
 }
@@ -158,12 +153,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 80)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 200)
             }
-            SoundEffect.COIN_CLINK -> {
-                // Short metallic clink: two quick ticks matching the 0.15s burst
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.9f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.7f, 40)
-            }
             SoundEffect.DICE_TAP -> {
                 // Wooden tap: low thud matching the 0.12s impact
                 composition
@@ -198,12 +187,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                 composition
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f, 0)
             }
-            SoundEffect.COIN_SPIN -> {
-                // Metallic spin: light tick for each half rotation
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 20)
-            }
             SoundEffect.DICE_BOUNCE -> {
                 // Bounce impact: low tick for each bounce landing
                 composition
@@ -217,26 +200,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.45f, 350)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
-            }
-            SoundEffect.COIN_FLIP -> {
-                // Coin flick: sharp tick at start
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 100)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 200)
-            }
-            SoundEffect.COIN_AIR -> {
-                // Coin in air: gentle continuous ticks
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.2f, 0)
-            }
-            SoundEffect.COIN_LAND -> {
-                // Coin landing: multiple impacts
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.9f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 150)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 300)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
             }
             SoundEffect.COIN_BUTTON -> {
                 // 2s combined: flick at start, settling at end
@@ -270,9 +233,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                     intArrayOf(255, 0, 180, 0), -1
                 ))
             }
-            SoundEffect.COIN_CLINK -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(20, 220))
-            }
             SoundEffect.DICE_TAP -> {
                 vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
             }
@@ -297,9 +257,6 @@ class AudioHapticManager private constructor(private val context: Context) {
             SoundEffect.WHEEL_TICK -> {
                 vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
             }
-            SoundEffect.COIN_SPIN -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(10, 130))
-            }
             SoundEffect.DICE_BOUNCE -> {
                 vibrator.vibrate(VibrationEffect.createOneShot(12, 180))
             }
@@ -308,21 +265,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                 vibrator.vibrate(VibrationEffect.createWaveform(
                     longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
                     intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
-                ))
-            }
-            SoundEffect.COIN_FLIP -> {
-                vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 15, 80, 10, 80),
-                    intArrayOf(220, 0, 150, 0, 100), -1
-                ))
-            }
-            SoundEffect.COIN_AIR -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(10, 80))
-            }
-            SoundEffect.COIN_LAND -> {
-                vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 25, 100, 20, 100, 15, 100),
-                    intArrayOf(200, 0, 140, 0, 90, 0, 50), -1
                 ))
             }
             SoundEffect.COIN_BUTTON -> {

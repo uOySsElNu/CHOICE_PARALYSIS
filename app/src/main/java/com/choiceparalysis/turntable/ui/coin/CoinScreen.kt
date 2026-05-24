@@ -42,8 +42,6 @@ import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.toBitmap
 import com.choiceparalysis.turntable.R
-import com.choiceparalysis.turntable.audio.AudioHapticManager
-import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.ui.coindice.Coin3DFlip
 import com.choiceparalysis.turntable.ui.components.ImageCustomizationSheet
 import com.choiceparalysis.turntable.viewmodel.CoinSide
@@ -101,8 +99,6 @@ fun CoinScreen(
 
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
-            val audioHaptic = AudioHapticManager.getInstance(context)
-            audioHaptic.playFeedback(SoundEffect.COIN_CLINK)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             viewModel.clearResult()
         }
