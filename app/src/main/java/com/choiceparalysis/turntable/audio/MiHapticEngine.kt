@@ -16,56 +16,82 @@ object MiHapticEngine {
     private var hapticPlayerClass: Class<*>? = null
     private var checked = false
 
+    // Cached method references
+    private var startComposeMethod: java.lang.reflect.Method? = null
+    private var addPrimitiveMethod: java.lang.reflect.Method? = null
+    private var createTransientMethod: java.lang.reflect.Method? = null
+    private var createContinuousMethod: java.lang.reflect.Method? = null
+    private var hapticPlayerConstructor: java.lang.reflect.Constructor<*>? = null
+    private var hapticPlayerStartMethod: java.lang.reflect.Method? = null
+
+    // PrimitiveEffect interface (inner class of DynamicEffect)
+    private var primitiveEffectClass: Class<*>? = null
+
     fun isAvailable(context: Context): Boolean {
         if (checked) return available
         checked = true
         return try {
             dynamicEffectClass = Class.forName("miui.os.DynamicEffect")
             hapticPlayerClass = Class.forName("miui.os.HapticPlayer")
-            available = true
-            Log.d(TAG, "MiHaptic available")
-            true
-        } catch (_: Exception) {
+
+            // Find PrimitiveEffect inner interface
+            primitiveEffectClass = dynamicEffectClass!!.classes.find {
+                it.simpleName == "PrimitiveEffect"
+            }
+
+            // Log all available methods for debugging
+            Log.d(TAG, "DynamicEffect methods:")
+            dynamicEffectClass!!.methods.forEach { m ->
+                Log.d(TAG, "  ${m.name}(${m.parameterTypes.joinToString { it.simpleName }})")
+            }
+            Log.d(TAG, "DynamicEffect inner classes:")
+            dynamicEffectClass!!.classes.forEach { c ->
+                Log.d(TAG, "  ${c.simpleName}")
+            }
+            Log.d(TAG, "HapticPlayer constructors:")
+            hapticPlayerClass!!.constructors.forEach { c ->
+                Log.d(TAG, "  (${c.parameterTypes.joinToString { it.simpleName }})")
+            }
+
+            // Cache methods
+            startComposeMethod = dynamicEffectClass!!.getMethod("startCompose")
+
+            // Find createTransient - could be (float, float) or (Float, Float)
+            createTransientMethod = dynamicEffectClass!!.methods.find {
+                it.name == "createTransient" && it.parameterTypes.size == 2
+            }
+
+            // Find createContinuous
+            createContinuousMethod = dynamicEffectClass!!.methods.find {
+                it.name == "createContinuous" && it.parameterTypes.size == 3
+            }
+
+            // Find addPrimitive - match by name and parameter count
+            addPrimitiveMethod = dynamicEffectClass!!.methods.find {
+                it.name == "addPrimitive" && it.parameterTypes.size == 2
+            }
+
+            // HapticPlayer constructor
+            hapticPlayerConstructor = hapticPlayerClass!!.constructors.firstOrNull()
+            hapticPlayerStartMethod = hapticPlayerClass!!.getMethod("start")
+
+            available = startComposeMethod != null &&
+                    createTransientMethod != null &&
+                    createContinuousMethod != null &&
+                    addPrimitiveMethod != null &&
+                    hapticPlayerConstructor != null
+
+            Log.d(TAG, "MiHaptic available: $available")
+            if (available) {
+                Log.d(TAG, "  addPrimitive params: ${addPrimitiveMethod!!.parameterTypes.map { it.simpleName }}")
+                Log.d(TAG, "  PrimitiveEffect class: ${primitiveEffectClass?.name}")
+            }
+
+            available
+        } catch (e: Exception) {
+            Log.w(TAG, "MiHaptic init failed", e)
             available = false
-            Log.d(TAG, "MiHaptic not available")
             false
-        }
-    }
-
-    /**
-     * Play a transient (sharp click) effect.
-     * @param intensity 0-100
-     * @param frequency 0-100 (sharpness)
-     */
-    fun playTransient(intensity: Int, frequency: Int) {
-        if (!available) return
-        try {
-            val effect = createEffect {
-                val transient = createTransient(intensity, frequency)
-                invokeAddPrimitive(it, 0.0, transient)
-            }
-            playEffect(effect)
-        } catch (e: Exception) {
-            Log.w(TAG, "playTransient failed", e)
-        }
-    }
-
-    /**
-     * Play a continuous (sustained) effect.
-     * @param intensity 0-100
-     * @param frequency 0-100
-     * @param durationMs duration in milliseconds
-     */
-    fun playContinuous(intensity: Int, frequency: Int, durationMs: Int) {
-        if (!available) return
-        try {
-            val effect = createEffect {
-                val continuous = createContinuous(intensity, frequency, durationMs / 1000.0)
-                invokeAddPrimitive(it, 0.0, continuous)
-            }
-            playEffect(effect)
-        } catch (e: Exception) {
-            Log.w(TAG, "playContinuous failed", e)
         }
     }
 
@@ -75,54 +101,29 @@ object MiHapticEngine {
     fun playComposed(primitives: List<HapticPrimitive>) {
         if (!available) return
         try {
-            val effect = createEffect { effectObj ->
-                for (p in primitives) {
-                    val primitive = when (p.type) {
-                        PrimitiveType.TRANSIENT -> createTransient(p.intensity, p.frequency)
-                        PrimitiveType.CONTINUOUS -> createContinuous(p.intensity, p.frequency, p.durationMs / 1000.0)
-                    }
-                    invokeAddPrimitive(effectObj, p.startTimeMs / 1000.0, primitive)
+            // Create DynamicEffect via startCompose()
+            val effect = startComposeMethod!!.invoke(null)!!
+
+            for (p in primitives) {
+                val primitive = when (p.type) {
+                    PrimitiveType.TRANSIENT -> createTransientMethod!!.invoke(
+                        null, p.intensity / 100f, p.frequency / 100f
+                    )!!
+                    PrimitiveType.CONTINUOUS -> createContinuousMethod!!.invoke(
+                        null, p.intensity / 100.0, p.frequency / 100.0, p.durationMs / 1000.0
+                    )!!
                 }
+                addPrimitiveMethod!!.invoke(effect, p.startTimeMs / 1000.0, primitive)
             }
-            playEffect(effect)
+
+            // Play via HapticPlayer
+            val player = hapticPlayerConstructor!!.newInstance(effect)
+            hapticPlayerStartMethod!!.invoke(player)
+
+            Log.d(TAG, "playComposed: ${primitives.size} primitives played")
         } catch (e: Exception) {
             Log.w(TAG, "playComposed failed", e)
         }
-    }
-
-    private fun createEffect(build: (Any) -> Unit): Any {
-        val startCompose = dynamicEffectClass!!.getMethod("startCompose")
-        val effect = startCompose.invoke(null)!!
-        build(effect)
-        return effect
-    }
-
-    private fun createTransient(intensity: Int, frequency: Int): Any {
-        val method = dynamicEffectClass!!.getMethod(
-            "createTransient", Float::class.java, Float::class.java
-        )
-        return method.invoke(null, intensity / 100f, frequency / 100f)!!
-    }
-
-    private fun createContinuous(intensity: Int, frequency: Int, durationSec: Double): Any {
-        val method = dynamicEffectClass!!.getMethod(
-            "createContinuous", Double::class.java, Double::class.java, Double::class.java
-        )
-        return method.invoke(null, intensity / 100.0, frequency / 100.0, durationSec)!!
-    }
-
-    private fun invokeAddPrimitive(effect: Any, timeSec: Double, primitive: Any) {
-        val method = dynamicEffectClass!!.getMethod(
-            "addPrimitive", Double::class.java, primitive.javaClass.interfaces.firstOrNull() ?: Any::class.java
-        )
-        method.invoke(effect, timeSec, primitive)
-    }
-
-    private fun playEffect(effect: Any) {
-        val constructor = hapticPlayerClass!!.getConstructor(effect.javaClass)
-        val player = constructor.newInstance(effect)
-        val startMethod = hapticPlayerClass!!.getMethod("start")
-        startMethod.invoke(player)
     }
 
     data class HapticPrimitive(
@@ -134,7 +135,7 @@ object MiHapticEngine {
     )
 
     enum class PrimitiveType {
-        TRANSIENT,   // sharp click
-        CONTINUOUS,  // sustained vibration
+        TRANSIENT,
+        CONTINUOUS,
     }
 }
