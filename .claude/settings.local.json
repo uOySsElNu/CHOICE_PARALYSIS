@@ -140,7 +140,16 @@
       "Bash(sox /tmp/tick_one.wav /tmp/tick_fast.wav speed 1.4)",
       "WebFetch(domain:dev.mi.com)",
       "Bash(curl -sL \"https://dev.mi.com/xiaomihyperos/documentation/detail?pId=1526\")",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(adb devices *)",
+      "Bash(export PATH=\"/d/Android/SDK/platform-tools:$PATH\")",
+      "Bash(adb -s 5cac01f5 logcat -c)",
+      "Bash(adb -s 5cac01f5 logcat -s MiHaptic -d)",
+      "Bash(adb -s 5cac01f5 logcat -d)",
+      "Bash(adb -s 5cac01f5 shell \"pm list packages | grep choiceparalysis\")",
+      "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep versionName\")",
+      "Bash(./gradlew installDebug)",
+      "Bash(grep -v \"^$\")"
     ]
   },
   "enabledMcpjsonServers": [
