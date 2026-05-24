@@ -57,7 +57,7 @@ class AudioHapticManager private constructor(private val context: Context) {
         .build()
 
     private val soundPool = SoundPool.Builder()
-        .setMaxStreams(4)
+        .setMaxStreams(8)
         .setAudioAttributes(audioAttributes)
         .build()
 

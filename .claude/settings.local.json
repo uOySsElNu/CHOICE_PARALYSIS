@@ -127,7 +127,9 @@
       "Bash(sox /tmp/coin.wav /tmp/land_seg.wav trim 3.0 1.2 gain -n)",
       "WebFetch(domain:cn.bing.com)",
       "WebFetch(domain:www.bing.com)",
-      "WebFetch(domain:developer.android.google.cn)"
+      "WebFetch(domain:developer.android.google.cn)",
+      "Bash(sox /tmp/wheeltick.wav /tmp/tick_short.wav trim 0.015 0.03 fade t 0.002 0 0.01 gain -n)",
+      "Bash(sox /tmp/wheeltick.wav /tmp/tick_ultra.wav trim 0.018 0.025 fade t 0.001 0 0.008 gain +3)"
     ]
   },
   "enabledMcpjsonServers": [
