@@ -136,6 +136,7 @@ class AudioHapticManager private constructor(private val context: Context) {
         // Trigger both on same frame for sync
         val soundReady = _soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT
         val hapticReady = _hapticEnabled.value
+        android.util.Log.d("AudioHaptic", "playFeedback $effect sound=$soundReady haptic=$hapticReady")
 
         if (soundReady) {
             try {
@@ -161,7 +162,9 @@ class AudioHapticManager private constructor(private val context: Context) {
 
     private fun playHapticFor(effect: SoundEffect) {
         // Priority: MiHaptic (Xiaomi) > Composition API > Legacy waveform
-        if (MiHapticEngine.isAvailable()) {
+        val miAvailable = MiHapticEngine.isAvailable()
+        android.util.Log.d("AudioHaptic", "playHapticFor $effect miHaptic=$miAvailable composition=$supportsComposition")
+        if (miAvailable) {
             playMiHaptic(effect)
         } else if (supportsComposition) {
             playCompositionHaptic(effect)
@@ -184,17 +187,17 @@ class AudioHapticManager private constructor(private val context: Context) {
                 MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 40, 30, 80, 200)
             )
             SoundEffect.COIN_BUTTON -> listOf(
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 70, 60),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 30, 50, 200, 1400),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 90, 40, 1600),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 35, 1800)
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 60),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 80, 50, 200, 1400),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 40, 1600),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 90, 35, 1800)
             )
             SoundEffect.COIN_DRAG -> listOf(
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 70, 60),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 20, 40, 400, 2000),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 35, 2500),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 30, 2800),
-                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 40, 25, 3200)
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 60),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 70, 40, 400, 2000),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 35, 2500),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 90, 30, 2800),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 25, 3200)
             )
             SoundEffect.DICE_ROLL -> listOf(
                 MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 20),

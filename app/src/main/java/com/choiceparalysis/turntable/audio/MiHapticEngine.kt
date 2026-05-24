@@ -79,11 +79,16 @@ object MiHapticEngine {
      * Play a composed haptic effect. Re-initializes if cached methods are stale.
      */
     fun playComposed(primitives: List<HapticPrimitive>) {
-        if (!isAvailable()) return
+        if (!isAvailable()) {
+            Log.d(TAG, "playComposed: not available")
+            return
+        }
         try {
+            Log.d(TAG, "playComposed: creating effect with ${primitives.size} primitives")
             val effect = startComposeMethod!!.invoke(null)!!
 
             for (p in primitives) {
+                Log.d(TAG, "  primitive: ${p.type} intensity=${p.intensity} freq=${p.frequency} time=${p.startTimeMs}ms dur=${p.durationMs}ms")
                 val primitive = when (p.type) {
                     PrimitiveType.TRANSIENT -> createTransientMethod!!.invoke(
                         null, p.intensity / 100f, p.frequency / 100f
@@ -97,8 +102,9 @@ object MiHapticEngine {
 
             val player = hapticPlayerConstructor!!.newInstance(effect)
             hapticPlayerStartMethod!!.invoke(player)
+            Log.d(TAG, "playComposed: started successfully")
         } catch (e: Exception) {
-            Log.w(TAG, "playComposed failed, re-initializing", e)
+            Log.w(TAG, "playComposed failed: ${e.message}", e)
             // Reset cached methods so next call re-discovers them
             resetCache()
         }

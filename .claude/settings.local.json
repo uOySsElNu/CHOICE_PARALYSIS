@@ -149,7 +149,8 @@
       "Bash(adb -s 5cac01f5 shell \"pm list packages | grep choiceparalysis\")",
       "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep versionName\")",
       "Bash(./gradlew installDebug)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep -i vibrate\")"
     ]
   },
   "enabledMcpjsonServers": [
