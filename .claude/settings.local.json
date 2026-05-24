@@ -137,7 +137,10 @@
       "Bash(sox /tmp/wheeltick.wav __TRACKED_VAR__/wheel_tick.wav speed 1.4 gain -n rate 44100)",
       "Bash(sox /tmp/wheeltick.wav /tmp/tick_one.wav trim 0.25 0.5 gain -n)",
       "Bash(sox /tmp/tick_one.wav -n stats)",
-      "Bash(sox /tmp/tick_one.wav /tmp/tick_fast.wav speed 1.4)"
+      "Bash(sox /tmp/tick_one.wav /tmp/tick_fast.wav speed 1.4)",
+      "WebFetch(domain:dev.mi.com)",
+      "Bash(curl -sL \"https://dev.mi.com/xiaomihyperos/documentation/detail?pId=1526\")",
+      "Bash(python3 *)"
     ]
   },
   "enabledMcpjsonServers": [

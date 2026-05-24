@@ -160,8 +160,67 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     private fun playHapticFor(effect: SoundEffect) {
-        if (supportsComposition) playCompositionHaptic(effect)
-        else playLegacyHaptic(effect)
+        // Priority: MiHaptic (Xiaomi) > Composition API > Legacy waveform
+        if (MiHapticEngine.isAvailable(context)) {
+            playMiHaptic(effect)
+        } else if (supportsComposition) {
+            playCompositionHaptic(effect)
+        } else {
+            playLegacyHaptic(effect)
+        }
+    }
+
+    /**
+     * MiHaptic (Xiaomi): finest-grained control with intensity + frequency.
+     * Transient = sharp click, Continuous = sustained vibration with envelope.
+     */
+    private fun playMiHaptic(effect: SoundEffect) {
+        val primitives = when (effect) {
+            SoundEffect.WHEEL_TICK -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 70)
+            )
+            SoundEffect.SPIN_DING -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 50),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 40, 30, 80, 200)
+            )
+            SoundEffect.COIN_BUTTON -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 70, 60),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 30, 50, 200, 1400),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 90, 40, 1600),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 35, 1800)
+            )
+            SoundEffect.COIN_DRAG -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 70, 60),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 20, 40, 400, 2000),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 35, 2500),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 30, 2800),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 40, 25, 3200)
+            )
+            SoundEffect.DICE_ROLL -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 20),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 25, 180),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 30, 350),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 40, 35, 500),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 25, 40, 630)
+            )
+            SoundEffect.YESNO_CHIME -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 50, 60, 0, 600),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 50, 350),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 40, 500)
+            )
+            SoundEffect.ELIMINATION_DRUM -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 10),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 60, 15, 30, 150)
+            )
+            SoundEffect.WINNER_CHEER -> listOf(
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.CONTINUOUS, 40, 50, 0, 800),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 60, 200),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 80, 50, 350),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 100, 60, 500),
+                MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 50, 40, 700)
+            )
+        }
+        MiHapticEngine.playComposed(primitives)
     }
 
     /**
