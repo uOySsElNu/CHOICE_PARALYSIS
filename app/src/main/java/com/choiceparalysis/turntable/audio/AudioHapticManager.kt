@@ -75,8 +75,34 @@ class AudioHapticManager private constructor(private val context: Context) {
         }
     }
 
-    private val supportsComposition = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    private val supportsComposition = checkCompositionSupport()
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    private fun checkCompositionSupport(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
+        return try {
+            // Check if the device actually supports composition primitives
+            // 0809 motors and similar may not support them
+            val v = vibrator
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val supported = v.arePrimitivesSupported(
+                    VibrationEffect.Composition.PRIMITIVE_CLICK,
+                    VibrationEffect.Composition.PRIMITIVE_TICK,
+                    VibrationEffect.Composition.PRIMITIVE_LOW_TICK
+                )
+                supported.any { it }
+            } else {
+                // Pre-API 33: try a test vibration
+                v.vibrate(VibrationEffect.startComposition()
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.01f, 0)
+                    .compose()
+                )
+                true
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     init {
         scope.launch {
@@ -228,53 +254,54 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     /**
-     * Legacy fallback (pre-API 30): waveform patterns approximating the composition.
+     * Legacy fallback: waveform patterns with max amplitude for small motors (0809 etc).
+     * All amplitudes are 200-255 to ensure the motor responds.
      */
     private fun playLegacyHaptic(effect: SoundEffect) {
         when (effect) {
             SoundEffect.WHEEL_TICK -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
+                vibrator.vibrate(VibrationEffect.createOneShot(15, 255))
             }
             SoundEffect.SPIN_DING -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 30, 80, 15),
-                    intArrayOf(255, 0, 180, 0), -1
+                    longArrayOf(0, 40, 60, 25),
+                    intArrayOf(255, 0, 220, 0), -1
                 ))
             }
             SoundEffect.COIN_BUTTON -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 15, 585, 30, 170, 25),
-                    intArrayOf(180, 0, 200, 0, 130, 0), -1
+                    longArrayOf(0, 20, 580, 40, 160, 30),
+                    intArrayOf(255, 0, 220, 0, 200, 0), -1
                 ))
             }
             SoundEffect.COIN_DRAG -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 15, 785, 10, 790, 30, 270, 25, 375),
-                    intArrayOf(180, 0, 80, 0, 200, 0, 130, 0, 80), -1
+                    longArrayOf(0, 20, 780, 15, 785, 40, 260, 30, 370),
+                    intArrayOf(255, 0, 200, 0, 220, 0, 200, 0, 200), -1
                 ))
             }
             SoundEffect.DICE_ROLL -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
-                    intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
+                    longArrayOf(0, 40, 140, 35, 135, 30, 120, 25, 105),
+                    intArrayOf(255, 0, 220, 0, 200, 0, 180, 0, 160), -1
                 ))
             }
             SoundEffect.YESNO_CHIME -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 200, 100, 200),
-                    intArrayOf(100, 0, 255, 0), -1
+                    longArrayOf(0, 250, 80, 250),
+                    intArrayOf(200, 0, 255, 0), -1
                 ))
             }
             SoundEffect.ELIMINATION_DRUM -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 40, 30, 80),
-                    intArrayOf(255, 0, 200, 0), -1
+                    longArrayOf(0, 60, 20, 100),
+                    intArrayOf(255, 0, 220, 0), -1
                 ))
             }
             SoundEffect.WINNER_CHEER -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 150, 80, 30, 50, 30, 50, 30),
-                    intArrayOf(150, 0, 255, 0, 200, 0, 255, 0), -1
+                    longArrayOf(0, 180, 60, 40, 40, 40, 40, 40),
+                    intArrayOf(200, 0, 255, 0, 220, 0, 255, 0), -1
                 ))
             }
         }
@@ -292,7 +319,7 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .compose()
                 )
             } else {
-                vibrator.vibrate(VibrationEffect.createOneShot(10, 150))
+                vibrator.vibrate(VibrationEffect.createOneShot(15, 255))
             }
         } catch (_: Exception) {}
     }
