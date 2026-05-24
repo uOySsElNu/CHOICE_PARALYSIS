@@ -124,7 +124,10 @@
       "Bash(soxi -D __TRACKED_VAR__/coin_flip.wav)",
       "Bash(sox __TRACKED_VAR__/coin_flip.wav -n trim 0.2 0.4 stat)",
       "Bash(sox /tmp/coin.wav /tmp/air_seg.wav trim 1.0 0.8 gain -n)",
-      "Bash(sox /tmp/coin.wav /tmp/land_seg.wav trim 3.0 1.2 gain -n)"
+      "Bash(sox /tmp/coin.wav /tmp/land_seg.wav trim 3.0 1.2 gain -n)",
+      "WebFetch(domain:cn.bing.com)",
+      "WebFetch(domain:www.bing.com)",
+      "WebFetch(domain:developer.android.google.cn)"
     ]
   },
   "enabledMcpjsonServers": [

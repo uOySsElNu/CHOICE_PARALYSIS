@@ -1,6 +1,7 @@
 package com.choiceparalysis.turntable.audio
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Build
@@ -49,8 +50,15 @@ class AudioHapticManager private constructor(private val context: Context) {
     private val _hapticEnabled = MutableStateFlow(true)
     val hapticEnabled: StateFlow<Boolean> = _hapticEnabled.asStateFlow()
 
+    // Low-latency audio path: USAGE_GAME routes through fast mixer
+    private val audioAttributes = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_GAME)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .build()
+
     private val soundPool = SoundPool.Builder()
-        .setMaxStreams(2)
+        .setMaxStreams(4)
+        .setAudioAttributes(audioAttributes)
         .build()
 
     private val soundMap = mutableMapOf<SoundEffect, Int>()
@@ -77,7 +85,6 @@ class AudioHapticManager private constructor(private val context: Context) {
         scope.launch {
             settingsRepository.hapticEnabled.collect { _hapticEnabled.value = it }
         }
-        // Pre-load sounds so first play() doesn't fail due to async loading
         loadSounds()
     }
 
@@ -96,128 +103,160 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     /**
-     * Unified feedback: plays sound and haptic simultaneously.
-     * Haptic pattern is designed to match the sound envelope.
+     * Unified feedback: plays sound and haptic simultaneously on the same frame.
+     * Haptic primitives are chosen based on each sound's frequency characteristics.
      */
     fun playFeedback(effect: SoundEffect) {
-        try {
-            // Sound
-            if (_soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT) {
+        // Trigger both on same frame for sync
+        val soundReady = _soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT
+        val hapticReady = _hapticEnabled.value
+
+        if (soundReady) {
+            try {
                 if (!loaded) loadSounds()
                 val soundId = soundMap[effect]
                 if (soundId != null && soundId != 0) {
                     val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-                    // If play returns 0, sound not loaded yet - retry once after short delay
                     if (streamId == 0) {
+                        // Sound not loaded yet, retry
                         scope.launch {
                             kotlinx.coroutines.delay(50)
-                            try {
-                                soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-                            } catch (_: Exception) {}
+                            try { soundPool.play(soundId, 1f, 1f, 1, 0, 1f) } catch (_: Exception) {}
                         }
                     }
                 }
-            }
-        } catch (_: Exception) {}
+            } catch (_: Exception) {}
+        }
 
-        try {
-            // Haptic - synced with sound envelope
-            if (_hapticEnabled.value) {
-                playHapticFor(effect)
-            }
-        } catch (_: Exception) {}
+        if (hapticReady) {
+            try { playHapticFor(effect) } catch (_: Exception) {}
+        }
     }
 
     private fun playHapticFor(effect: SoundEffect) {
-        if (supportsComposition) {
-            playCompositionHaptic(effect)
-        } else {
-            playLegacyHaptic(effect)
-        }
+        if (supportsComposition) playCompositionHaptic(effect)
+        else playLegacyHaptic(effect)
     }
 
     /**
-     * Composition API (API 30+): uses haptic primitives that match each sound's character.
-     * These primitives drive the X-axis linear motor with precise timing.
+     * Composition API haptics — each pattern matches the audio's frequency/envelope.
+     *
+     * Primitive selection by frequency:
+     *   TICK      — high freq clicks (3-5kHz), light/fast
+     *   CLICK     — mid freq impacts (1-2kHz), medium/tactile
+     *   LOW_TICK  — low freq thuds (200-500Hz), heavy/slow
+     *   THUD      — sub-bass booms (50-100Hz), heaviest
+     *   SLOW_RISE — ascending tone, tension build
+     *   QUICK_RISE— sharp crescendo, excitement
      */
     private fun playCompositionHaptic(effect: SoundEffect) {
-        val composition = VibrationEffect.startComposition()
+        val c = VibrationEffect.startComposition()
 
         when (effect) {
-            SoundEffect.SPIN_DING -> {
-                // Metallic ding: sharp click at impact, matching the 0.8s decay
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 80)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 200)
-            }
-            SoundEffect.YESNO_CHIME -> {
-                // Mysterious chime: slow rise matching the ascending notes over 1.0s
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.7f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 350)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 500)
-            }
-            SoundEffect.ELIMINATION_DRUM -> {
-                // Tense drum: heavy impact matching the 0.4s boom
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD, 0.8f, 60)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.4f, 150)
-            }
-            SoundEffect.WINNER_CHEER -> {
-                // Celebration: quick rise + triple clicks matching the 1.2s chord
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE, 0.6f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 200)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.8f, 350)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 500)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 700)
-            }
+            // 4.2kHz click, 40ms, fast decay
+            // High freq = light, sharp tick
             SoundEffect.WHEEL_TICK -> {
-                // Mechanical tick: single sharp tick for segment boundary crossing
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f, 0)
             }
-            SoundEffect.DICE_ROLL -> {
-                // 5 impacts matching real recording: 0ms, 180ms, 350ms, 500ms, 630ms
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 1.0f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 180)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.45f, 350)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
+
+            // 880Hz fundamental + 2640Hz harmonic, 0.8s exponential decay
+            // Medium freq = resonant click at impact, tick shimmer on decay
+            SoundEffect.SPIN_DING -> {
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 80)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 200)
             }
+
+            // 2.0s: metallic spin (3-4kHz) + landing (200-500Hz)
+            // Start: light ticks for spin, end: heavy low_tick for landing
             SoundEffect.COIN_BUTTON -> {
-                // 2s combined: flick at start, settling at end
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 800)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 1700)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.7f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 600)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 1600)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.5f, 1800)
             }
+
+            // 4.8s: spin + air + landing
+            // Sparse ticks during air, heavy impacts at landing
             SoundEffect.COIN_DRAG -> {
-                // 4.8s combined: flick + air + landing
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 2500)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.5f, 2800)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 3200)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.7f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 800)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.2f, 1600)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 2500)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.5f, 2800)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 3200)
+            }
+
+            // 1.1s: 5 impacts at 200-500Hz, decreasing amplitude
+            // Low freq = heavy thuds matching each bounce
+            SoundEffect.DICE_ROLL -> {
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 1.0f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 180)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.45f, 350)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
+            }
+
+            // 1.0s: ascending C5-E5-G5 chord
+            // Rising tone = slow_rise, resolution = click
+            SoundEffect.YESNO_CHIME -> {
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.7f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 350)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 500)
+            }
+
+            // 0.4s: 80Hz sub-bass boom
+            // Lowest freq = heaviest impact: thud + click attack
+            SoundEffect.ELIMINATION_DRUM -> {
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD, 1.0f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.6f, 30)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 150)
+            }
+
+            // 1.2s: major chord + shimmer
+            // Excitement = quick_rise, celebration = click sequence
+            SoundEffect.WINNER_CHEER -> {
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE, 0.6f, 0)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 200)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.8f, 350)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 500)
+                c.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 700)
             }
         }
 
-        vibrator.vibrate(composition.compose())
+        vibrator.vibrate(c.compose())
     }
 
     /**
-     * Legacy fallback (pre-API 30): waveform-based patterns.
+     * Legacy fallback (pre-API 30): waveform patterns approximating the composition.
      */
     private fun playLegacyHaptic(effect: SoundEffect) {
         when (effect) {
+            SoundEffect.WHEEL_TICK -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
+            }
             SoundEffect.SPIN_DING -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
                     longArrayOf(0, 30, 80, 15),
                     intArrayOf(255, 0, 180, 0), -1
+                ))
+            }
+            SoundEffect.COIN_BUTTON -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 15, 585, 30, 170, 25),
+                    intArrayOf(180, 0, 200, 0, 130, 0), -1
+                ))
+            }
+            SoundEffect.COIN_DRAG -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 15, 785, 10, 790, 30, 270, 25, 375),
+                    intArrayOf(180, 0, 80, 0, 200, 0, 130, 0, 80), -1
+                ))
+            }
+            SoundEffect.DICE_ROLL -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
+                    intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
                 ))
             }
             SoundEffect.YESNO_CHIME -> {
@@ -238,27 +277,11 @@ class AudioHapticManager private constructor(private val context: Context) {
                     intArrayOf(150, 0, 255, 0, 200, 0, 255, 0), -1
                 ))
             }
-            SoundEffect.WHEEL_TICK -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
-            }
-            SoundEffect.DICE_ROLL -> {
-                // 5 impacts at 0, 180, 350, 500, 630ms
-                vibrator.vibrate(VibrationEffect.createWaveform(
-                    longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
-                    intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
-                ))
-            }
-            SoundEffect.COIN_BUTTON -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
-            }
-            SoundEffect.COIN_DRAG -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
-            }
         }
     }
 
     /**
-     * Haptic-only feedback (no sound). Used for continuous touch feedback like spin wheel drag.
+     * Haptic-only feedback for continuous touch (spin wheel drag).
      */
     fun tick() {
         try {
