@@ -119,7 +119,7 @@ fun Coin3DFlip(
     LaunchedEffect(isAnimating) {
         if (!isAnimating || isFling) return@LaunchedEffect
 
-        audioHaptic.playFeedback(SoundEffect.COIN_FLIP)
+        audioHaptic.playFeedback(SoundEffect.COIN_BUTTON)
         val target = pendingResult ?: CoinSide.HEADS
         val endAngle = faceAngle(target)
         // 逆时针 = 正方向，固定5整圈(1800°)，修正负角度取模
@@ -157,7 +157,6 @@ fun Coin3DFlip(
 
         settledAngle = endAngle
         highlightTrigger++
-        audioHaptic.playFeedback(SoundEffect.COIN_LAND)
         onAnimationComplete()
     }
 
@@ -253,7 +252,7 @@ fun Coin3DFlip(
                                 val animDuration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
 
                                 isFling = true
-                                audioHaptic.playFeedback(SoundEffect.COIN_FLIP)
+                                audioHaptic.playFeedback(SoundEffect.COIN_DRAG)
                                 coroutineScope.launch {
                                     rotation.animateTo(target, tween(animDuration, easing = StandardEasing.EaseOutQuart))
 
@@ -269,7 +268,6 @@ fun Coin3DFlip(
 
                                     highlightTrigger++
                                     isFling = false
-                                    audioHaptic.playFeedback(SoundEffect.COIN_LAND)
                                     onDragFlipComplete(newFace)
                                 }
                             } else {

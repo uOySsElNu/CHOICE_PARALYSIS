@@ -30,6 +30,8 @@ enum class SoundEffect(val resId: Int) {
     COIN_FLIP(R.raw.coin_flip),
     COIN_AIR(R.raw.coin_air),
     COIN_LAND(R.raw.coin_land),
+    COIN_BUTTON(R.raw.coin_button),
+    COIN_DRAG(R.raw.coin_drag),
 }
 
 class AudioHapticManager private constructor(private val context: Context) {
@@ -235,6 +237,21 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 150)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 300)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
+            }
+            SoundEffect.COIN_BUTTON -> {
+                // 2s combined: flick at start, settling at end
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 800)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 1700)
+            }
+            SoundEffect.COIN_DRAG -> {
+                // 4.8s combined: flick + air + landing
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 2500)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.5f, 2800)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 3200)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
             }
         }
@@ -307,6 +324,12 @@ class AudioHapticManager private constructor(private val context: Context) {
                     longArrayOf(0, 25, 100, 20, 100, 15, 100),
                     intArrayOf(200, 0, 140, 0, 90, 0, 50), -1
                 ))
+            }
+            SoundEffect.COIN_BUTTON -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
+            }
+            SoundEffect.COIN_DRAG -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
             }
         }
     }

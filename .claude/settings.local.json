@@ -116,7 +116,13 @@
       "Bash(sox /tmp/coin.wav -n remix - trim 3.0 2.0 stat)",
       "Bash(sox /tmp/coin.wav -n remix - trim 5.0 1.2 stat)",
       "Bash(ffmpeg -y -i __TRACKED_VAR__/coin.mp3 /tmp/coin_full.wav)",
-      "Bash(sox /tmp/coin_full.wav __TRACKED_VAR__/coin_flip.wav trim 0 0.8 gain -n rate 44100)"
+      "Bash(sox /tmp/coin_full.wav __TRACKED_VAR__/coin_flip.wav trim 0 0.8 gain -n rate 44100)",
+      "Bash(sox __TRACKED_VAR__/coin_flip.wav /tmp/coin_loop_src.wav trim 0.2 0.4 gain -n)",
+      "Bash(sox /tmp/coin_loop_src.wav /tmp/coin_loop.wav repeat 1)",
+      "Bash(sox /tmp/coin_loop_src.wav /tmp/coin_loop_long.wav repeat 9)",
+      "Bash(sox /tmp/coin_loop_long.wav /tmp/coin_loop_4s.wav trim 0 4.0)",
+      "Bash(soxi -D __TRACKED_VAR__/coin_flip.wav)",
+      "Bash(sox __TRACKED_VAR__/coin_flip.wav -n trim 0.2 0.4 stat)"
     ]
   },
   "enabledMcpjsonServers": [
