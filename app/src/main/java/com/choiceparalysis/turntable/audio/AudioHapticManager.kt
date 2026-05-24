@@ -18,12 +18,10 @@ import kotlinx.coroutines.launch
 
 enum class SoundEffect(val resId: Int) {
     SPIN_DING(R.raw.spin_ding),
-    DICE_TAP(R.raw.dice_tap),
     YESNO_CHIME(R.raw.yesno_chime),
     ELIMINATION_DRUM(R.raw.elimination_drum),
     WINNER_CHEER(R.raw.winner_cheer),
     WHEEL_TICK(R.raw.wheel_tick),
-    DICE_BOUNCE(R.raw.dice_bounce),
     DICE_ROLL(R.raw.dice_roll),
     COIN_BUTTON(R.raw.coin_button),
     COIN_DRAG(R.raw.coin_drag),
@@ -153,12 +151,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 80)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.3f, 200)
             }
-            SoundEffect.DICE_TAP -> {
-                // Wooden tap: low thud matching the 0.12s impact
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.8f, 0)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 30)
-            }
             SoundEffect.YESNO_CHIME -> {
                 // Mysterious chime: slow rise matching the ascending notes over 1.0s
                 composition
@@ -186,11 +178,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                 // Mechanical tick: single sharp tick for segment boundary crossing
                 composition
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f, 0)
-            }
-            SoundEffect.DICE_BOUNCE -> {
-                // Bounce impact: low tick for each bounce landing
-                composition
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.7f, 0)
             }
             SoundEffect.DICE_ROLL -> {
                 // 5 impacts matching real recording: 0ms, 180ms, 350ms, 500ms, 630ms
@@ -233,9 +220,6 @@ class AudioHapticManager private constructor(private val context: Context) {
                     intArrayOf(255, 0, 180, 0), -1
                 ))
             }
-            SoundEffect.DICE_TAP -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(15, 200))
-            }
             SoundEffect.YESNO_CHIME -> {
                 vibrator.vibrate(VibrationEffect.createWaveform(
                     longArrayOf(0, 200, 100, 200),
@@ -256,9 +240,6 @@ class AudioHapticManager private constructor(private val context: Context) {
             }
             SoundEffect.WHEEL_TICK -> {
                 vibrator.vibrate(VibrationEffect.createOneShot(8, 150))
-            }
-            SoundEffect.DICE_BOUNCE -> {
-                vibrator.vibrate(VibrationEffect.createOneShot(12, 180))
             }
             SoundEffect.DICE_ROLL -> {
                 // 5 impacts at 0, 180, 350, 500, 630ms
