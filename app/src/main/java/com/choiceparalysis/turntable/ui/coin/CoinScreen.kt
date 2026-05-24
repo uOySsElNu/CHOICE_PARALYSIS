@@ -52,6 +52,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinScreen(
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: CoinViewModel = viewModel(),
 ) {
@@ -62,8 +63,6 @@ fun CoinScreen(
     val customCoinTailsUri by viewModel.customCoinTailsUri.collectAsState()
     var showCustomizationSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     val defaultHeadsBitmap by produceState<ImageBitmap?>(null) {
         value = withContext(Dispatchers.IO) {
             BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads).asImageBitmap()
@@ -121,7 +120,7 @@ fun CoinScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"

@@ -53,22 +53,22 @@ fun AppNavGraph(
             })
         }
         composable(Routes.SPIN_WHEEL) {
-            SpinWheelScreen()
+            SpinWheelScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.COIN) {
-            CoinScreen()
+            CoinScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.DICE) {
-            DiceScreen()
+            DiceScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.YES_NO) {
-            YesNoScreen()
+            YesNoScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.FINGER_ROULETTE) {
-            FingerRouletteScreen()
+            FingerRouletteScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.STATS) {
-            StatsScreen()
+            StatsScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.HISTORY) {
             HistoryScreen()

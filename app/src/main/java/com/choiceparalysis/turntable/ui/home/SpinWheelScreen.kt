@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -76,6 +75,7 @@ fun SpinWheelScreen(
     modifier: Modifier = Modifier,
     viewModel: SpinWheelViewModel = viewModel(),
     onNavigateToSettings: () -> Unit = {},
+    onBack: () -> Unit = {},
 ) {
     val options by viewModel.options.collectAsState()
     val weights by viewModel.weights.collectAsState()
@@ -92,8 +92,6 @@ fun SpinWheelScreen(
     var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -107,7 +105,7 @@ fun SpinWheelScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"

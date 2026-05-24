@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,13 +57,12 @@ import com.choiceparalysis.turntable.audio.SoundEffect
 fun FingerRouletteScreen(
     modifier: Modifier = Modifier,
     viewModel: FingerRouletteViewModel = viewModel(),
+    onBack: () -> Unit = {},
 ) {
     val fingers by viewModel.fingers.collectAsState()
     val phase by viewModel.phase.collectAsState()
     val winnerId by viewModel.winnerId.collectAsState()
     val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     val markerRadius = with(LocalDensity.current) { 36.dp.toPx() }
     val textMeasurer = rememberTextMeasurer()
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -99,7 +97,7 @@ fun FingerRouletteScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"

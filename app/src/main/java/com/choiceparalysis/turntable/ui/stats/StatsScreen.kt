@@ -26,7 +26,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,11 +54,10 @@ import java.util.Locale
 fun StatsScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = viewModel(),
+    onBack: () -> Unit = {},
 ) {
     val stats by viewModel.stats.collectAsState()
     val animationProgress = remember { Animatable(0f) }
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     LaunchedEffect(stats.totalCount) {
         if (stats.totalCount > 0) {
             animationProgress.snapTo(0f)
@@ -81,7 +79,7 @@ fun StatsScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"

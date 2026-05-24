@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,13 +39,12 @@ import com.choiceparalysis.turntable.viewmodel.YesNoViewModel
 fun YesNoScreen(
     modifier: Modifier = Modifier,
     viewModel: YesNoViewModel = viewModel(),
+    onBack: () -> Unit = {},
 ) {
     val result by viewModel.result.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val customQuestion by viewModel.customQuestion.collectAsState()
     val context = LocalContext.current
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -65,7 +63,7 @@ fun YesNoScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "返回"

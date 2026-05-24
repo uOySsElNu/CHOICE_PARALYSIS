@@ -18,7 +18,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -39,12 +38,11 @@ import com.choiceparalysis.turntable.viewmodel.DiceViewModel
 fun DiceScreen(
     modifier: Modifier = Modifier,
     viewModel: DiceViewModel = viewModel(),
+    onBack: () -> Unit = {},
 ) {
     val diceValue by viewModel.diceValue.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val context = LocalContext.current
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     DisposableEffect(isAnimating) {
         val shakeDetector = ShakeDetector(context) {
             if (!isAnimating) {
@@ -80,7 +78,7 @@ fun DiceScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { backDispatcher?.onBackPressed() }) {
+                IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回"
