@@ -1,6 +1,5 @@
 package com.choiceparalysis.turntable.audio
 
-import android.content.Context
 import android.util.Log
 
 /**
@@ -17,30 +16,31 @@ import android.util.Log
 object MiHapticEngine {
 
     private const val TAG = "MiHaptic"
-    private var available = false
-    private var checked = false
 
-    // Cached references
+    // Cached references - lazily initialized, re-initialized on failure
     private var dynamicEffectClass: Class<*>? = null
     private var hapticPlayerClass: Class<*>? = null
-    private var primitiveEffectClass: Class<*>? = null
     private var startComposeMethod: java.lang.reflect.Method? = null
     private var createTransientMethod: java.lang.reflect.Method? = null
     private var createContinuousMethod: java.lang.reflect.Method? = null
     private var addPrimitiveMethod: java.lang.reflect.Method? = null
     private var hapticPlayerConstructor: java.lang.reflect.Constructor<*>? = null
     private var hapticPlayerStartMethod: java.lang.reflect.Method? = null
+    private var initFailed = false
 
-    fun isAvailable(context: Context): Boolean {
-        if (checked) return available
-        checked = true
+    /**
+     * Check if MiHaptic is available. Re-discovers methods if not yet initialized.
+     */
+    fun isAvailable(): Boolean {
+        if (initFailed) return false
+        if (startComposeMethod != null) return true
+        return initMethods()
+    }
+
+    private fun initMethods(): Boolean {
         return try {
             dynamicEffectClass = Class.forName("miui.os.DynamicEffect")
             hapticPlayerClass = Class.forName("miui.os.HapticPlayer")
-
-            primitiveEffectClass = dynamicEffectClass!!.classes.find {
-                it.simpleName == "PrimitiveEffect"
-            }
 
             startComposeMethod = dynamicEffectClass!!.getMethod("startCompose")
             createTransientMethod = dynamicEffectClass!!.methods.find {
@@ -52,29 +52,34 @@ object MiHapticEngine {
             addPrimitiveMethod = dynamicEffectClass!!.methods.find {
                 it.name == "addPrimitive" && it.parameterTypes.size == 2
             }
-
             hapticPlayerConstructor = hapticPlayerClass!!.constructors.find {
                 it.parameterTypes.size == 1
             }
             hapticPlayerStartMethod = hapticPlayerClass!!.getMethod("start")
 
-            available = startComposeMethod != null &&
+            val ok = startComposeMethod != null &&
                     createTransientMethod != null &&
                     createContinuousMethod != null &&
                     addPrimitiveMethod != null &&
                     hapticPlayerConstructor != null
 
-            Log.d(TAG, "MiHaptic available: $available")
-            available
+            if (!ok) {
+                Log.w(TAG, "MiHaptic: some methods not found")
+                initFailed = true
+            }
+            ok
         } catch (e: Exception) {
             Log.w(TAG, "MiHaptic init failed", e)
-            available = false
+            initFailed = true
             false
         }
     }
 
+    /**
+     * Play a composed haptic effect. Re-initializes if cached methods are stale.
+     */
     fun playComposed(primitives: List<HapticPrimitive>) {
-        if (!available) return
+        if (!isAvailable()) return
         try {
             val effect = startComposeMethod!!.invoke(null)!!
 
@@ -87,15 +92,28 @@ object MiHapticEngine {
                         null, p.intensity / 100f, p.frequency / 100f, p.durationMs / 1000f
                     )!!
                 }
-                // addPrimitive(float timeSec, PrimitiveEffect pe)
                 addPrimitiveMethod!!.invoke(effect, p.startTimeMs / 1000f, primitive)
             }
 
             val player = hapticPlayerConstructor!!.newInstance(effect)
             hapticPlayerStartMethod!!.invoke(player)
         } catch (e: Exception) {
-            Log.w(TAG, "playComposed failed", e)
+            Log.w(TAG, "playComposed failed, re-initializing", e)
+            // Reset cached methods so next call re-discovers them
+            resetCache()
         }
+    }
+
+    private fun resetCache() {
+        dynamicEffectClass = null
+        hapticPlayerClass = null
+        startComposeMethod = null
+        createTransientMethod = null
+        createContinuousMethod = null
+        addPrimitiveMethod = null
+        hapticPlayerConstructor = null
+        hapticPlayerStartMethod = null
+        initFailed = false
     }
 
     data class HapticPrimitive(

@@ -161,7 +161,7 @@ class AudioHapticManager private constructor(private val context: Context) {
 
     private fun playHapticFor(effect: SoundEffect) {
         // Priority: MiHaptic (Xiaomi) > Composition API > Legacy waveform
-        if (MiHapticEngine.isAvailable(context)) {
+        if (MiHapticEngine.isAvailable()) {
             playMiHaptic(effect)
         } else if (supportsComposition) {
             playCompositionHaptic(effect)
