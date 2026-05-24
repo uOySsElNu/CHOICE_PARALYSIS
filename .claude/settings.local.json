@@ -122,7 +122,9 @@
       "Bash(sox /tmp/coin_loop_src.wav /tmp/coin_loop_long.wav repeat 9)",
       "Bash(sox /tmp/coin_loop_long.wav /tmp/coin_loop_4s.wav trim 0 4.0)",
       "Bash(soxi -D __TRACKED_VAR__/coin_flip.wav)",
-      "Bash(sox __TRACKED_VAR__/coin_flip.wav -n trim 0.2 0.4 stat)"
+      "Bash(sox __TRACKED_VAR__/coin_flip.wav -n trim 0.2 0.4 stat)",
+      "Bash(sox /tmp/coin.wav /tmp/air_seg.wav trim 1.0 0.8 gain -n)",
+      "Bash(sox /tmp/coin.wav /tmp/land_seg.wav trim 3.0 1.2 gain -n)"
     ]
   },
   "enabledMcpjsonServers": [
