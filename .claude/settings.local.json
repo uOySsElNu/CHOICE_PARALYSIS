@@ -107,7 +107,16 @@
       "Bash(sox /tmp/single_tick.wav -n remix - trim 0.15 0.15 stat)",
       "Bash(sox /tmp/single_tick.wav -n remix - trim 0.3 0.2 stat)",
       "Bash(sox /tmp/single_tick.wav -n spectrogram -x 300 -y 200 -o /tmp/tick_spec.png)",
-      "Bash(sox /tmp/single_tick.wav D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/wheel_tick.wav gain -n rate 44100)"
+      "Bash(sox /tmp/single_tick.wav D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/wheel_tick.wav gain -n rate 44100)",
+      "Bash(ffmpeg -y -i D:/Android/Projects/CHOICEPARALYSIS/app/src/main/res/raw/coin.mp3 /tmp/coin.wav)",
+      "Bash(sox /tmp/coin.wav -n stats)",
+      "Bash(sox /tmp/coin.wav -n remix - trim 0 0.5 stat)",
+      "Bash(sox /tmp/coin.wav -n remix - trim 0.5 1.0 stat)",
+      "Bash(sox /tmp/coin.wav -n remix - trim 1.5 1.5 stat)",
+      "Bash(sox /tmp/coin.wav -n remix - trim 3.0 2.0 stat)",
+      "Bash(sox /tmp/coin.wav -n remix - trim 5.0 1.2 stat)",
+      "Bash(ffmpeg -y -i __TRACKED_VAR__/coin.mp3 /tmp/coin_full.wav)",
+      "Bash(sox /tmp/coin_full.wav __TRACKED_VAR__/coin_flip.wav trim 0 0.8 gain -n rate 44100)"
     ]
   },
   "enabledMcpjsonServers": [

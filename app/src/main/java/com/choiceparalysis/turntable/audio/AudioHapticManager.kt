@@ -27,6 +27,9 @@ enum class SoundEffect(val resId: Int) {
     COIN_SPIN(R.raw.coin_spin),
     DICE_BOUNCE(R.raw.dice_bounce),
     DICE_ROLL(R.raw.dice_roll),
+    COIN_FLIP(R.raw.coin_flip),
+    COIN_AIR(R.raw.coin_air),
+    COIN_LAND(R.raw.coin_land),
 }
 
 class AudioHapticManager private constructor(private val context: Context) {
@@ -213,6 +216,27 @@ class AudioHapticManager private constructor(private val context: Context) {
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
             }
+            SoundEffect.COIN_FLIP -> {
+                // Coin flick: sharp tick at start
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 100)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.3f, 200)
+            }
+            SoundEffect.COIN_AIR -> {
+                // Coin in air: gentle continuous ticks
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.2f, 0)
+            }
+            SoundEffect.COIN_LAND -> {
+                // Coin landing: multiple impacts
+                composition
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.9f, 0)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_LOW_TICK, 0.6f, 150)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 300)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.25f, 500)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.12f, 630)
+            }
         }
 
         vibrator.vibrate(composition.compose())
@@ -267,6 +291,21 @@ class AudioHapticManager private constructor(private val context: Context) {
                 vibrator.vibrate(VibrationEffect.createWaveform(
                     longArrayOf(0, 30, 150, 30, 140, 25, 125, 20, 110),
                     intArrayOf(255, 0, 180, 0, 120, 0, 70, 0, 30), -1
+                ))
+            }
+            SoundEffect.COIN_FLIP -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 15, 80, 10, 80),
+                    intArrayOf(220, 0, 150, 0, 100), -1
+                ))
+            }
+            SoundEffect.COIN_AIR -> {
+                vibrator.vibrate(VibrationEffect.createOneShot(10, 80))
+            }
+            SoundEffect.COIN_LAND -> {
+                vibrator.vibrate(VibrationEffect.createWaveform(
+                    longArrayOf(0, 25, 100, 20, 100, 15, 100),
+                    intArrayOf(200, 0, 140, 0, 90, 0, 50), -1
                 ))
             }
         }

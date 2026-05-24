@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -94,18 +93,7 @@ fun Coin3DFlip(
         canvasReady = true
     }
 
-    // Tick sound every 180° during coin rotation
     val audioHaptic = AudioHapticManager.getInstance(androidx.compose.ui.platform.LocalContext.current)
-    LaunchedEffect(Unit) {
-        var lastHalf = (rotation.value / 180f).toInt()
-        snapshotFlow { rotation.value }.collect { angle ->
-            val currentHalf = (angle / 180f).toInt()
-            if (currentHalf != lastHalf) {
-                audioHaptic.playFeedback(SoundEffect.COIN_SPIN)
-                lastHalf = currentHalf
-            }
-        }
-    }
 
     // SpinWheel 风格逐帧速度追踪
     var prevTime by remember { mutableLongStateOf(0L) }
@@ -131,6 +119,7 @@ fun Coin3DFlip(
     LaunchedEffect(isAnimating) {
         if (!isAnimating || isFling) return@LaunchedEffect
 
+        audioHaptic.playFeedback(SoundEffect.COIN_FLIP)
         val target = pendingResult ?: CoinSide.HEADS
         val endAngle = faceAngle(target)
         // 逆时针 = 正方向，固定5整圈(1800°)，修正负角度取模
@@ -168,6 +157,7 @@ fun Coin3DFlip(
 
         settledAngle = endAngle
         highlightTrigger++
+        audioHaptic.playFeedback(SoundEffect.COIN_LAND)
         onAnimationComplete()
     }
 
@@ -263,6 +253,7 @@ fun Coin3DFlip(
                                 val animDuration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
 
                                 isFling = true
+                                audioHaptic.playFeedback(SoundEffect.COIN_FLIP)
                                 coroutineScope.launch {
                                     rotation.animateTo(target, tween(animDuration, easing = StandardEasing.EaseOutQuart))
 
@@ -278,6 +269,7 @@ fun Coin3DFlip(
 
                                     highlightTrigger++
                                     isFling = false
+                                    audioHaptic.playFeedback(SoundEffect.COIN_LAND)
                                     onDragFlipComplete(newFace)
                                 }
                             } else {
