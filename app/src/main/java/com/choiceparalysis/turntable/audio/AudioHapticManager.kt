@@ -371,11 +371,16 @@ class AudioHapticManager private constructor(private val context: Context) {
 
     /**
      * Haptic-only feedback for continuous touch (spin wheel drag).
+     * Priority: MiHaptic > Composition API > Legacy.
      */
     fun tick() {
         try {
             if (!_hapticEnabled.value) return
-            if (supportsComposition) {
+            if (MiHapticEngine.isAvailable()) {
+                MiHapticEngine.playComposed(listOf(
+                    MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 70)
+                ))
+            } else if (supportsComposition) {
                 vibrator.vibrate(VibrationEffect.startComposition()
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 0)
                     .compose()
