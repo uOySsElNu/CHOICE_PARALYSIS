@@ -161,9 +161,13 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     private fun playHapticFor(effect: SoundEffect) {
+        // WHEEL_TICK: ultra-fast direct vibrator (skip MiHaptic for per-frame calls)
+        if (effect == SoundEffect.WHEEL_TICK) {
+            vibrator.vibrate(VibrationEffect.createOneShot(12, 200))
+            return
+        }
         // Priority: MiHaptic (Xiaomi) > Composition API > Legacy waveform
         val miAvailable = MiHapticEngine.isAvailable()
-        android.util.Log.d("AudioHaptic", "playHapticFor $effect miHaptic=$miAvailable composition=$supportsComposition")
         if (miAvailable) {
             playMiHaptic(effect)
         } else if (supportsComposition) {
@@ -370,24 +374,14 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     /**
-     * Haptic-only feedback for continuous touch (spin wheel drag).
-     * Priority: MiHaptic > Composition API > Legacy.
+     * Ultra-fast haptic tick for spin wheel segment crossing.
+     * Uses direct Vibrator.vibrate() for minimum latency (~1ms).
+     * Does NOT use MiHaptic (too slow for per-frame calls).
      */
     fun tick() {
         try {
             if (!_hapticEnabled.value) return
-            if (MiHapticEngine.isAvailable()) {
-                MiHapticEngine.playComposed(listOf(
-                    MiHapticEngine.HapticPrimitive(MiHapticEngine.PrimitiveType.TRANSIENT, 60, 70)
-                ))
-            } else if (supportsComposition) {
-                vibrator.vibrate(VibrationEffect.startComposition()
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.5f, 0)
-                    .compose()
-                )
-            } else {
-                vibrator.vibrate(VibrationEffect.createOneShot(15, 255))
-            }
+            vibrator.vibrate(VibrationEffect.createOneShot(12, 200))
         } catch (_: Exception) {}
     }
 
