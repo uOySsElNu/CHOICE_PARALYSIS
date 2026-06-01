@@ -1,10 +1,9 @@
 package com.choiceparalysis.turntable.audio
 
-import android.util.Log
-
 /**
- * MiHaptic engine wrapper for Xiaomi devices.
- * Uses reflection to avoid compile-time dependency on miui.os.
+ * MiHaptic engine for Xiaomi devices.
+ * Uses reflection to access miui.os.DynamicEffect and miui.os.HapticPlayer
+ * without compile-time dependency on the Xiaomi SDK.
  *
  * API signatures (from device):
  *   DynamicEffect.startCompose() -> DynamicEffect
@@ -13,9 +12,7 @@ import android.util.Log
  *   effect.addPrimitive(float timeSec, PrimitiveEffect pe)
  *   HapticPlayer() + player.start(DynamicEffect)
  */
-object MiHapticEngine {
-
-    private const val TAG = "MiHaptic"
+class MiHapticEngineImpl : HapticEngine {
 
     private var startComposeMethod: java.lang.reflect.Method? = null
     private var createTransientMethod: java.lang.reflect.Method? = null
@@ -26,10 +23,9 @@ object MiHapticEngine {
     private var initFailed = false
     private var initDone = false
 
-    // Cached player — reuse across all calls to avoid constructor overhead
     private var cachedPlayer: Any? = null
 
-    fun isAvailable(): Boolean {
+    override fun isAvailable(): Boolean {
         if (initFailed) return false
         if (!initDone) initMethods()
         return !initFailed
@@ -72,26 +68,61 @@ object MiHapticEngine {
                     hapticPlayerConstructor != null &&
                     hapticPlayerStartEffectMethod != null
 
-            Log.d(TAG, "init: ok=$ok startCompose=${startComposeMethod != null} " +
-                "createTransient=${createTransientMethod != null} " +
-                "createContinuous=${createContinuousMethod != null} " +
-                "addPrimitive=${addPrimitiveMethod != null} " +
-                "playerCtor=${hapticPlayerConstructor != null} " +
-                "start=${hapticPlayerStartEffectMethod != null}")
-
             if (!ok) initFailed = true
-        } catch (e: Exception) {
-            Log.w(TAG, "init failed: ${e.message}")
+        } catch (_: Exception) {
             initFailed = true
         }
     }
 
-    /**
-     * Play a composed haptic effect. Creates fresh player each time
-     * since start(effect) properly terminates the previous one.
-     */
-    fun playComposed(primitives: List<HapticPrimitive>) {
+    override fun playTick() {
         if (!isAvailable()) return
+        try {
+            val effect = startComposeMethod!!.invoke(null)!!
+            val primitive = createTransientMethod!!.invoke(null, 1.0f, 0.9f)!!
+            addPrimitiveMethod!!.invoke(effect, 0f, primitive)
+            val player = getOrCreatePlayer()
+            hapticPlayerStartEffectMethod!!.invoke(player, effect)
+        } catch (_: Exception) {
+            cachedPlayer = null
+        }
+    }
+
+    override fun playEffect(effect: HapticEffect) {
+        if (!isAvailable()) return
+        val primitives = mapEffect(effect)
+        playComposed(primitives)
+    }
+
+    private fun mapEffect(effect: HapticEffect): List<HapticPrimitive> = when (effect) {
+        HapticEffect.TICK -> listOf(
+            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 70)
+        )
+        HapticEffect.CLICK -> listOf(
+            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 50),
+            HapticPrimitive(PrimitiveType.CONTINUOUS, 40, 30, 80, 200)
+        )
+        HapticEffect.THUD -> listOf(
+            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 20),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 25, 180),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 60, 30, 350),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 40, 35, 500),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 25, 40, 630)
+        )
+        HapticEffect.RISE -> listOf(
+            HapticPrimitive(PrimitiveType.CONTINUOUS, 50, 60, 0, 600),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 50, 350),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 60, 40, 500)
+        )
+        HapticEffect.CELEBRATION -> listOf(
+            HapticPrimitive(PrimitiveType.CONTINUOUS, 40, 50, 0, 800),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 60, 200),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 50, 350),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 60, 500),
+            HapticPrimitive(PrimitiveType.TRANSIENT, 50, 40, 700)
+        )
+    }
+
+    private fun playComposed(primitives: List<HapticPrimitive>) {
         try {
             val effect = startComposeMethod!!.invoke(null)!!
             for (p in primitives) {
@@ -107,27 +138,7 @@ object MiHapticEngine {
             }
             val player = getOrCreatePlayer()
             hapticPlayerStartEffectMethod!!.invoke(player, effect)
-        } catch (e: Exception) {
-            Log.w(TAG, "playComposed failed: ${e.message}")
-            cachedPlayer = null
-        }
-    }
-
-    /**
-     * Play a single crisp tick for spin wheel boundary crossing.
-     * Reuses cached player, creates fresh effect each call.
-     */
-    fun playTick() {
-        if (!isAvailable()) return
-        try {
-            val effect = startComposeMethod!!.invoke(null)!!
-            // intensity=100, sharpness=90 — strong crisp click
-            val primitive = createTransientMethod!!.invoke(null, 1.0f, 0.9f)!!
-            addPrimitiveMethod!!.invoke(effect, 0f, primitive)
-            val player = getOrCreatePlayer()
-            hapticPlayerStartEffectMethod!!.invoke(player, effect)
-        } catch (e: Exception) {
-            Log.w(TAG, "playTick failed: ${e.message}")
+        } catch (_: Exception) {
             cachedPlayer = null
         }
     }
@@ -137,7 +148,11 @@ object MiHapticEngine {
         return cachedPlayer ?: hapticPlayerConstructor!!.newInstance().also { cachedPlayer = it }
     }
 
-    data class HapticPrimitive(
+    override fun release() {
+        cachedPlayer = null
+    }
+
+    private data class HapticPrimitive(
         val type: PrimitiveType,
         val intensity: Int,    // 0-100
         val frequency: Int,    // 0-100
@@ -145,7 +160,7 @@ object MiHapticEngine {
         val durationMs: Long = 0,
     )
 
-    enum class PrimitiveType {
+    private enum class PrimitiveType {
         TRANSIENT,
         CONTINUOUS,
     }
