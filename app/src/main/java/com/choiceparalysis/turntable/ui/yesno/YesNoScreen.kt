@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.choiceparalysis.turntable.viewmodel.YesNoResult
 import com.choiceparalysis.turntable.audio.AudioHapticManager
 import com.choiceparalysis.turntable.audio.SoundEffect
@@ -38,7 +38,7 @@ import com.choiceparalysis.turntable.viewmodel.YesNoViewModel
 @Composable
 fun YesNoScreen(
     modifier: Modifier = Modifier,
-    viewModel: YesNoViewModel = viewModel(),
+    viewModel: YesNoViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
 ) {
     val result by viewModel.result.collectAsState()

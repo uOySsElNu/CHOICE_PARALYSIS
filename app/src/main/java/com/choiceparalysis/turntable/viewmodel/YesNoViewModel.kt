@@ -1,17 +1,17 @@
 package com.choiceparalysis.turntable.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class YesNoResult(val displayName: String, val emoji: String) {
     YES("是的!", "👍"),
@@ -19,8 +19,10 @@ enum class YesNoResult(val displayName: String, val emoji: String) {
     MAYBE("也许吧", "🤔")
 }
 
-class YesNoViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application.dataStore)
+@HiltViewModel
+class YesNoViewModel @Inject constructor(
+    private val historyRepository: HistoryRepository
+) : ViewModel() {
 
     private val _result = MutableStateFlow<YesNoResult?>(null)
     val result: StateFlow<YesNoResult?> = _result.asStateFlow()

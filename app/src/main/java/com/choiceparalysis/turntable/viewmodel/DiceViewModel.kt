@@ -1,19 +1,21 @@
 package com.choiceparalysis.turntable.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DiceViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application.dataStore)
+@HiltViewModel
+class DiceViewModel @Inject constructor(
+    private val historyRepository: HistoryRepository
+) : ViewModel() {
 
     private val _diceValue = MutableStateFlow<Int?>(null)
     val diceValue: StateFlow<Int?> = _diceValue.asStateFlow()

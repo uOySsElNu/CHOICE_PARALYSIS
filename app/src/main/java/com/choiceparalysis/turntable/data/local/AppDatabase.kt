@@ -9,7 +9,7 @@ import com.choiceparalysis.turntable.data.local.entity.OptionGroupEntity
 
 @Database(
     entities = [OptionGroupEntity::class, HistoryEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

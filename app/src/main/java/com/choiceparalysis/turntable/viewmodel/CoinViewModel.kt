@@ -1,28 +1,30 @@
 package com.choiceparalysis.turntable.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class CoinSide(val displayName: String) {
     HEADS("正面"),
     TAILS("反面")
 }
 
-class CoinViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application.dataStore)
-    private val settingsRepository = SettingsRepository(application.dataStore, application)
+@HiltViewModel
+class CoinViewModel @Inject constructor(
+    private val historyRepository: HistoryRepository,
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
 
     private val _coinResult = MutableStateFlow<CoinSide?>(null)
     val coinResult: StateFlow<CoinSide?> = _coinResult.asStateFlow()

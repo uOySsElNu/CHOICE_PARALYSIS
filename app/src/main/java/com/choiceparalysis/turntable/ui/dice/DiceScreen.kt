@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.choiceparalysis.turntable.ui.coindice.Dice3DRoll
 import com.choiceparalysis.turntable.ui.coindice.ShakeDetector
 import com.choiceparalysis.turntable.viewmodel.DiceViewModel
@@ -37,7 +37,7 @@ import com.choiceparalysis.turntable.viewmodel.DiceViewModel
 @Composable
 fun DiceScreen(
     modifier: Modifier = Modifier,
-    viewModel: DiceViewModel = viewModel(),
+    viewModel: DiceViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
 ) {
     val diceValue by viewModel.diceValue.collectAsState()

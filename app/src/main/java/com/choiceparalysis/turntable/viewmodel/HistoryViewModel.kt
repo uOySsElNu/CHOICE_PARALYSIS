@@ -1,18 +1,20 @@
 package com.choiceparalysis.turntable.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HistoryViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = HistoryRepository(application.dataStore)
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
+    private val repository: HistoryRepository
+) : ViewModel() {
 
     val history: StateFlow<List<HistoryEntry>> = repository.history
         .stateIn(

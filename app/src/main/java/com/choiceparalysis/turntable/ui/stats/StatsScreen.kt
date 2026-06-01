@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -53,7 +53,7 @@ import java.util.Locale
 @Composable
 fun StatsScreen(
     modifier: Modifier = Modifier,
-    viewModel: StatsViewModel = viewModel(),
+    viewModel: StatsViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
 ) {
     val stats by viewModel.stats.collectAsState()

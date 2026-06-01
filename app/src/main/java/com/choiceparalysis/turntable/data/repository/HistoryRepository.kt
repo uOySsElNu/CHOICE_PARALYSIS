@@ -1,9 +1,8 @@
 package com.choiceparalysis.turntable.data.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import com.choiceparalysis.turntable.data.datastore.DataStoreKeys
+import com.choiceparalysis.turntable.data.local.dao.HistoryDao
+import com.choiceparalysis.turntable.data.local.entity.HistoryEntity
+import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -11,32 +10,52 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class HistoryRepository @Inject constructor(private val dataStore: DataStore<Preferences>) {
+class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) {
 
-    val history: Flow<List<HistoryEntry>> = dataStore.data.map { preferences ->
-        val json = preferences[DataStoreKeys.HISTORY] ?: "[]"
-        Json.decodeFromString<List<HistoryEntry>>(json)
+    val history: Flow<List<HistoryEntry>> = historyDao.getRecent().map { entities ->
+        entities.map { it.toHistoryEntry() }
     }
 
     suspend fun addEntry(entry: HistoryEntry) {
-        dataStore.edit { preferences ->
-            val current = Json.decodeFromString<List<HistoryEntry>>(preferences[DataStoreKeys.HISTORY] ?: "[]")
-            val updated = (listOf(entry) + current).take(100) // Keep last 100 entries
-            preferences[DataStoreKeys.HISTORY] = Json.encodeToString(updated)
-        }
+        historyDao.insert(entry.toEntity())
+        historyDao.trimOld()
     }
 
     suspend fun clearHistory() {
-        dataStore.edit { preferences ->
-            preferences[DataStoreKeys.HISTORY] = "[]"
-        }
+        historyDao.deleteAll()
     }
 
     suspend fun deleteEntry(id: String) {
-        dataStore.edit { preferences ->
-            val current = Json.decodeFromString<List<HistoryEntry>>(preferences[DataStoreKeys.HISTORY] ?: "[]")
-            val updated = current.filter { it.id != id }
-            preferences[DataStoreKeys.HISTORY] = Json.encodeToString(updated)
-        }
+        historyDao.deleteById(legacyId = id, id = 0L)
+    }
+
+    private fun HistoryEntity.toHistoryEntry(): HistoryEntry {
+        return HistoryEntry(
+            id = legacyId ?: id.toString(),
+            method = try {
+                DecisionMethod.valueOf(method)
+            } catch (e: IllegalArgumentException) {
+                DecisionMethod.SPIN_WHEEL
+            },
+            options = try {
+                Json.decodeFromString<List<String>>(optionsSnapshot)
+            } catch (e: Exception) {
+                emptyList()
+            },
+            result = result,
+            listName = listName,
+            timestamp = timestamp
+        )
+    }
+
+    private fun HistoryEntry.toEntity(): HistoryEntity {
+        return HistoryEntity(
+            legacyId = id,
+            method = method.name,
+            result = result,
+            optionsSnapshot = Json.encodeToString(options),
+            listName = listName,
+            timestamp = timestamp
+        )
     }
 }

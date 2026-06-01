@@ -1,17 +1,17 @@
 package com.choiceparalysis.turntable.ui.stats
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import javax.inject.Inject
 
 data class StatsState(
     val totalCount: Int = 0,
@@ -22,8 +22,10 @@ data class StatsState(
     val lastDecisionTime: Long? = null,
 )
 
-class StatsViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application.dataStore)
+@HiltViewModel
+class StatsViewModel @Inject constructor(
+    private val historyRepository: HistoryRepository
+) : ViewModel() {
 
     private val _stats = MutableStateFlow(StatsState())
     val stats: StateFlow<StatsState> = _stats.asStateFlow()

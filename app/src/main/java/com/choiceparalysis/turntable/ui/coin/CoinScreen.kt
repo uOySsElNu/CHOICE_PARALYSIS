@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
@@ -54,7 +54,7 @@ import kotlinx.coroutines.withContext
 fun CoinScreen(
     onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: CoinViewModel = viewModel(),
+    viewModel: CoinViewModel = hiltViewModel(),
 ) {
     val coinResult by viewModel.coinResult.collectAsState()
     val pendingCoinResult by viewModel.pendingCoinResult.collectAsState()
