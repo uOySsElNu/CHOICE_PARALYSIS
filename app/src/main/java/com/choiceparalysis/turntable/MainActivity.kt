@@ -23,7 +23,9 @@ import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.navigation.AppNavGraph
 import com.choiceparalysis.turntable.navigation.BottomNavDestinations
 import com.choiceparalysis.turntable.ui.theme.CHOICEPARALYSISTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 .collectAsState(initial = true)
             val darkTheme = if (followSystem) isSystemInDarkTheme() else false
             CHOICEPARALYSISTheme(darkTheme = darkTheme) {
-                ChoiceParalysisApp()
+                ChoiceParalysisMainScreen()
             }
         }
     }
@@ -42,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
 @PreviewScreenSizes
 @Composable
-fun ChoiceParalysisApp() {
+fun ChoiceParalysisMainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: BottomNavDestinations.HUB.route
