@@ -3,6 +3,7 @@ package com.choiceparalysis.turntable.ui.stats
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
@@ -22,7 +23,7 @@ data class StatsState(
 )
 
 class StatsViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application)
+    private val historyRepository = HistoryRepository(application.dataStore)
 
     private val _stats = MutableStateFlow(StatsState())
     val stats: StateFlow<StatsState> = _stats.asStateFlow()

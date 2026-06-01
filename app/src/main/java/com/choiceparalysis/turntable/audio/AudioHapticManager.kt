@@ -1,6 +1,7 @@
 package com.choiceparalysis.turntable.audio
 
 import android.content.Context
+import android.util.Log
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.SoundPool
@@ -9,6 +10,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import com.choiceparalysis.turntable.R
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +33,7 @@ enum class SoundEffect(val resId: Int) {
 class AudioHapticManager private constructor(private val context: Context) {
 
     companion object {
+        private const val TAG = "AudioHaptic"
         @Volatile
         private var instance: AudioHapticManager? = null
 
@@ -41,7 +44,7 @@ class AudioHapticManager private constructor(private val context: Context) {
         }
     }
 
-    private val settingsRepository = SettingsRepository(context)
+    private val settingsRepository = SettingsRepository(context.dataStore, context)
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _soundEnabled = MutableStateFlow(true)
@@ -133,10 +136,16 @@ class AudioHapticManager private constructor(private val context: Context) {
      * Haptic primitives are chosen based on each sound's frequency characteristics.
      */
     fun playFeedback(effect: SoundEffect) {
-        // Trigger both on same frame for sync
+        // WHEEL_TICK: haptic only (no sound), pure boundary click
+        if (effect == SoundEffect.WHEEL_TICK) {
+            if (_hapticEnabled.value) {
+                try { playHapticFor(effect) } catch (_: Exception) {}
+            }
+            return
+        }
+
         val soundReady = _soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT
         val hapticReady = _hapticEnabled.value
-        android.util.Log.d("AudioHaptic", "playFeedback $effect sound=$soundReady haptic=$hapticReady")
 
         if (soundReady) {
             try {
@@ -161,9 +170,17 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     private fun playHapticFor(effect: SoundEffect) {
-        // WHEEL_TICK: ultra-fast direct vibrator (skip MiHaptic for per-frame calls)
+        // WHEEL_TICK: MiHaptic tick for crisp boundary click
         if (effect == SoundEffect.WHEEL_TICK) {
-            vibrator.vibrate(VibrationEffect.createOneShot(12, 200))
+            val mi = MiHapticEngine.isAvailable()
+            Log.d(TAG, "WHEEL_TICK miHaptic=$mi composition=$supportsComposition")
+            if (mi) {
+                MiHapticEngine.playTick()
+            } else if (supportsComposition) {
+                playCompositionHaptic(effect)
+            } else {
+                playLegacyHaptic(effect)
+            }
             return
         }
         // Priority: MiHaptic (Xiaomi) > Composition API > Legacy waveform
@@ -374,14 +391,13 @@ class AudioHapticManager private constructor(private val context: Context) {
     }
 
     /**
-     * Ultra-fast haptic tick for spin wheel segment crossing.
-     * Uses direct Vibrator.vibrate() for minimum latency (~1ms).
-     * Does NOT use MiHaptic (too slow for per-frame calls).
+     * Haptic-only feedback for continuous touch (spin wheel drag).
+     * Uses direct vibrator for minimum latency.
      */
     fun tick() {
         try {
             if (!_hapticEnabled.value) return
-            vibrator.vibrate(VibrationEffect.createOneShot(12, 200))
+            vibrator.vibrate(VibrationEffect.createOneShot(15, 255))
         } catch (_: Exception) {}
     }
 

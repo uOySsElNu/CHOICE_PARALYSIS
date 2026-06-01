@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.navigation.AppNavGraph
 import com.choiceparalysis.turntable.navigation.BottomNavDestinations
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
-            val followSystem by SettingsRepository(context).followSystemTheme
+            val followSystem by SettingsRepository(context.dataStore, context).followSystemTheme
                 .collectAsState(initial = true)
             val darkTheme = if (followSystem) isSystemInDarkTheme() else false
             CHOICEPARALYSISTheme(darkTheme = darkTheme) {

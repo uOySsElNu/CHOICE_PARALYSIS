@@ -26,18 +26,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSettingsRepository(@ApplicationContext context: Context): SettingsRepository =
-        SettingsRepository(context)
+    fun provideSettingsRepository(
+        dataStore: DataStore<Preferences>,
+        @ApplicationContext context: Context
+    ): SettingsRepository = SettingsRepository(dataStore, context)
 
     @Provides
     @Singleton
-    fun provideHistoryRepository(@ApplicationContext context: Context): HistoryRepository =
-        HistoryRepository(context)
+    fun provideHistoryRepository(dataStore: DataStore<Preferences>): HistoryRepository =
+        HistoryRepository(dataStore)
 
     @Provides
     @Singleton
-    fun provideOptionListRepository(@ApplicationContext context: Context): OptionListRepository =
-        OptionListRepository(context)
+    fun provideOptionListRepository(dataStore: DataStore<Preferences>): OptionListRepository =
+        OptionListRepository(dataStore)
 
     @Provides
     @Singleton

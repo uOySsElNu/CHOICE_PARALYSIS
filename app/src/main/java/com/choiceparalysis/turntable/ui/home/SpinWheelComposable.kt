@@ -1,7 +1,6 @@
 package com.choiceparalysis.turntable.ui.home
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import androidx.compose.foundation.Canvas
@@ -38,9 +37,20 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
+import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
+import androidx.core.graphics.withTranslation
+
+/** Pre-computed per-segment data that doesn't depend on Canvas size. */
+private data class SegmentLayout(
+    val startAngle: Float,    // degrees, starting from -90° (top)
+    val sweepAngle: Float,
+    val color: Color,
+    val borderColor: Color,
+    val text: String,
+    val textAngleDeg: Float,  // bisector angle for text placement
+)
 
 @Composable
 fun SpinWheel(
@@ -57,55 +67,83 @@ fun SpinWheel(
     val animatable = remember { Animatable(0f) }
     var settledResult by remember { mutableStateOf<String?>(null) }
     var isDragging by remember { mutableStateOf(false) }
-    // Trigger counter for button-initiated spins
+    var isSpinning by remember { mutableStateOf(false) }
     var spinTrigger by remember { mutableIntStateOf(0) }
 
-    // Compute weighted segment angles
-    val safeWeights = options.indices.map { weights.getOrElse(it) { 1 } }
-    val totalWeight = safeWeights.sum().coerceAtLeast(options.size)
-    val segmentAngles = safeWeights.map { (it.toFloat() / totalWeight) * 360f }
+    // --- Pre-compute segment layout (angles, colors, text) — independent of Canvas size ---
+    val segmentLayouts = remember(options, weights, colorScheme) {
+        val safeW = options.indices.map { weights.getOrElse(it) { 1 } }
+        val total = safeW.sum().coerceAtLeast(options.size)
+        val angles = safeW.map { (it.toFloat() / total) * 360f }
+        var acc = -90f  // start from top
+        options.mapIndexed { index, option ->
+            val start = acc
+            val sweep = angles[index]
+            acc += sweep
+            SegmentLayout(
+                startAngle = start,
+                sweepAngle = sweep,
+                color = colorScheme.getColorForIndex(index),
+                borderColor = colorScheme.borderColor,
+                text = option,
+                textAngleDeg = start + sweep / 2,
+            )
+        }
+    }
 
-    // Helper: which segment is under the indicator
     fun segmentIndexAt(rotation: Float): Int {
         val norm = ((rotation % 360f) + 360f) % 360f
         val indicatorAngle = (360f - norm) % 360f
         var acc = 0f
-        for (i in segmentAngles.indices) {
-            acc += segmentAngles[i]
+        for (i in segmentLayouts.indices) {
+            acc += segmentLayouts[i].sweepAngle
             if (indicatorAngle < acc) return i
         }
-        return segmentAngles.indices.last
+        return segmentLayouts.indices.last
     }
 
-    // Tick sound on segment boundary crossing during spin
-    LaunchedEffect(Unit) {
-        var lastSegment = segmentIndexAt(animatable.value)
+    // --- Haptic tick with 80ms throttle + delta > 180° skip ---
+    LaunchedEffect(options, weights) {
+        var lastRotation = animatable.value
+        var lastSegment = segmentIndexAt(lastRotation)
+        var lastTickTime = 0L
         snapshotFlow { animatable.value }.collect { rotation ->
+            val delta = abs(rotation - lastRotation)
+            lastRotation = rotation
+            if (delta > 180f) return@collect
             val currentSegment = segmentIndexAt(rotation)
             if (currentSegment != lastSegment) {
-                audioHaptic.playFeedback(SoundEffect.WHEEL_TICK)
+                val now = System.currentTimeMillis()
+                if (now - lastTickTime > 80) {
+                    audioHaptic.playFeedback(SoundEffect.WHEEL_TICK)
+                    lastTickTime = now
+                }
                 lastSegment = currentSegment
             }
         }
     }
 
-    // Button-initiated spin
+    // --- Button spin — try/finally guarantees onSpinEnd exactly once ---
     LaunchedEffect(spinTrigger) {
         if (spinTrigger == 0) return@LaunchedEffect
+        isSpinning = true
         onSpinStart()
         settledResult = null
-        val target = (1440..2160).random().toFloat() + (0..360).random().toFloat()
-        animatable.snapTo(0f)
-        animatable.animateTo(target, tween(3000, easing = StandardEasing.EaseOutQuart))
-        onSpinEnd()
-        val idx = segmentIndexAt(animatable.value)
-        settledResult = options[idx]
-        onSpinResult(options[idx])
-        audioHaptic.playFeedback(SoundEffect.SPIN_DING)
+        try {
+            val target = (1440..2160).random().toFloat() + (0..360).random().toFloat()
+            animatable.snapTo(0f)
+            animatable.animateTo(target, tween(3000, easing = StandardEasing.EaseOutQuart))
+            val idx = segmentIndexAt(animatable.value)
+            settledResult = options[idx]
+            onSpinResult(options[idx])
+            audioHaptic.playFeedback(SoundEffect.SPIN_DING)
+        } finally {
+            isSpinning = false
+            onSpinEnd()
+        }
     }
 
-    // Result-drag detection: fires AFTER drag stops, with debounce
-    // Key includes both isDragging and settledResult so it re-checks after each spin result
+    // --- Result-drag detection ---
     LaunchedEffect(isDragging, settledResult) {
         if (!isDragging && settledResult != null) {
             delay(300)
@@ -117,6 +155,7 @@ fun SpinWheel(
         }
     }
 
+    // --- Layout ---
     BoxWithConstraints(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -151,8 +190,6 @@ fun SpinWheel(
                 .size(wheelSize)
                 .padding(12.dp)
                 .pointerInput(options, weights) {
-                    // Use coroutineScope + launch so we can call animatable suspend functions
-                    // directly from gesture callbacks — no async lag
                     coroutineScope {
                         var prevAngle = 0f
                         var prevTime = 0L
@@ -160,6 +197,7 @@ fun SpinWheel(
                         detectDragGestures(
                             onDragStart = { offset ->
                                 isDragging = true
+                                launch { animatable.stop() }
                                 val cx = size.width / 2f
                                 val cy = size.height / 2f
                                 prevAngle = atan2(offset.y - cy, offset.x - cx)
@@ -180,7 +218,6 @@ fun SpinWheel(
                                 velocities.add(delta / dt * 1000f)
                                 if (velocities.size > 5) velocities.removeAt(0)
                                 prevTime = now
-                                audioHaptic.tick()
                                 change.consume()
                             },
                             onDragEnd = {
@@ -190,28 +227,35 @@ fun SpinWheel(
                                         it.subList(it.size / 4, it.size * 3 / 4).average().toFloat()
                                     }
                                 } else 0f
-                                if (kotlin.math.abs(avgVelocity) > 400f) {
+                                if (abs(avgVelocity) > 400f) {
+                                    if (isSpinning) return@detectDragGestures
                                     settledResult = null
                                     launch {
+                                        isSpinning = true
                                         onSpinStart()
-                                        val absV = kotlin.math.abs(avgVelocity)
-                                        // Enforce minimum spin distance (same as button: ~1440°)
-                                        // If velocity too low for meaningful spin, animate to minimum
-                                        val minRotation = 1440f
-                                        val sign = if (avgVelocity > 0) 1f else -1f
-                                        val current = animatable.value
-                                        val target = current + sign * maxOf(absV * 1.5f, minRotation)
-                                        animatable.animateTo(
-                                            target,
-                                            tween(maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000),
-                                                easing = StandardEasing.EaseOutQuart)
-                                        )
-                                        onSpinEnd()
-                                        val idx = segmentIndexAt(animatable.value)
-                                        settledResult = options[idx]
-                                        onSpinResult(options[idx])
-                                        audioHaptic.playFeedback(SoundEffect.SPIN_DING)
+                                        try {
+                                            val absV = abs(avgVelocity)
+                                            val minRotation = 1440f
+                                            val sign = if (avgVelocity > 0) 1f else -1f
+                                            val current = animatable.value
+                                            val target = current + sign * maxOf(absV * 1.5f, minRotation)
+                                            animatable.animateTo(
+                                                target,
+                                                tween(maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000),
+                                                    easing = StandardEasing.EaseOutQuart)
+                                            )
+                                            val idx = segmentIndexAt(animatable.value)
+                                            settledResult = options[idx]
+                                            onSpinResult(options[idx])
+                                            audioHaptic.playFeedback(SoundEffect.SPIN_DING)
+                                        } finally {
+                                            isSpinning = false
+                                            onSpinEnd()
+                                        }
                                     }
+                                } else {
+                                    isSpinning = false
+                                    onSpinEnd()
                                 }
                             }
                         )
@@ -221,7 +265,11 @@ fun SpinWheel(
             val centerX = size.width / 2
             val centerY = size.height / 2
             val radius = minOf(centerX, centerY) - 8f
+            val diameter = radius * 2
+            val arcSize = Size(diameter, diameter)
+            val arcTopLeft = Offset(centerX - radius, centerY - radius)
 
+            // Shadow
             drawCircle(
                 color = Color.Black.copy(alpha = 0.15f),
                 radius = radius + 4f,
@@ -229,64 +277,59 @@ fun SpinWheel(
             )
 
             rotate(degrees = animatable.value) {
-                var startAngle = -90f
-                options.forEachIndexed { index, option ->
-                    val sweepAngle = segmentAngles[index]
-                    val color = colorScheme.getColorForIndex(index)
-
+                // Draw arcs using pre-computed layouts
+                for (seg in segmentLayouts) {
                     drawArc(
-                        color = color,
-                        startAngle = startAngle,
-                        sweepAngle = sweepAngle,
+                        color = seg.color,
+                        startAngle = seg.startAngle,
+                        sweepAngle = seg.sweepAngle,
                         useCenter = true,
-                        topLeft = Offset(centerX - radius, centerY - radius),
-                        size = Size(radius * 2, radius * 2)
+                        topLeft = arcTopLeft,
+                        size = arcSize
                     )
                     drawArc(
-                        color = colorScheme.borderColor,
-                        startAngle = startAngle,
-                        sweepAngle = sweepAngle,
+                        color = seg.borderColor,
+                        startAngle = seg.startAngle,
+                        sweepAngle = seg.sweepAngle,
                         useCenter = true,
-                        topLeft = Offset(centerX - radius, centerY - radius),
-                        size = Size(radius * 2, radius * 2),
+                        topLeft = arcTopLeft,
+                        size = arcSize,
                         style = Stroke(width = 3.dp.toPx())
                     )
+                }
 
-                    val textAngleDeg = startAngle + sweepAngle / 2
-                    val textAngleRad = Math.toRadians(textAngleDeg.toDouble())
-                    val textRadius = radius * 0.58f
-                    val textCx = centerX + cos(textAngleRad).toFloat() * textRadius
-                    val textCy = centerY + sin(textAngleRad).toFloat() * textRadius
+                // Draw text — only position and size depend on radius
+                val textRadius = radius * 0.58f
+                val baseTextSize = radius * 0.18f
+                val availWidth = radius * 0.45f
+                val canvas = drawContext.canvas.nativeCanvas
 
-                    val baseTextSize = radius * 0.18f
-                    val availWidth = radius * 0.45f
+                for (seg in segmentLayouts) {
+                    val angleRad = Math.toRadians(seg.textAngleDeg.toDouble())
+                    val textCx = centerX + cos(angleRad).toFloat() * textRadius
+                    val textCy = centerY + sin(angleRad).toFloat() * textRadius
+
                     textFillPaint.textSize = baseTextSize
                     textStrokePaint.textSize = baseTextSize
-                    val measured = textFillPaint.measureText(option)
+                    val measured = textFillPaint.measureText(seg.text)
                     if (measured > availWidth) {
-                        textFillPaint.textSize = baseTextSize * (availWidth / measured)
-                        textStrokePaint.textSize = textFillPaint.textSize
+                        val scale = availWidth / measured
+                        textFillPaint.textSize = baseTextSize * scale
+                        textStrokePaint.textSize = baseTextSize * scale
                     }
-                    textFillPaint.color = colorScheme.textColor.copy(alpha = 0.9f).toArgb()
 
-                    // Align text baseline along the bisector (radial direction)
-                    // Top half: rotate so text flows outward (center → edge)
-                    // Bottom half: flip 180° so text stays readable
-                    val isBottomHalf = textAngleDeg % 360f in 90f..270f
-                    val rotation = if (isBottomHalf) textAngleDeg else textAngleDeg + 180f
+                    val isBottomHalf = seg.textAngleDeg % 360f in 90f..270f
+                    val rot = if (isBottomHalf) seg.textAngleDeg else seg.textAngleDeg + 180f
 
-                    val canvas = drawContext.canvas.nativeCanvas
-                    canvas.save()
-                    canvas.translate(textCx, textCy)
-                    canvas.rotate(rotation)
-                    canvas.drawText(option, 0f, textFillPaint.textSize * 0.35f, textStrokePaint)
-                    canvas.drawText(option, 0f, textFillPaint.textSize * 0.35f, textFillPaint)
-                    canvas.restore()
-
-                    startAngle += sweepAngle
+                    canvas.withTranslation(textCx, textCy) {
+                        rotate(rot)
+                        drawText(seg.text, 0f, textFillPaint.textSize * 0.35f, textStrokePaint)
+                        drawText(seg.text, 0f, textFillPaint.textSize * 0.35f, textFillPaint)
+                    }
                 }
             }
 
+            // Outer ring
             drawCircle(
                 color = colorScheme.borderColor,
                 radius = radius,
@@ -295,6 +338,7 @@ fun SpinWheel(
             )
         }
 
+        // Indicator
         val indicatorWidth = wheelSize * 0.08f
         TriangleIndicator(
             color = colorScheme.indicatorColor,
@@ -305,8 +349,10 @@ fun SpinWheel(
         )
     }
 
-    // Expose spin trigger for button
-    SpinWheelSpinTrigger { spinTrigger++ }
+    // Button trigger guard
+    SpinWheelSpinTrigger {
+        if (!isSpinning) spinTrigger++
+    }
 }
 
 private val spinTriggerCallbacks = mutableListOf<() -> Unit>()
@@ -350,10 +396,3 @@ private fun TriangleIndicator(
     }
 }
 
-private fun Color.toArgb(): Int {
-    val alpha = (this.alpha * 255).toInt()
-    val red = (this.red * 255).toInt()
-    val green = (this.green * 255).toInt()
-    val blue = (this.blue * 255).toInt()
-    return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
-}

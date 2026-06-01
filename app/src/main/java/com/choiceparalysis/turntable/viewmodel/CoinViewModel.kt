@@ -3,6 +3,7 @@ package com.choiceparalysis.turntable.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
@@ -20,8 +21,8 @@ enum class CoinSide(val displayName: String) {
 }
 
 class CoinViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application)
-    private val settingsRepository = SettingsRepository(application)
+    private val historyRepository = HistoryRepository(application.dataStore)
+    private val settingsRepository = SettingsRepository(application.dataStore, application)
 
     private val _coinResult = MutableStateFlow<CoinSide?>(null)
     val coinResult: StateFlow<CoinSide?> = _coinResult.asStateFlow()

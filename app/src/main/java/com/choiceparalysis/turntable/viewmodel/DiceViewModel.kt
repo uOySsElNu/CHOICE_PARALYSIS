@@ -3,6 +3,7 @@ package com.choiceparalysis.turntable.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class DiceViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application)
+    private val historyRepository = HistoryRepository(application.dataStore)
 
     private val _diceValue = MutableStateFlow<Int?>(null)
     val diceValue: StateFlow<Int?> = _diceValue.asStateFlow()

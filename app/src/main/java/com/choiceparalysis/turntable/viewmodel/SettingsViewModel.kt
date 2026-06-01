@@ -2,11 +2,12 @@ package com.choiceparalysis.turntable.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = SettingsRepository(application)
+    private val repository = SettingsRepository(application.dataStore, application)
 
     val dynamicColorEnabled: Flow<Boolean> = repository.dynamicColorEnabled
     val selectedPreset: Flow<String> = repository.selectedPreset

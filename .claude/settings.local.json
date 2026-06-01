@@ -150,7 +150,22 @@
       "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep versionName\")",
       "Bash(./gradlew installDebug)",
       "Bash(grep -v \"^$\")",
-      "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep -i vibrate\")"
+      "Bash(adb -s 5cac01f5 shell \"dumpsys package com.choiceparalysis.turntable | grep -i vibrate\")",
+      "Bash(adb install *)",
+      "Read(//c/Users/m1368/AppData/Local/Android/Sdk/platform-tools/**)",
+      "Read(//c/Users/m1368/AppData/Local/**)",
+      "Read(//d/Android/SDK/platform-tools/**)",
+      "Bash(\"D:/Android/SDK/platform-tools/adb.exe\" devices *)",
+      "Bash(D:/Android/SDK/platform-tools/adb.exe install *)",
+      "Bash(D:/Android/SDK/platform-tools/adb.exe logcat *)",
+      "WebFetch(domain:dl.google.com)",
+      "Bash(curl -s \"https://dl.google.com/dl/android/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/maven-metadata.xml\")",
+      "Bash(curl -s \"https://plugins.gradle.org/m2/com/google/devtools/ksp/com.google.devtools.ksp.gradle.plugin/maven-metadata.xml\")",
+      "Bash(curl -sL \"https://repo1.maven.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/maven-metadata.xml\")",
+      "Bash(curl -sL \"https://repo1.maven.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/2.3.9/symbol-processing-gradle-plugin-2.3.9.pom\")",
+      "Bash(curl -sL \"https://repo1.maven.org/maven2/com/google/devtools/ksp/symbol-processing-gradle-plugin/2.3.9/symbol-processing-gradle-plugin-2.3.9.module\")",
+      "Bash(curl -sL \"https://repo1.maven.org/maven2/com/google/dagger/hilt-android/maven-metadata.xml\")",
+      "Bash(curl -sL \"https://repo1.maven.org/maven2/com/google/dagger/hilt-android-gradle-plugin/maven-metadata.xml\")"
     ]
   },
   "enabledMcpjsonServers": [

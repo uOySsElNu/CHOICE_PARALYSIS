@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import kotlinx.coroutines.launch
 
@@ -50,7 +51,7 @@ fun SettingsScreen(
     var showOpenSourceLicenses by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val settingsRepository = remember { SettingsRepository(context) }
+    val settingsRepository = remember { SettingsRepository(context.dataStore, context) }
     val followSystemTheme by settingsRepository.followSystemTheme.collectAsState(initial = true)
     val soundEnabled by settingsRepository.soundEnabled.collectAsState(initial = true)
     val hapticEnabled by settingsRepository.hapticEnabled.collectAsState(initial = true)

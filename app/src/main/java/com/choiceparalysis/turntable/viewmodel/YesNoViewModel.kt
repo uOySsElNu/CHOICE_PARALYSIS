@@ -3,6 +3,7 @@ package com.choiceparalysis.turntable.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
@@ -19,7 +20,7 @@ enum class YesNoResult(val displayName: String, val emoji: String) {
 }
 
 class YesNoViewModel(application: Application) : AndroidViewModel(application) {
-    private val historyRepository = HistoryRepository(application)
+    private val historyRepository = HistoryRepository(application.dataStore)
 
     private val _result = MutableStateFlow<YesNoResult?>(null)
     val result: StateFlow<YesNoResult?> = _result.asStateFlow()

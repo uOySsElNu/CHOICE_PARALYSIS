@@ -135,8 +135,8 @@ fun SpinWheelScreen(
                 colorScheme = colorScheme,
                 modifier = Modifier.padding(bottom = 16.dp),
                 onSpinResult = { selected -> viewModel.onSpinResult(selected) },
-                onSpinStart = { viewModel.setAnimating(true) },
-                onSpinEnd = { viewModel.setAnimating(false) },
+                onSpinStart = { viewModel.startSpin() },
+                onSpinEnd = { viewModel.endSpin() },
                 onResultDragged = {
                     Toast.makeText(context, "你在干嘛？！", Toast.LENGTH_SHORT).show()
                 }

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.model.OptionGroup
@@ -23,8 +24,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SpinWheelViewModel(application: Application) : AndroidViewModel(application) {
-    private val settingsRepository = SettingsRepository(application)
-    private val historyRepository = HistoryRepository(application)
+    private val settingsRepository = SettingsRepository(application.dataStore, application)
+    private val historyRepository = HistoryRepository(application.dataStore)
 
     private val _result = MutableStateFlow<String?>(null)
     val result: StateFlow<String?> = _result.asStateFlow()
@@ -132,8 +133,32 @@ class SpinWheelViewModel(application: Application) : AndroidViewModel(applicatio
         _optionsEditorOpen.value = !_optionsEditorOpen.value
     }
 
-    fun setAnimating(value: Boolean) {
-        _isAnimating.value = value
+    private var spinJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Start a spin animation. Returns false if already spinning.
+     * The caller should run the animation and then call endSpin().
+     */
+    fun startSpin(): Boolean {
+        if (_isAnimating.value) return false
+        _isAnimating.value = true
+        // Safety timeout: auto-reset after 10s
+        spinJob = viewModelScope.launch {
+            delay(10_000)
+            if (_isAnimating.value) {
+                _isAnimating.value = false
+            }
+        }
+        return true
+    }
+
+    /**
+     * End a spin animation. Always safe to call.
+     */
+    fun endSpin() {
+        spinJob?.cancel()
+        spinJob = null
+        _isAnimating.value = false
     }
 
     fun updateOptions(newOptions: List<String>) {
