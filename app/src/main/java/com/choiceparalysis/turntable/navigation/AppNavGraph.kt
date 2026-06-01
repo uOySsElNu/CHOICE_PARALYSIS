@@ -71,10 +71,10 @@ fun AppNavGraph(
             StatsScreen(onBack = { navController.popBackStack() })
         }
         composable<Route.History> {
-            HistoryScreen()
+            HistoryScreen(onBack = { navController.popBackStack() })
         }
         composable<Route.Settings> {
-            SettingsScreen()
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }

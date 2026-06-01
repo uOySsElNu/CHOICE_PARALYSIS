@@ -40,9 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import com.choiceparalysis.turntable.viewmodel.ColorSchemeVM
 import com.choiceparalysis.turntable.viewmodel.OptionsVM
 import kotlinx.coroutines.launch
@@ -260,10 +260,3 @@ private fun PresetThemeChip(
     }
 }
 
-private fun Color.toArgb(): Int {
-    val a = (alpha * 255).roundToInt()
-    val r = (red * 255).roundToInt()
-    val g = (green * 255).roundToInt()
-    val b = (blue * 255).roundToInt()
-    return (a shl 24) or (r shl 16) or (g shl 8) or b
-}

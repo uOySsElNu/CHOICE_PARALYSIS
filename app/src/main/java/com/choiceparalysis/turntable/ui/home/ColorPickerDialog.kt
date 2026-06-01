@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -256,13 +257,6 @@ private fun parseHexColor(hex: String): Color? {
     }
 }
 
-private fun Color.toArgb(): Int {
-    val a = (alpha * 255).roundToInt()
-    val r = (red * 255).roundToInt()
-    val g = (green * 255).roundToInt()
-    val b = (blue * 255).roundToInt()
-    return (a shl 24) or (r shl 16) or (g shl 8) or b
-}
 
 private val COMMON_COLORS = listOf(
     Color(0xFFE91E63), // Pink

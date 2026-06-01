@@ -1,6 +1,7 @@
 package com.choiceparalysis.turntable.viewmodel
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class ColorSchemeVM @Inject constructor(
@@ -133,10 +133,3 @@ class ColorSchemeVM @Inject constructor(
     }
 }
 
-private fun Color.toArgb(): Int {
-    val a = (alpha * 255).roundToInt()
-    val r = (red * 255).roundToInt()
-    val g = (green * 255).roundToInt()
-    val b = (blue * 255).roundToInt()
-    return (a shl 24) or (r shl 16) or (g shl 8) or b
-}
