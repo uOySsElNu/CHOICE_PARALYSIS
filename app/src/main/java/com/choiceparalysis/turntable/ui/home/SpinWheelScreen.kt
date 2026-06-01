@@ -58,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,26 +65,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
 import kotlin.math.roundToInt
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.choiceparalysis.turntable.viewmodel.ColorSchemeVM
+import com.choiceparalysis.turntable.viewmodel.OptionsVM
+import com.choiceparalysis.turntable.viewmodel.SpinWheelVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpinWheelScreen(
     modifier: Modifier = Modifier,
-    viewModel: SpinWheelViewModel = viewModel(),
+    spinWheelVM: SpinWheelVM = hiltViewModel(),
+    optionsVM: OptionsVM = hiltViewModel(),
+    colorSchemeVM: ColorSchemeVM = hiltViewModel(),
     onNavigateToSettings: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
-    val options by viewModel.options.collectAsState()
-    val weights by viewModel.weights.collectAsState()
-    val isAnimating by viewModel.isAnimating.collectAsState()
-    val result by viewModel.result.collectAsState()
-    val colorScheme by viewModel.colorScheme.collectAsState()
-    val optionsEditorOpen by viewModel.optionsEditorOpen.collectAsState()
-    val dynamicColorEnabled by viewModel.dynamicColorEnabled.collectAsState()
-    val customColors by viewModel.customColors.collectAsState()
-    val optionGroups by viewModel.optionGroups.collectAsState()
+    val options by optionsVM.options.collectAsState()
+    val weights by optionsVM.weights.collectAsState()
+    val isAnimating by spinWheelVM.isAnimating.collectAsState()
+    val result by spinWheelVM.result.collectAsState()
+    val colorScheme by colorSchemeVM.colorScheme.collectAsState()
+    val optionsEditorOpen by optionsVM.optionsEditorOpen.collectAsState()
+    val dynamicColorEnabled by colorSchemeVM.dynamicColorEnabled.collectAsState()
+    val customColors by colorSchemeVM.customColors.collectAsState()
+    val optionGroups by optionsVM.optionGroups.collectAsState()
+
+    // Keep ColorSchemeVM in sync with current options count
+    LaunchedEffect(options.size) {
+        colorSchemeVM.setOptionsCount(options.size)
+    }
     var showSettingsSheet by remember { mutableStateOf(false) }
     var showSaveGroupDialog by remember { mutableStateOf(false) }
     var showLoadGroupDialog by remember { mutableStateOf(false) }
@@ -134,9 +142,11 @@ fun SpinWheelScreen(
                 weights = weights,
                 colorScheme = colorScheme,
                 modifier = Modifier.padding(bottom = 16.dp),
-                onSpinResult = { selected -> viewModel.onSpinResult(selected) },
-                onSpinStart = { viewModel.startSpin() },
-                onSpinEnd = { viewModel.endSpin() },
+                onSpinResult = { selected ->
+                    spinWheelVM.recordSpinResult(selected, options)
+                },
+                onSpinStart = { spinWheelVM.startSpin() },
+                onSpinEnd = { spinWheelVM.endSpin() },
                 onResultDragged = {
                     Toast.makeText(context, "你在干嘛？！", Toast.LENGTH_SHORT).show()
                 }
@@ -165,7 +175,7 @@ fun SpinWheelScreen(
 
             // Options editor toggle button
             ElevatedButton(
-                onClick = { viewModel.toggleOptionsEditor() },
+                onClick = { optionsVM.toggleOptionsEditor() },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -195,14 +205,14 @@ fun SpinWheelScreen(
                     colorScheme = colorScheme,
                     dynamicColorEnabled = dynamicColorEnabled,
                     customColors = customColors,
-                    onUpdateOption = { index, name -> viewModel.updateOptionName(index, name) },
-                    onRemoveOption = { viewModel.removeOption(it) },
-                    onAddOption = { viewModel.addOption() },
+                    onUpdateOption = { index, name -> optionsVM.updateOptionName(index, name) },
+                    onRemoveOption = { optionsVM.removeOption(it) },
+                    onAddOption = { optionsVM.addOption() },
                     onColorClick = { colorPickerIndex = it },
                     onDynamicColorClick = {
                         Toast.makeText(context, "动态色彩已开启", Toast.LENGTH_SHORT).show()
                     },
-                    onUpdateWeight = { index, weight -> viewModel.updateWeight(index, weight) },
+                    onUpdateWeight = { index, weight -> optionsVM.updateWeight(index, weight) },
                     onSaveGroup = { showSaveGroupDialog = true },
                     onLoadGroup = { showLoadGroupDialog = true },
                     modifier = Modifier.padding(top = 8.dp)
@@ -222,14 +232,15 @@ fun SpinWheelScreen(
     LaunchedEffect(result) {
         result?.let { resultText ->
             Toast.makeText(context, resultText, Toast.LENGTH_SHORT).show()
-            viewModel.clearResult()
+            spinWheelVM.clearResult()
         }
     }
 
     // Settings bottom sheet
     if (showSettingsSheet) {
         WheelSettingsSheet(
-            viewModel = viewModel,
+            colorSchemeVM = colorSchemeVM,
+            optionsVM = optionsVM,
             onDismiss = { showSettingsSheet = false }
         )
     }
@@ -239,7 +250,7 @@ fun SpinWheelScreen(
         SaveGroupDialog(
             onDismiss = { showSaveGroupDialog = false },
             onSave = { name ->
-                viewModel.saveOptionGroup(name)
+                optionsVM.saveOptionGroup(name)
                 showSaveGroupDialog = false
             }
         )
@@ -251,10 +262,10 @@ fun SpinWheelScreen(
             groups = optionGroups,
             onDismiss = { showLoadGroupDialog = false },
             onLoad = { group ->
-                viewModel.loadOptionGroup(group)
+                optionsVM.loadOptionGroup(group)
                 showLoadGroupDialog = false
             },
-            onDelete = { viewModel.deleteOptionGroup(it) }
+            onDelete = { optionsVM.deleteOptionGroup(it) }
         )
     }
 
@@ -269,7 +280,7 @@ fun SpinWheelScreen(
         ColorPickerDialog(
             initialColor = currentColor,
             onConfirm = { color ->
-                viewModel.updateOptionColor(editingIndex, color.toArgb())
+                colorSchemeVM.updateOptionColor(editingIndex, color.toArgb())
                 colorPickerIndex = null
             },
             onDismiss = { colorPickerIndex = null }

@@ -43,19 +43,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import com.choiceparalysis.turntable.viewmodel.SpinWheelViewModel
+import com.choiceparalysis.turntable.viewmodel.ColorSchemeVM
+import com.choiceparalysis.turntable.viewmodel.OptionsVM
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun WheelSettingsSheet(
-    viewModel: SpinWheelViewModel,
+    colorSchemeVM: ColorSchemeVM,
+    optionsVM: OptionsVM,
     onDismiss: () -> Unit,
 ) {
-    val dynamicColorEnabled by viewModel.dynamicColorEnabled.collectAsState()
-    val selectedPreset by viewModel.selectedPresetName.collectAsState()
-    val customColors by viewModel.customColors.collectAsState()
-    val options by viewModel.options.collectAsState()
+    val dynamicColorEnabled by colorSchemeVM.dynamicColorEnabled.collectAsState()
+    val selectedPreset by colorSchemeVM.selectedPresetName.collectAsState()
+    val customColors by colorSchemeVM.customColors.collectAsState()
+    val options by optionsVM.options.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
@@ -99,7 +101,7 @@ fun WheelSettingsSheet(
                 Switch(
                     checked = dynamicColorEnabled,
                     onCheckedChange = { enabled ->
-                        scope.launch { viewModel.setDynamicColorEnabled(enabled) }
+                        scope.launch { colorSchemeVM.setDynamicColorEnabled(enabled) }
                     }
                 )
             }
@@ -128,7 +130,7 @@ fun WheelSettingsSheet(
                             design = design,
                             isSelected = isSelected,
                             onClick = {
-                                scope.launch { viewModel.setSelectedPreset(design.name) }
+                                scope.launch { colorSchemeVM.setSelectedPreset(design.name) }
                             }
                         )
                     }
@@ -204,7 +206,7 @@ fun WheelSettingsSheet(
         ColorPickerDialog(
             initialColor = currentColor,
             onConfirm = { color ->
-                scope.launch { viewModel.updateOptionColor(editingIndex, color.toArgb()) }
+                scope.launch { colorSchemeVM.updateOptionColor(editingIndex, color.toArgb()) }
                 colorPickerIndex = null
             },
             onDismiss = { colorPickerIndex = null }
