@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.choiceparalysis.turntable.data.datastore.dataStore
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
 fun ChoiceParalysisMainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: BottomNavDestinations.HUB.route
+    val currentDestination = navBackStackEntry?.destination
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -56,9 +57,9 @@ fun ChoiceParalysisMainScreen() {
                 item(
                     icon = { Icon(dest.icon, contentDescription = dest.label) },
                     label = { Text(dest.label) },
-                    selected = currentRoute == dest.route,
+                    selected = currentDestination?.hasRoute(dest.route::class) == true,
                     onClick = {
-                        if (currentRoute != dest.route) {
+                        if (currentDestination?.hasRoute(dest.route::class) != true) {
                             navController.navigate(dest.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true

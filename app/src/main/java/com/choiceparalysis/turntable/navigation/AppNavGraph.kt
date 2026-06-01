@@ -28,7 +28,7 @@ fun AppNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HUB,
+        startDestination = Route.Hub,
         modifier = modifier,
         enterTransition = {
             fadeIn(animationSpec = tween(500, easing = StandardEasing.EaseInOutQuart)) +
@@ -47,33 +47,33 @@ fun AppNavGraph(
                 scaleOut(targetScale = 1.5f, animationSpec = tween(500, easing = StandardEasing.EaseInOutQuart))
         },
     ) {
-        composable(Routes.HUB) {
+        composable<Route.Hub> {
             HubScreen(onNavigate = { route ->
                 navController.navigate(route)
             })
         }
-        composable(Routes.SPIN_WHEEL) {
+        composable<Route.SpinWheel> {
             SpinWheelScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.COIN) {
+        composable<Route.Coin> {
             CoinScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.DICE) {
+        composable<Route.Dice> {
             DiceScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.YES_NO) {
+        composable<Route.YesNo> {
             YesNoScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.FINGER_ROULETTE) {
+        composable<Route.FingerRoulette> {
             FingerRouletteScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.STATS) {
+        composable<Route.Stats> {
             StatsScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.HISTORY) {
+        composable<Route.History> {
             HistoryScreen()
         }
-        composable(Routes.SETTINGS) {
+        composable<Route.Settings> {
             SettingsScreen()
         }
     }

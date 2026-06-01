@@ -33,28 +33,28 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.choiceparalysis.turntable.navigation.Routes
+import com.choiceparalysis.turntable.navigation.Route
 
 data class HubCard(
     val title: String,
     val description: String,
     val icon: ImageVector,
-    val route: String,
+    val route: Route,
 )
 
 private val hubCards = listOf(
-    HubCard("转盘", "转动命运之轮", Icons.Default.Autorenew, Routes.SPIN_WHEEL),
-    HubCard("硬币", "抛一枚命运硬币", Icons.Default.MonetizationOn, Routes.COIN),
-    HubCard("骰子", "掷出你的答案", Icons.Default.Casino, Routes.DICE),
-    HubCard("Yes/No", "让宇宙替你决定", Icons.Default.ThumbsUpDown, Routes.YES_NO),
-    HubCard("指尖轮盘", "多人淘汰，谁是天选", Icons.Default.TouchApp, Routes.FINGER_ROULETTE),
-    HubCard("数据洞察", "看看你的决策模式", Icons.Default.BarChart, Routes.STATS),
+    HubCard("转盘", "转动命运之轮", Icons.Default.Autorenew, Route.SpinWheel),
+    HubCard("硬币", "抛一枚命运硬币", Icons.Default.MonetizationOn, Route.Coin),
+    HubCard("骰子", "掷出你的答案", Icons.Default.Casino, Route.Dice),
+    HubCard("Yes/No", "让宇宙替你决定", Icons.Default.ThumbsUpDown, Route.YesNo),
+    HubCard("指尖轮盘", "多人淘汰，谁是天选", Icons.Default.TouchApp, Route.FingerRoulette),
+    HubCard("数据洞察", "看看你的决策模式", Icons.Default.BarChart, Route.Stats),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HubScreen(
-    onNavigate: (String) -> Unit,
+    onNavigate: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
