@@ -123,21 +123,27 @@ fun SpinWheel(
         }
     }
 
-    // --- Button spin — try/finally guarantees onSpinEnd exactly once ---
+    // --- Button spin — reuses same physics as drag fling ---
     LaunchedEffect(spinTrigger) {
         if (spinTrigger == 0) return@LaunchedEffect
         isSpinning = true
         onSpinStart()
         settledResult = null
         try {
-            val target = (1440..2160).random().toFloat() + (0..360).random().toFloat()
-            // Only snap to 0 if not already spinning (prevents jarring reset on rapid clicks)
+            // Random velocity in range of a strong manual fling
+            val simulatedVelocity = (2000..4000).random().toFloat()
+            val absV = abs(simulatedVelocity)
+            val minRotation = 1440f
+            val current = animatable.value
+            val target = current + maxOf(absV * 1.5f, minRotation)
+            val duration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
+
             if (!animatable.isRunning) {
                 animatable.snapTo(0f)
             }
             animatable.animateTo(
-                if (animatable.isRunning) animatable.value + target else target,
-                tween(3000, easing = StandardEasing.EaseOutQuart)
+                if (animatable.isRunning) animatable.value + target - current else target,
+                tween(duration, easing = StandardEasing.EaseOutQuart)
             )
             val idx = segmentIndexAt(animatable.value)
             settledResult = options[idx]
