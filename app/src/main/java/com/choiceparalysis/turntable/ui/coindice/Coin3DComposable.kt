@@ -70,6 +70,7 @@ fun Coin3DFlip(
     modifier: Modifier = Modifier,
     onAnimationComplete: () -> Unit = {},
     onDragFlipComplete: (CoinSide) -> Unit = {},
+    onFlingChanged: (Boolean) -> Unit = {},
 ) {
     val rotation = remember { Animatable(0f) }
     val scale = remember { Animatable(1f) }
@@ -99,6 +100,11 @@ fun Coin3DFlip(
     val velocities = remember { mutableListOf<Float>() }
 
     val anyAnimating = isAnimating || isFling
+
+    // Report fling state to ViewModel for button enabled/disabled
+    LaunchedEffect(isFling) {
+        onFlingChanged(isFling)
+    }
 
     // idle 时同步 settledAngle
     LaunchedEffect(result, isAnimating) {

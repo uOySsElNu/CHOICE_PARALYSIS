@@ -6,6 +6,8 @@ import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,15 +26,25 @@ class DiceViewModel @Inject constructor(
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
 
     private val _pendingDiceValue = MutableStateFlow<Int?>(null)
+    private var safetyTimeoutJob: Job? = null
 
     fun rollDice() {
         if (_isAnimating.value) return
         _isAnimating.value = true
         _diceValue.value = null
         _pendingDiceValue.value = (1..6).random()
+        // Safety timeout: force end animation if stuck for 10 seconds
+        safetyTimeoutJob?.cancel()
+        safetyTimeoutJob = viewModelScope.launch {
+            delay(10_000)
+            if (_isAnimating.value) {
+                onDiceRollAnimationComplete()
+            }
+        }
     }
 
     fun onDiceRollAnimationComplete() {
+        safetyTimeoutJob?.cancel()
         val result = _pendingDiceValue.value ?: return
         _diceValue.value = result
         _isAnimating.value = false
@@ -49,6 +61,6 @@ class DiceViewModel @Inject constructor(
 
     fun clearResult() {
         _diceValue.value = null
-        _isAnimating.value = false
+        // Don't reset _isAnimating here — let animation lifecycle manage it
     }
 }

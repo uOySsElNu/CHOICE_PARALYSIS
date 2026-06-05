@@ -9,6 +9,8 @@ import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +33,17 @@ class CoinViewModel @Inject constructor(
 
     private val _isAnimating = MutableStateFlow(false)
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
+
+    // Fling animation state (drag-initiated spin)
+    private val _isFling = MutableStateFlow(false)
+    val isFling: StateFlow<Boolean> = _isFling.asStateFlow()
+
+    // Safety timeout to prevent permanent stuck state
+    private var safetyTimeoutJob: Job? = null
+
+    fun setFling(value: Boolean) {
+        _isFling.value = value
+    }
 
     private val _pendingCoinResult = MutableStateFlow<CoinSide?>(null)
     val pendingCoinResult: StateFlow<CoinSide?> = _pendingCoinResult.asStateFlow()
@@ -60,13 +73,22 @@ class CoinViewModel @Inject constructor(
     }
 
     fun flipCoin() {
-        if (_isAnimating.value) return
+        if (_isAnimating.value || _isFling.value) return
         _isAnimating.value = true
         _coinResult.value = null
         _pendingCoinResult.value = if (Math.random() < 0.5) CoinSide.HEADS else CoinSide.TAILS
+        // Safety timeout: force end animation if stuck for 10 seconds
+        safetyTimeoutJob?.cancel()
+        safetyTimeoutJob = viewModelScope.launch {
+            delay(10_000)
+            if (_isAnimating.value) {
+                onCoinFlipAnimationComplete()
+            }
+        }
     }
 
     fun onCoinFlipAnimationComplete() {
+        safetyTimeoutJob?.cancel()
         val result = _pendingCoinResult.value ?: return
         _coinResult.value = result
         _isAnimating.value = false
@@ -97,7 +119,7 @@ class CoinViewModel @Inject constructor(
 
     fun clearResult() {
         _coinResult.value = null
-        _isAnimating.value = false
+        // Don't reset _isAnimating here — let animation lifecycle manage it
     }
 
     fun setCustomCoinImage(side: CoinSide, uri: String?) {

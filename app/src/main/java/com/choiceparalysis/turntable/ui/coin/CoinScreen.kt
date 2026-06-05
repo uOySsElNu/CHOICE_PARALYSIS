@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,7 +60,18 @@ fun CoinScreen(
     val coinResult by viewModel.coinResult.collectAsState()
     val pendingCoinResult by viewModel.pendingCoinResult.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
+    val isFling by viewModel.isFling.collectAsState()
     val customCoinHeadsUri by viewModel.customCoinHeadsUri.collectAsState()
+
+    // Reset animation state when leaving screen to prevent stuck button
+    DisposableEffect(Unit) {
+        onDispose {
+            if (isAnimating) {
+                viewModel.onCoinFlipAnimationComplete()
+            }
+            viewModel.setFling(false)
+        }
+    }
     val customCoinTailsUri by viewModel.customCoinTailsUri.collectAsState()
     var showCustomizationSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -144,12 +156,13 @@ fun CoinScreen(
             tailsImage = tailsBitmap,
             onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
             onDragFlipComplete = { viewModel.flipCoinDirectly(it) },
+            onFlingChanged = { viewModel.setFling(it) },
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Button(
             onClick = { viewModel.flipCoin() },
-            enabled = !isAnimating,
+            enabled = !isAnimating && !isFling,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)

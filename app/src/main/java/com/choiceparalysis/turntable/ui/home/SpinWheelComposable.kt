@@ -131,8 +131,14 @@ fun SpinWheel(
         settledResult = null
         try {
             val target = (1440..2160).random().toFloat() + (0..360).random().toFloat()
-            animatable.snapTo(0f)
-            animatable.animateTo(target, tween(3000, easing = StandardEasing.EaseOutQuart))
+            // Only snap to 0 if not already spinning (prevents jarring reset on rapid clicks)
+            if (!animatable.isRunning) {
+                animatable.snapTo(0f)
+            }
+            animatable.animateTo(
+                if (animatable.isRunning) animatable.value + target else target,
+                tween(3000, easing = StandardEasing.EaseOutQuart)
+            )
             val idx = segmentIndexAt(animatable.value)
             settledResult = options[idx]
             onSpinResult(options[idx])

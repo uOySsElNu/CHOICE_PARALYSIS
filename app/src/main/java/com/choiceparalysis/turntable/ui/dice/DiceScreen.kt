@@ -43,6 +43,16 @@ fun DiceScreen(
     val diceValue by viewModel.diceValue.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val context = LocalContext.current
+
+    // Reset animation state when leaving screen to prevent stuck button
+    DisposableEffect(Unit) {
+        onDispose {
+            if (isAnimating) {
+                viewModel.onDiceRollAnimationComplete()
+            }
+        }
+    }
+
     DisposableEffect(isAnimating) {
         val shakeDetector = ShakeDetector(context) {
             if (!isAnimating) {

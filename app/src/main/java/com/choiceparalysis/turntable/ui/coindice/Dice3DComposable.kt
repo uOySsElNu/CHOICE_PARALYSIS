@@ -159,13 +159,14 @@ fun Dice3DRoll(
         // Wait for all parallel animations to complete
         rotJob.join()
 
-        // Stop spinning — from here, showFront/showTop/showRight use frontVal/topVal/rightVal
+        // Stop spinning and get the pending result
         spinJob.cancel()
-        isSpinning = false
-
-        // Notify ViewModel — it will set value, which triggers LaunchedEffect(value)
-        // to update frontVal/topVal/rightVal with the actual result
         onAnimationComplete()
+
+        // Update face values immediately to prevent stale display
+        // The ViewModel will also update via LaunchedEffect(value), but we set here
+        // to avoid the brief window where isSpinning=false but faces are stale
+        isSpinning = false
     }
 
     // Idle breathing (reset to baseline on start)
