@@ -6,7 +6,10 @@ import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
+import com.choiceparalysis.turntable.widget.WidgetDataSync
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class SpinWheelVM @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val historyRepository: HistoryRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
@@ -86,6 +90,9 @@ class SpinWheelVM @Inject constructor(
                     options = currentOptions,
                     result = selectedOption,
                 )
+            )
+            WidgetDataSync.updateLastResultWidget(
+                appContext, selectedOption, appContext.getString(com.choiceparalysis.turntable.R.string.method_spin_wheel)
             )
         }
     }

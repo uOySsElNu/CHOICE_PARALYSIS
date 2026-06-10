@@ -19,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -60,6 +62,7 @@ fun SpinWheel(
     colorScheme: WheelColorScheme,
     modifier: Modifier = Modifier,
     lastResult: String? = null,
+    contentDescription: String = "",
     onSpinResult: (String) -> Unit = {},
     onSpinStart: () -> Unit = {},
     onSpinEnd: () -> Unit = {},
@@ -219,6 +222,11 @@ fun SpinWheel(
             modifier = Modifier
                 .size(wheelSize)
                 .padding(12.dp)
+                .semantics {
+                    if (contentDescription.isNotEmpty()) {
+                        this.contentDescription = contentDescription
+                    }
+                }
                 .pointerInput(options, weights) {
                     coroutineScope {
                         var prevAngle = 0f

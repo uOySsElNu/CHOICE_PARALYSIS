@@ -3,11 +3,11 @@ package com.choiceparalysis.turntable.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "option_groups")
-data class OptionGroupEntity(
+@Entity(tableName = "coin_presets")
+data class CoinPresetEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val options: String,   // JSON array of String
-    val weights: String,   // JSON array of Int
+    val headsImagePath: String,
+    val tailsImagePath: String,
     val createdAt: Long,
 )

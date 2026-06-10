@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">É você!</string>
 
@@ -22,14 +22,16 @@
     <string name="hub_card_coin">Moeda</string>
     <string name="hub_card_coin_desc">Jogue uma moeda do destino</string>
     <string name="hub_card_dice">Dado</string>
-    <string name="hub_card_dice_desc">Jogue sua resposta</string>    <string name="hub_card_yes_no_desc">Deixe o universo decidir</string>
+    <string name="hub_card_dice_desc">Jogue sua resposta</string>
+    <string name="hub_card_yes_no_desc">Deixe o universo decidir</string>
     <string name="hub_card_finger_roulette">Roleta de Dedos</string>
     <string name="hub_card_finger_roulette_desc">Jogo de eliminação, quem é o escolhido</string>
 
     <!-- Decision Methods -->
     <string name="method_spin_wheel">Roleta</string>
     <string name="method_coin_flip">Moeda</string>
-    <string name="method_dice_roll">Dado</string>    <string name="method_random_pick">Aleatório</string>
+    <string name="method_dice_roll">Dado</string>
+    <string name="method_random_pick">Aleatório</string>
     <string name="method_finger_roulette">Roleta de Dedos</string>
 
     <!-- Spin Wheel -->
@@ -179,7 +181,8 @@
     <string name="settings_open_source_licenses">Licenças de código aberto</string>
 
     <!-- Language names -->
-    <string name="locale_follow_system">Seguir sistema</string>    <string name="dialog_select_language">Selecionar idioma</string>
+    <string name="locale_follow_system">Seguir sistema</string>
+    <string name="dialog_select_language">Selecionar idioma</string>
 
     <!-- Wheel Settings -->
     <string name="wheel_settings_title">Configurações da roleta</string>
@@ -207,9 +210,29 @@
     <string name="btn_save_as_preset">Salvar como predefinição</string>
     <string name="btn_apply_directly">Aplicar</string>
     <string name="cd_select_image">Selecionar imagem</string>
+    <string name="cd_expand_collapse">Expandir/Recolher</string>
+    <string name="cd_selected">Selecionado</string>
+    <string name="cd_answer_book_icon">Livro de respostas</string>
+    <string name="cd_no_history_icon">Sem histórico</string>
+    <string name="cd_spin_wheel">Roleta, arraste para girar</string>
+    <string name="cd_coin">Moeda, arraste para virar</string>
+    <string name="cd_dice">Dado</string>
+    <string name="cd_hourly_chart">Gráfico de distribuição de decisões por hora</string>
+    <string name="cd_rolling">Lançando…</string>
     <string name="preset_default">Padrão</string>
     <string name="dialog_save_coin_preset">Salvar predefinição de moeda</string>
     <string name="label_preset_name">Nome da predefinição</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">Decisão rápida</string>
+    <string name="widget_quick_decision_tap">Toque para decidir</string>
+    <string name="widget_quick_decision_desc">Obtenha um resultado aleatório diretamente na tela inicial</string>
+    <string name="widget_last_result_title">Último resultado</string>
+    <string name="widget_last_result_tap">Toque para ver</string>
+    <string name="widget_last_result_desc">Mostra seu resultado de decisão mais recente</string>
+    <string name="widget_no_result">Sem resultados ainda</string>
+    <string name="widget_quick_decision_result_desc">Resultado da decisão rápida: %s</string>
+    <string name="widget_deciding">Decidindo…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">Selecionar cor</string>
@@ -282,8 +305,15 @@
     <string name="terms_s7_body">Estes termos são regidos pelas leis da República Popular da China.</string>
 
     <!-- Open Source Licenses -->
-    <string name="oss_intro">Este aplicativo utiliza as seguintes bibliotecas de código aberto:</string>    <string name="oss_compose_desc">Jetpack Compose é o toolkit moderno do Android para construir interfaces nativas.</string>    <string name="oss_hilt_desc">Hilt é uma biblioteca de injeção de dependência para Android que simplifica o uso do Dagger.</string>    <string name="oss_room_desc">Room fornece uma camada de abstração sobre o SQLite para permitir acesso fluente ao banco de dados aproveitando todos os recursos do SQLite.</string>    <string name="oss_coil_desc">Coil é uma biblioteca de carregamento de imagens para Android alimentada por coroutines do Kotlin.</string>    <string name="oss_navigation_desc">Navigation Compose fornece suporte de navegação no Compose.</string>    <string name="oss_datastore_desc">DataStore é uma solução de armazenamento de dados que permite armazenar pares chave-valor ou objetos de buffer de protocolo de forma assíncrona e consistente usando coroutines e Flow.</string>
-    <string name="oss_copyright">Todos os direitos reservados</string>    <string name="oss_apache_intro">Você é livre para:</string>
+    <string name="oss_intro">Este aplicativo utiliza as seguintes bibliotecas de código aberto:</string>
+    <string name="oss_compose_desc">Jetpack Compose é o toolkit moderno do Android para construir interfaces nativas.</string>
+    <string name="oss_hilt_desc">Hilt é uma biblioteca de injeção de dependência para Android que simplifica o uso do Dagger.</string>
+    <string name="oss_room_desc">Room fornece uma camada de abstração sobre o SQLite para permitir acesso fluente ao banco de dados aproveitando todos os recursos do SQLite.</string>
+    <string name="oss_coil_desc">Coil é uma biblioteca de carregamento de imagens para Android alimentada por coroutines do Kotlin.</string>
+    <string name="oss_navigation_desc">Navigation Compose fornece suporte de navegação no Compose.</string>
+    <string name="oss_datastore_desc">DataStore é uma solução de armazenamento de dados que permite armazenar pares chave-valor ou objetos de buffer de protocolo de forma assíncrona e consistente usando coroutines e Flow.</string>
+    <string name="oss_copyright">Todos os direitos reservados</string>
+    <string name="oss_apache_intro">Você é livre para:</string>
     <string name="oss_apache_use">• Usar o software para fins comerciais ou não comerciais</string>
     <string name="oss_apache_modify">• Modificar o software</string>
     <string name="oss_apache_distribute">• Distribuir o software</string>

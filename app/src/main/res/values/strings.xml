@@ -223,9 +223,29 @@
     <string name="btn_save_as_preset">保存为预设</string>
     <string name="btn_apply_directly">直接应用</string>
     <string name="cd_select_image">选择图片</string>
+    <string name="cd_expand_collapse">展开/收起</string>
+    <string name="cd_selected">已选择</string>
+    <string name="cd_answer_book_icon">答案之书</string>
+    <string name="cd_no_history_icon">暂无记录</string>
+    <string name="cd_spin_wheel">转盘，可拖拽旋转</string>
+    <string name="cd_coin">硬币，可拖拽翻转</string>
+    <string name="cd_dice">骰子</string>
+    <string name="cd_hourly_chart">每小时决策分布图表</string>
+    <string name="cd_rolling">投掷中…</string>
     <string name="preset_default">默认</string>
     <string name="dialog_save_coin_preset">保存硬币预设</string>
     <string name="label_preset_name">预设名称</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">快速决策</string>
+    <string name="widget_quick_decision_tap">点一下就知道</string>
+    <string name="widget_quick_decision_desc">直接在桌面获取随机决策结果</string>
+    <string name="widget_last_result_title">上次结果</string>
+    <string name="widget_last_result_tap">点击查看</string>
+    <string name="widget_last_result_desc">显示最近一次的决策结果</string>
+    <string name="widget_no_result">暂无结果</string>
+    <string name="widget_quick_decision_result_desc">快速决策结果：%s</string>
+    <string name="widget_deciding">决策中…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">选择颜色</string>

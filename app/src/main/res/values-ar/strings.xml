@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">أنت المختار!</string>
 
@@ -22,14 +22,16 @@
     <string name="hub_card_coin">العملة</string>
     <string name="hub_card_coin_desc">ارمِ عملة القدر</string>
     <string name="hub_card_dice">النرد</string>
-    <string name="hub_card_dice_desc">ارمِ إجابتك</string>    <string name="hub_card_yes_no_desc">دع الكون يقرر</string>
+    <string name="hub_card_dice_desc">ارمِ إجابتك</string>
+    <string name="hub_card_yes_no_desc">دع الكون يقرر</string>
     <string name="hub_card_finger_roulette">روليت الأصابع</string>
     <string name="hub_card_finger_roulette_desc">لعبة إقصاء، من هو المختار</string>
 
     <!-- Decision Methods -->
     <string name="method_spin_wheel">العجلة</string>
     <string name="method_coin_flip">العملة</string>
-    <string name="method_dice_roll">النرد</string>    <string name="method_random_pick">عشوائي</string>
+    <string name="method_dice_roll">النرد</string>
+    <string name="method_random_pick">عشوائي</string>
     <string name="method_finger_roulette">روليت الأصابع</string>
 
     <!-- Spin Wheel -->
@@ -179,7 +181,8 @@
     <string name="settings_open_source_licenses">تراخيص المصادر المفتوحة</string>
 
     <!-- Language names -->
-    <string name="locale_follow_system">اتباع النظام</string>    <string name="dialog_select_language">اختر اللغة</string>
+    <string name="locale_follow_system">اتباع النظام</string>
+    <string name="dialog_select_language">اختر اللغة</string>
 
     <!-- Wheel Settings -->
     <string name="wheel_settings_title">إعدادات العجلة</string>
@@ -207,9 +210,29 @@
     <string name="btn_save_as_preset">حفظ كإعداد مسبق</string>
     <string name="btn_apply_directly">تطبيق</string>
     <string name="cd_select_image">اختر صورة</string>
+    <string name="cd_expand_collapse">توسيع/طي</string>
+    <string name="cd_selected">محدد</string>
+    <string name="cd_answer_book_icon">كتاب الإجابات</string>
+    <string name="cd_no_history_icon">لا توجد سجلات</string>
+    <string name="cd_spin_wheel">عجلة الدوران، اسحب للدوران</string>
+    <string name="cd_coin">عملة، اسحب للقلب</string>
+    <string name="cd_dice">نرد</string>
+    <string name="cd_hourly_chart">مخطط توزيع القرارات حسب الساعة</string>
+    <string name="cd_rolling">يتم الرمي…</string>
     <string name="preset_default">افتراضي</string>
     <string name="dialog_save_coin_preset">حفظ إعداد مسبق للعملة</string>
     <string name="label_preset_name">اسم الإعداد المسبق</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">قرار سريع</string>
+    <string name="widget_quick_decision_tap">انقر للقرار</string>
+    <string name="widget_quick_decision_desc">احصل على نتيجة عشوائية مباشرة على شاشتك الرئيسية</string>
+    <string name="widget_last_result_title">النتيجة الأخيرة</string>
+    <string name="widget_last_result_tap">انقر للعرض</string>
+    <string name="widget_last_result_desc">يعرض أحدث نتيجة قرار لك</string>
+    <string name="widget_no_result">لا توجد نتائج بعد</string>
+    <string name="widget_quick_decision_result_desc">نتيجة القرار السريع: %s</string>
+    <string name="widget_deciding">جارٍ القرار…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">اختر اللون</string>
@@ -282,8 +305,15 @@
     <string name="terms_s7_body">تخضع هذه الشروط لقوانين جمهورية الصين الشعبية.</string>
 
     <!-- Open Source Licenses -->
-    <string name="oss_intro">يستخدم هذا التطبيق مكتبات المصادر المفتوحة التالية:</string>    <string name="oss_compose_desc">Jetpack Compose هو أدوات Android الحديثة لبناء واجهات أصلية.</string>    <string name="oss_hilt_desc">Hilt هو مكتبة حقن التبعية لـ Android التي تبسّط استخدام Dagger.</string>    <string name="oss_room_desc">يوفر Room طبقة تجريد فوق SQLite للسماح بوصول سلس لقاعدة البيانات مع الاستفادة من جميع إمكانيات SQLite.</string>    <string name="oss_coil_desc">Coil هو مكتبة تحميل الصور لـ Android مدعومة بـ Kotlin Coroutines.</string>    <string name="oss_navigation_desc">يوفر Navigation Compose دعم التنقل في Compose.</string>    <string name="oss_datastore_desc">DataStore هو حل تخزين البيانات يتيح تخزين أزواج القيمة-المفتاح أو كائنات بروتوكول الع缓冲 بشكل غير متزامن ومتسق باستخدام Coroutines و Flow.</string>
-    <string name="oss_copyright">جميع الحقوق محفوظة</string>    <string name="oss_apache_intro">أنت حر في:</string>
+    <string name="oss_intro">يستخدم هذا التطبيق مكتبات المصادر المفتوحة التالية:</string>
+    <string name="oss_compose_desc">Jetpack Compose هو أدوات Android الحديثة لبناء واجهات أصلية.</string>
+    <string name="oss_hilt_desc">Hilt هو مكتبة حقن التبعية لـ Android التي تبسّط استخدام Dagger.</string>
+    <string name="oss_room_desc">يوفر Room طبقة تجريد فوق SQLite للسماح بوصول سلس لقاعدة البيانات مع الاستفادة من جميع إمكانيات SQLite.</string>
+    <string name="oss_coil_desc">Coil هو مكتبة تحميل الصور لـ Android مدعومة بـ Kotlin Coroutines.</string>
+    <string name="oss_navigation_desc">يوفر Navigation Compose دعم التنقل في Compose.</string>
+    <string name="oss_datastore_desc">DataStore هو حل تخزين البيانات يتيح تخزين أزواج القيمة-المفتاح أو كائنات بروتوكول الع缓冲 بشكل غير متزامن ومتسق باستخدام Coroutines و Flow.</string>
+    <string name="oss_copyright">جميع الحقوق محفوظة</string>
+    <string name="oss_apache_intro">أنت حر في:</string>
     <string name="oss_apache_use">• استخدام البرنامج لأغراض تجارية أو غير تجارية</string>
     <string name="oss_apache_modify">• تعديل البرنامج</string>
     <string name="oss_apache_distribute">• توزيع البرنامج</string>

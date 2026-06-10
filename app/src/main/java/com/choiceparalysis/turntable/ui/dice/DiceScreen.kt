@@ -106,7 +106,9 @@ fun DiceScreen(
             value = diceValue,
             isAnimating = isAnimating,
             onAnimationComplete = { viewModel.onDiceRollAnimationComplete() },
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp),
+            contentDescription = stringResource(R.string.cd_dice),
+            rollingDescription = stringResource(R.string.cd_rolling),
         )
 
         Button(

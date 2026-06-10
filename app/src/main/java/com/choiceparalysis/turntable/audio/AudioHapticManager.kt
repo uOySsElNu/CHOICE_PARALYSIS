@@ -5,15 +5,17 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.SoundPool
+import androidx.datastore.preferences.core.Preferences
 import com.choiceparalysis.turntable.R
-import dagger.hilt.android.EntryPointAccessors
+import com.choiceparalysis.turntable.data.datastore.DataStoreKeys
 import com.choiceparalysis.turntable.data.datastore.dataStore
-import com.choiceparalysis.turntable.data.repository.SettingsRepository
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -50,7 +52,7 @@ class AudioHapticManager private constructor(
         }
     }
 
-    private val settingsRepository = SettingsRepository(context.dataStore, context)
+    private val dataStore = context.dataStore
     private val scope = CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main)
 
     private val _soundEnabled = MutableStateFlow(true)
@@ -76,10 +78,14 @@ class AudioHapticManager private constructor(
 
     init {
         scope.launch {
-            settingsRepository.soundEnabled.collect { _soundEnabled.value = it }
+            dataStore.data.collect { prefs: Preferences ->
+                _soundEnabled.value = prefs[DataStoreKeys.SOUND_ENABLED]?.toBooleanStrictOrNull() ?: true
+            }
         }
         scope.launch {
-            settingsRepository.hapticEnabled.collect { _hapticEnabled.value = it }
+            dataStore.data.collect { prefs: Preferences ->
+                _hapticEnabled.value = prefs[DataStoreKeys.HAPTIC_ENABLED]?.toBooleanStrictOrNull() ?: true
+            }
         }
         loadSounds()
     }
@@ -193,11 +199,7 @@ class AudioHapticManager private constructor(
                 if (!loaded) loadSounds()
                 val soundId = soundMap[effect]
                 if (soundId != null && soundId != 0) {
-                    val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-                    when (streamId) {
-                        0 -> {
-                        }
-                    }
+                    soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
                 }
             } catch (_: Exception) {}
         }

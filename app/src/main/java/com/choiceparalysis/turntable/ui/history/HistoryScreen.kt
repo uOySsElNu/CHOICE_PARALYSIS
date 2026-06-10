@@ -43,7 +43,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -76,6 +79,7 @@ fun HistoryScreen(
     var showClearConfirm by remember { mutableStateOf(false) }
     var entryToDelete by remember { mutableStateOf<String?>(null) }
     val animationProgress = remember { Animatable(0f) }
+    val context = LocalContext.current
 
     LaunchedEffect(stats.totalCount, showStats) {
         if (stats.totalCount > 0 && showStats) {
@@ -132,7 +136,7 @@ fun HistoryScreen(
                 )
                 Icon(
                     if (showStats) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_expand_collapse),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -221,11 +225,15 @@ fun HistoryScreen(
                         val maxHourly = stats.hourlyDistribution.maxOrNull() ?: 1
                         val textMeasurer = rememberTextMeasurer()
                         val barColor = MaterialTheme.colorScheme.primary
+                        val hourlyChartDesc = stringResource(R.string.cd_hourly_chart)
 
                         Canvas(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp)
+                                .semantics {
+                                    contentDescription = hourlyChartDesc
+                                }
                         ) {
                             val barWidth = size.width / 28f
                             val barSpacing = size.width / 24f
@@ -277,7 +285,10 @@ fun HistoryScreen(
             ) {
                 Text(
                     text = "📝",
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier.semantics {
+                        contentDescription = context.getString(R.string.cd_no_history_icon)
+                    }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(

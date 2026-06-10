@@ -6,7 +6,10 @@ import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
+import com.choiceparalysis.turntable.widget.WidgetDataSync
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class DiceViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val historyRepository: HistoryRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
@@ -74,6 +78,9 @@ class DiceViewModel @Inject constructor(
                     options = listOf("1", "2", "3", "4", "5", "6"),
                     result = result.toString(),
                 )
+            )
+            WidgetDataSync.updateLastResultWidget(
+                appContext, result.toString(), appContext.getString(com.choiceparalysis.turntable.R.string.method_dice_roll)
             )
         }
     }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">就決定是你了</string>
 
@@ -22,14 +22,16 @@
     <string name="hub_card_coin">硬幣</string>
     <string name="hub_card_coin_desc">轉一枚命運硬幣</string>
     <string name="hub_card_dice">骰子</string>
-    <string name="hub_card_dice_desc">擲出你的答案</string>    <string name="hub_card_yes_no_desc">讓宇宙替你決定</string>
+    <string name="hub_card_dice_desc">擲出你的答案</string>
+    <string name="hub_card_yes_no_desc">讓宇宙替你決定</string>
     <string name="hub_card_finger_roulette">指尖輪盤</string>
     <string name="hub_card_finger_roulette_desc">多人淘汰，誰是天選</string>
 
     <!-- Decision Methods -->
     <string name="method_spin_wheel">轉盤</string>
     <string name="method_coin_flip">轉硬幣</string>
-    <string name="method_dice_roll">擲骰子</string>    <string name="method_random_pick">隨機選擇</string>
+    <string name="method_dice_roll">擲骰子</string>
+    <string name="method_random_pick">隨機選擇</string>
     <string name="method_finger_roulette">指尖輪盤</string>
 
     <!-- Spin Wheel -->
@@ -179,7 +181,8 @@
     <string name="settings_open_source_licenses">開源授權</string>
 
     <!-- Language names -->
-    <string name="locale_follow_system">跟隨系統</string>    <string name="dialog_select_language">選擇語言</string>
+    <string name="locale_follow_system">跟隨系統</string>
+    <string name="dialog_select_language">選擇語言</string>
 
     <!-- Wheel Settings -->
     <string name="wheel_settings_title">轉盤設定</string>
@@ -207,9 +210,29 @@
     <string name="btn_save_as_preset">儲存為預設</string>
     <string name="btn_apply_directly">直接套用</string>
     <string name="cd_select_image">選擇圖片</string>
+    <string name="cd_expand_collapse">展開/收起</string>
+    <string name="cd_selected">已選擇</string>
+    <string name="cd_answer_book_icon">答案之書</string>
+    <string name="cd_no_history_icon">暫無記錄</string>
+    <string name="cd_spin_wheel">轉盤，可拖拽旋轉</string>
+    <string name="cd_coin">硬幣，可拖拽翻轉</string>
+    <string name="cd_dice">骰子</string>
+    <string name="cd_hourly_chart">每小時決策分佈圖表</string>
+    <string name="cd_rolling">投擲中…</string>
     <string name="preset_default">預設</string>
     <string name="dialog_save_coin_preset">儲存硬幣預設</string>
     <string name="label_preset_name">預設名稱</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">快速決策</string>
+    <string name="widget_quick_decision_tap">點一下就知道</string>
+    <string name="widget_quick_decision_desc">直接在桌面獲取隨機決策結果</string>
+    <string name="widget_last_result_title">上次結果</string>
+    <string name="widget_last_result_tap">點擊查看</string>
+    <string name="widget_last_result_desc">顯示最近一次的決策結果</string>
+    <string name="widget_no_result">暫無結果</string>
+    <string name="widget_quick_decision_result_desc">快速決策結果：%s</string>
+    <string name="widget_deciding">決策中…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">選擇顏色</string>
@@ -282,8 +305,15 @@
     <string name="terms_s7_body">本條款受中華人民共和國法律管轄。</string>
 
     <!-- Open Source Licenses -->
-    <string name="oss_intro">本應用使用了以下開源函式庫：</string>    <string name="oss_compose_desc">Jetpack Compose 是 Android 的現代工具包，用於建構原生 UI。</string>    <string name="oss_hilt_desc">Hilt 是 Android 的依賴注入函式庫，簡化了 Dagger 的使用。</string>    <string name="oss_room_desc">Room 在 SQLite 之上提供了一個抽象層，以便在充分利用 SQLite 功能的前提下實現穩健的資料庫存取。</string>    <string name="oss_coil_desc">Coil 是一個 Android 圖片載入函式庫，由 Kotlin 協程驅動。</string>    <string name="oss_navigation_desc">Navigation Compose 提供 Compose 中的導航支援。</string>    <string name="oss_datastore_desc">DataStore 是一個資料儲存解決方案，允許使用協程和 Flow 以非同步、一致的方式儲存鍵值對或協定緩衝區物件。</string>
-    <string name="oss_copyright">版權所有</string>    <string name="oss_apache_intro">您可以自由地：</string>
+    <string name="oss_intro">本應用使用了以下開源函式庫：</string>
+    <string name="oss_compose_desc">Jetpack Compose 是 Android 的現代工具包，用於建構原生 UI。</string>
+    <string name="oss_hilt_desc">Hilt 是 Android 的依賴注入函式庫，簡化了 Dagger 的使用。</string>
+    <string name="oss_room_desc">Room 在 SQLite 之上提供了一個抽象層，以便在充分利用 SQLite 功能的前提下實現穩健的資料庫存取。</string>
+    <string name="oss_coil_desc">Coil 是一個 Android 圖片載入函式庫，由 Kotlin 協程驅動。</string>
+    <string name="oss_navigation_desc">Navigation Compose 提供 Compose 中的導航支援。</string>
+    <string name="oss_datastore_desc">DataStore 是一個資料儲存解決方案，允許使用協程和 Flow 以非同步、一致的方式儲存鍵值對或協定緩衝區物件。</string>
+    <string name="oss_copyright">版權所有</string>
+    <string name="oss_apache_intro">您可以自由地：</string>
     <string name="oss_apache_use">• 出於商業或非商業目的使用本軟體</string>
     <string name="oss_apache_modify">• 修改本軟體</string>
     <string name="oss_apache_distribute">• 分發本軟體</string>

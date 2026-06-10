@@ -153,6 +153,7 @@ fun SpinWheelScreen(
                 colorScheme = colorScheme,
                 lastResult = result,
                 modifier = Modifier.padding(bottom = 16.dp),
+                contentDescription = stringResource(R.string.cd_spin_wheel),
                 onSpinResult = { selected ->
                     spinWheelVM.recordSpinResult(selected, options)
                 },
@@ -198,7 +199,7 @@ fun SpinWheelScreen(
                 Icon(
                     if (optionsEditorOpen) Icons.Default.KeyboardArrowUp
                     else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null
+                    contentDescription = stringResource(R.string.cd_expand_collapse)
                 )
             }
 

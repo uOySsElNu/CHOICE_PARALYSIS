@@ -1,6 +1,5 @@
 package com.choiceparalysis.turntable.data.model
 
-import android.content.Context
 import androidx.annotation.StringRes
 import com.choiceparalysis.turntable.R
 
@@ -12,5 +11,4 @@ enum class DecisionMethod(@StringRes val displayNameRes: Int) {
     RANDOM_PICK(R.string.method_random_pick),
     FINGER_ROULETTE(R.string.method_finger_roulette);
 
-    fun displayName(context: Context): String = context.getString(displayNameRes)
 }

@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -65,6 +67,7 @@ fun Coin3DFlip(
     headsImage: ImageBitmap?,
     tailsImage: ImageBitmap?,
     modifier: Modifier = Modifier,
+    contentDescription: String = "",
     onDragFlipComplete: (CoinSide) -> Unit = {},
     onFlingChanged: (Boolean) -> Unit = {},
 ) {
@@ -205,6 +208,11 @@ fun Coin3DFlip(
         Canvas(
             modifier = Modifier
                 .size(coinSize)
+                .semantics {
+                    if (contentDescription.isNotEmpty()) {
+                        this.contentDescription = contentDescription
+                    }
+                }
                 .pointerInput(anyAnimating) {
                     detectDragGestures(
                         onDragStart = {

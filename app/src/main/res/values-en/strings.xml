@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">It\'s you</string>
 
@@ -22,14 +22,16 @@
     <string name="hub_card_coin">Coin</string>
     <string name="hub_card_coin_desc">Flip a coin of destiny</string>
     <string name="hub_card_dice">Dice</string>
-    <string name="hub_card_dice_desc">Roll your answer</string>    <string name="hub_card_yes_no_desc">Let the universe decide</string>
+    <string name="hub_card_dice_desc">Roll your answer</string>
+    <string name="hub_card_yes_no_desc">Let the universe decide</string>
     <string name="hub_card_finger_roulette">Roulette</string>
     <string name="hub_card_finger_roulette_desc">Elimination game, who\'s chosen</string>
 
     <!-- Decision Methods -->
     <string name="method_spin_wheel">Wheel</string>
     <string name="method_coin_flip">Coin</string>
-    <string name="method_dice_roll">Dice</string>    <string name="method_random_pick">Random</string>
+    <string name="method_dice_roll">Dice</string>
+    <string name="method_random_pick">Random</string>
     <string name="method_finger_roulette">Roulette</string>
 
     <!-- Spin Wheel -->
@@ -179,7 +181,8 @@
     <string name="settings_open_source_licenses">Open Source Licenses</string>
 
     <!-- Language names -->
-    <string name="locale_follow_system">Follow System</string>    <string name="dialog_select_language">Select Language</string>
+    <string name="locale_follow_system">Follow System</string>
+    <string name="dialog_select_language">Select Language</string>
 
     <!-- Wheel Settings -->
     <string name="wheel_settings_title">Wheel Settings</string>
@@ -207,9 +210,29 @@
     <string name="btn_save_as_preset">Save as Preset</string>
     <string name="btn_apply_directly">Apply</string>
     <string name="cd_select_image">Select Image</string>
+    <string name="cd_expand_collapse">Expand/Collapse</string>
+    <string name="cd_selected">Selected</string>
+    <string name="cd_answer_book_icon">Answer Book</string>
+    <string name="cd_no_history_icon">No history entries</string>
+    <string name="cd_spin_wheel">Spin wheel, drag to spin</string>
+    <string name="cd_coin">Coin, drag to flip</string>
+    <string name="cd_dice">Dice</string>
+    <string name="cd_hourly_chart">Hourly decision distribution chart</string>
+    <string name="cd_rolling">Rolling…</string>
     <string name="preset_default">Default</string>
     <string name="dialog_save_coin_preset">Save Coin Preset</string>
     <string name="label_preset_name">Preset Name</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">Quick Decision</string>
+    <string name="widget_quick_decision_tap">Tap to decide</string>
+    <string name="widget_quick_decision_desc">Get a random decision result right on your home screen</string>
+    <string name="widget_last_result_title">Last Result</string>
+    <string name="widget_last_result_tap">Tap to view</string>
+    <string name="widget_last_result_desc">Shows your most recent decision result</string>
+    <string name="widget_no_result">No result yet</string>
+    <string name="widget_quick_decision_result_desc">Quick decision result: %s</string>
+    <string name="widget_deciding">Deciding…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">Select Color</string>
@@ -282,8 +305,15 @@
     <string name="terms_s7_body">These terms are governed by the laws of the People\'s Republic of China.</string>
 
     <!-- Open Source Licenses -->
-    <string name="oss_intro">This app uses the following open-source libraries:</string>    <string name="oss_compose_desc">Jetpack Compose is Android\'s modern toolkit for building native UI.</string>    <string name="oss_hilt_desc">Hilt is a dependency injection library for Android that simplifies Dagger usage.</string>    <string name="oss_room_desc">Room provides an abstraction layer over SQLite to allow fluent database access while utilizing SQLite\'s full capabilities.</string>    <string name="oss_coil_desc">Coil is an image loading library for Android powered by Kotlin coroutines.</string>    <string name="oss_navigation_desc">Navigation Compose provides navigation support in Compose.</string>    <string name="oss_datastore_desc">DataStore is a data storage solution that allows storing key-value pairs or protocol buffer objects asynchronously and consistently using coroutines and Flow.</string>
-    <string name="oss_copyright">All rights reserved</string>    <string name="oss_apache_intro">You are free to:</string>
+    <string name="oss_intro">This app uses the following open-source libraries:</string>
+    <string name="oss_compose_desc">Jetpack Compose is Android\'s modern toolkit for building native UI.</string>
+    <string name="oss_hilt_desc">Hilt is a dependency injection library for Android that simplifies Dagger usage.</string>
+    <string name="oss_room_desc">Room provides an abstraction layer over SQLite to allow fluent database access while utilizing SQLite\'s full capabilities.</string>
+    <string name="oss_coil_desc">Coil is an image loading library for Android powered by Kotlin coroutines.</string>
+    <string name="oss_navigation_desc">Navigation Compose provides navigation support in Compose.</string>
+    <string name="oss_datastore_desc">DataStore is a data storage solution that allows storing key-value pairs or protocol buffer objects asynchronously and consistently using coroutines and Flow.</string>
+    <string name="oss_copyright">All rights reserved</string>
+    <string name="oss_apache_intro">You are free to:</string>
     <string name="oss_apache_use">• Use the software for commercial or non-commercial purposes</string>
     <string name="oss_apache_modify">• Modify the software</string>
     <string name="oss_apache_distribute">• Distribute the software</string>

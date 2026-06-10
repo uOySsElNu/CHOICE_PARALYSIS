@@ -35,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -161,7 +163,17 @@ fun FingerRouletteScreen(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(modifier = Modifier
+                .fillMaxSize()
+                .semantics {
+                    val activeCount = fingers.count { !it.isEliminated }
+                    contentDescription = if (activeCount > 0) {
+                        context.getString(R.string.status_ready_count, activeCount)
+                    } else {
+                        context.getString(R.string.status_waiting_fingers)
+                    }
+                }
+            ) {
                 fingers.forEach { finger ->
                     if (finger.isEliminated) return@forEach
                     val scale = if (finger.id == winnerId) winnerScale.value else 1f

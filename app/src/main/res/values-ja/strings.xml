@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">君に決めた</string>
 
@@ -22,14 +22,16 @@
     <string name="hub_card_coin">コイン</string>
     <string name="hub_card_coin_desc">運命のコインを投げる</string>
     <string name="hub_card_dice">サイコロ</string>
-    <string name="hub_card_dice_desc">答えを振ろう</string>    <string name="hub_card_yes_no_desc">宇宙に決めてもらおう</string>
+    <string name="hub_card_dice_desc">答えを振ろう</string>
+    <string name="hub_card_yes_no_desc">宇宙に決めてもらおう</string>
     <string name="hub_card_finger_roulette">フィンガールーレット</string>
     <string name="hub_card_finger_roulette_desc">多人数淘汰、天選は誰だ</string>
 
     <!-- Decision Methods -->
     <string name="method_spin_wheel">ルーレット</string>
     <string name="method_coin_flip">コイン投げ</string>
-    <string name="method_dice_roll">サイコロ</string>    <string name="method_random_pick">ランダム</string>
+    <string name="method_dice_roll">サイコロ</string>
+    <string name="method_random_pick">ランダム</string>
     <string name="method_finger_roulette">フィンガールーレット</string>
 
     <!-- Spin Wheel -->
@@ -179,7 +181,8 @@
     <string name="settings_open_source_licenses">オープンソースライセンス</string>
 
     <!-- Language names -->
-    <string name="locale_follow_system">システムに従う</string>    <string name="dialog_select_language">言語を選択</string>
+    <string name="locale_follow_system">システムに従う</string>
+    <string name="dialog_select_language">言語を選択</string>
 
     <!-- Wheel Settings -->
     <string name="wheel_settings_title">ルーレット設定</string>
@@ -207,9 +210,29 @@
     <string name="btn_save_as_preset">プリセットとして保存</string>
     <string name="btn_apply_directly">直接適用</string>
     <string name="cd_select_image">画像を選択</string>
+    <string name="cd_expand_collapse">展開/折りたたみ</string>
+    <string name="cd_selected">選択中</string>
+    <string name="cd_answer_book_icon">答えの本</string>
+    <string name="cd_no_history_icon">履歴なし</string>
+    <string name="cd_spin_wheel">回転車輪、ドラッグで回す</string>
+    <string name="cd_coin">コイン、ドラッグで裏表</string>
+    <string name="cd_dice">サイコロ</string>
+    <string name="cd_hourly_chart">時間帯別意思決定分布チャート</string>
+    <string name="cd_rolling">投擲中…</string>
     <string name="preset_default">デフォルト</string>
     <string name="dialog_save_coin_preset">コインプリセットを保存</string>
     <string name="label_preset_name">プリセット名</string>
+
+    <!-- Widget -->
+    <string name="widget_quick_decision_title">クイック判定</string>
+    <string name="widget_quick_decision_tap">タップで判定</string>
+    <string name="widget_quick_decision_desc">ホーム画面からランダムに判定結果を取得</string>
+    <string name="widget_last_result_title">前回の結果</string>
+    <string name="widget_last_result_tap">タップして表示</string>
+    <string name="widget_last_result_desc">最近の判定結果を表示</string>
+    <string name="widget_no_result">まだ結果なし</string>
+    <string name="widget_quick_decision_result_desc">クイック決定結果：%s</string>
+    <string name="widget_deciding">判定中…</string>
 
     <!-- Color Picker -->
     <string name="dialog_select_color">色を選択</string>
@@ -282,8 +305,15 @@
     <string name="terms_s7_body">本規約は中華人民共和国の法律に準拠します。</string>
 
     <!-- Open Source Licenses -->
-    <string name="oss_intro">本アプリは以下のオープンソースライブラリを使用しています：</string>    <string name="oss_compose_desc">Jetpack Composeは、ネイティブUIを構築するためのAndroidのモダンツールキットです。</string>    <string name="oss_hilt_desc">Hiltは、Daggerの使用を簡素化するAndroidの依存性注入ライブラリです。</string>    <string name="oss_room_desc">RoomはSQLiteの上に抽象層を提供し、SQLiteの機能を活用しながら堅牢なデータベースアクセスを実現します。</string>    <string name="oss_coil_desc">CoilはKotlinコルーチンによるAndroidの画像読み込みライブラリです。</string>    <string name="oss_navigation_desc">Navigation ComposeはComposeでのナビゲーションをサポートします。</string>    <string name="oss_datastore_desc">DataStoreは、コルーチンとFlowを使用してキーバリューペアまたはプロトコルバッファオブジェクトを非同期かつ一貫性を持って保存するデータストレージソリューションです。</string>
-    <string name="oss_copyright">全著作権所有</string>    <string name="oss_apache_intro">以下のことができます：</string>
+    <string name="oss_intro">本アプリは以下のオープンソースライブラリを使用しています：</string>
+    <string name="oss_compose_desc">Jetpack Composeは、ネイティブUIを構築するためのAndroidのモダンツールキットです。</string>
+    <string name="oss_hilt_desc">Hiltは、Daggerの使用を簡素化するAndroidの依存性注入ライブラリです。</string>
+    <string name="oss_room_desc">RoomはSQLiteの上に抽象層を提供し、SQLiteの機能を活用しながら堅牢なデータベースアクセスを実現します。</string>
+    <string name="oss_coil_desc">CoilはKotlinコルーチンによるAndroidの画像読み込みライブラリです。</string>
+    <string name="oss_navigation_desc">Navigation ComposeはComposeでのナビゲーションをサポートします。</string>
+    <string name="oss_datastore_desc">DataStoreは、コルーチンとFlowを使用してキーバリューペアまたはプロトコルバッファオブジェクトを非同期かつ一貫性を持って保存するデータストレージソリューションです。</string>
+    <string name="oss_copyright">全著作権所有</string>
+    <string name="oss_apache_intro">以下のことができます：</string>
     <string name="oss_apache_use">• 商用・非商用目的での使用</string>
     <string name="oss_apache_modify">• ソフトウェアの変更</string>
     <string name="oss_apache_distribute">• ソフトウェアの配布</string>

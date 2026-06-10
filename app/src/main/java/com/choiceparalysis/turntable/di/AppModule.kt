@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import com.choiceparalysis.turntable.audio.AudioHapticManager
 import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.local.DataMigration
+import com.choiceparalysis.turntable.data.local.dao.CoinPresetDao
 import com.choiceparalysis.turntable.data.local.dao.HistoryDao
+import com.choiceparalysis.turntable.data.local.dao.OptionGroupDao
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import dagger.Module
@@ -29,8 +31,10 @@ object AppModule {
     @Singleton
     fun provideSettingsRepository(
         dataStore: DataStore<Preferences>,
-        @ApplicationContext context: Context
-    ): SettingsRepository = SettingsRepository(dataStore, context)
+        @ApplicationContext context: Context,
+        optionGroupDao: OptionGroupDao,
+        coinPresetDao: CoinPresetDao,
+    ): SettingsRepository = SettingsRepository(dataStore, context, optionGroupDao, coinPresetDao)
 
     @Provides
     @Singleton
@@ -41,8 +45,10 @@ object AppModule {
     @Singleton
     fun provideDataMigration(
         dataStore: DataStore<Preferences>,
-        historyDao: HistoryDao
-    ): DataMigration = DataMigration(dataStore, historyDao)
+        historyDao: HistoryDao,
+        optionGroupDao: OptionGroupDao,
+        coinPresetDao: CoinPresetDao,
+    ): DataMigration = DataMigration(dataStore, historyDao, optionGroupDao, coinPresetDao)
 
     @Provides
     @Singleton

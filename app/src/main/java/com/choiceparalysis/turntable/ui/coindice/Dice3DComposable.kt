@@ -16,6 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -73,6 +75,8 @@ fun Dice3DRoll(
     value: Int?,
     isAnimating: Boolean,
     modifier: Modifier = Modifier,
+    contentDescription: String = "",
+    rollingDescription: String = "",
     onAnimationComplete: () -> Unit = {}
 ) {
     val bounceAnim = remember { Animatable(0f) }
@@ -247,6 +251,18 @@ fun Dice3DRoll(
         Canvas(
             modifier = Modifier
                 .size(diceSize)
+                .semantics {
+                    val desc = if (isSpinning && rollingDescription.isNotEmpty()) {
+                        rollingDescription
+                    } else if (value != null) {
+                        "$contentDescription $value"
+                    } else {
+                        contentDescription
+                    }
+                    if (desc.isNotEmpty()) {
+                        this.contentDescription = desc
+                    }
+                }
                 .graphicsLayer {
                     translationY = bounceAnim.value + breathAnim.value * -6f
                     scaleX = scaleAnim.value * popAnim.value

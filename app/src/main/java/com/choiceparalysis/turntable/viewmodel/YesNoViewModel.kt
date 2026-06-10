@@ -7,6 +7,7 @@ import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import com.choiceparalysis.turntable.widget.WidgetDataSync
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -146,19 +147,8 @@ object AnswerBook {
         ),
     )
 
-    /** 通用回答池（@StringRes） */
-    private val generalAnswers = listOf(
-        R.string.answer_general_1,
-        R.string.answer_general_2,
-        R.string.answer_general_3,
-        R.string.answer_general_4,
-        R.string.answer_general_5,
-        R.string.answer_general_6,
-        R.string.answer_general_7,
-        R.string.answer_general_8,
-        R.string.answer_general_9,
-        R.string.answer_general_10,
-    )
+    /** 通用回答池（@StringRes），与 WidgetDataSync.generalAnswers 共享 */
+    private val generalAnswers = WidgetDataSync.generalAnswers
 
     /**
      * 根据问题内容返回一条答案的 @StringRes ID。
@@ -214,6 +204,9 @@ class YesNoViewModel @Inject constructor(
                     options = listOf(appContext.getString(R.string.method_answer_book)),
                     result = answerText,
                 )
+            )
+            WidgetDataSync.updateLastResultWidget(
+                appContext, answerText, appContext.getString(R.string.method_answer_book)
             )
         }
     }

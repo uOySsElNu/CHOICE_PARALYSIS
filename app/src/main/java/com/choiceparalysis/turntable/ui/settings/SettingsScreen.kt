@@ -43,6 +43,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -548,7 +550,13 @@ fun SettingsScreen(
                             headlineContent = { Text(label) },
                             trailingContent = {
                                 if (appLocale == code) {
-                                    Text("✓", color = MaterialTheme.colorScheme.primary)
+                                    Text(
+                                        "✓",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.semantics {
+                                            contentDescription = context.getString(R.string.cd_selected)
+                                        }
+                                    )
                                 }
                             },
                             modifier = Modifier.clickable {

@@ -159,7 +159,8 @@ fun CoinScreen(
             tailsImage = tailsBitmap,
             onDragFlipComplete = { viewModel.flipCoinDirectly(it) },
             onFlingChanged = { viewModel.setFling(it) },
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp),
+            contentDescription = stringResource(R.string.cd_coin),
         )
 
         Button(

@@ -10,6 +10,7 @@ import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
+import com.choiceparalysis.turntable.widget.WidgetDataSync
 import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -123,6 +124,9 @@ class CoinViewModel @Inject constructor(
                     result = result.displayName(appContext),
                 )
             )
+            WidgetDataSync.updateLastResultWidget(
+                appContext, result.displayName(appContext), appContext.getString(R.string.method_coin_flip)
+            )
         }
     }
 
@@ -143,6 +147,9 @@ class CoinViewModel @Inject constructor(
                     ),
                     result = result.displayName(appContext),
                 )
+            )
+            WidgetDataSync.updateLastResultWidget(
+                appContext, result.displayName(appContext), appContext.getString(R.string.method_coin_flip)
             )
         }
     }

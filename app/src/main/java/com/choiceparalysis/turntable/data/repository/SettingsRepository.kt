@@ -7,6 +7,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.datastore.DataStoreKeys
+import com.choiceparalysis.turntable.data.local.dao.CoinPresetDao
+import com.choiceparalysis.turntable.data.local.dao.OptionGroupDao
+import com.choiceparalysis.turntable.data.local.entity.CoinPresetEntity
+import com.choiceparalysis.turntable.data.local.entity.OptionGroupEntity
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.OptionGroup
 import com.choiceparalysis.turntable.ui.components.CircularCropUtil
@@ -19,7 +23,9 @@ import javax.inject.Inject
 
 class SettingsRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val optionGroupDao: OptionGroupDao,
+    private val coinPresetDao: CoinPresetDao,
 ) {
     private val jsonConfig = Json { ignoreUnknownKeys = true }
 
@@ -31,12 +37,10 @@ class SettingsRepository @Inject constructor(
         prefs[DataStoreKeys.FOLLOW_SYSTEM_THEME]?.toBooleanStrictOrNull() ?: true
     }
 
-    /** Manual dark mode preference (only used when followSystemTheme is false). */
     val darkMode: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[DataStoreKeys.DARK_MODE]?.toBooleanStrictOrNull() ?: false
     }
 
-    /** App locale code: "system" (follow system), "zh", "en", "ja", "ko", etc. */
     val appLocale: Flow<String> = dataStore.data.map { prefs ->
         prefs[DataStoreKeys.APP_LOCALE] ?: "system"
     }
@@ -80,9 +84,17 @@ class SettingsRepository @Inject constructor(
         runCatching { jsonConfig.decodeFromString<List<Int>>(json) }.getOrElse { listOf(1, 1) }
     }
 
-    val optionGroups: Flow<List<OptionGroup>> = dataStore.data.map { prefs ->
-        val json = prefs[DataStoreKeys.OPTION_GROUPS] ?: "[]"
-        runCatching { jsonConfig.decodeFromString<List<OptionGroup>>(json) }.getOrElse { emptyList() }
+    // OptionGroups — now from Room
+    val optionGroups: Flow<List<OptionGroup>> = optionGroupDao.getAll().map { entities ->
+        entities.map { entity ->
+            OptionGroup(
+                id = entity.id,
+                name = entity.name,
+                options = runCatching { jsonConfig.decodeFromString<List<String>>(entity.options) }.getOrElse { emptyList() },
+                weights = runCatching { jsonConfig.decodeFromString<List<Int>>(entity.weights) }.getOrElse { emptyList() },
+                createdAt = entity.createdAt,
+            )
+        }
     }
 
     val coinHeadsImage: Flow<String?> = dataStore.data.map { prefs ->
@@ -93,9 +105,17 @@ class SettingsRepository @Inject constructor(
         prefs[DataStoreKeys.COIN_TAILS_IMAGE]
     }
 
-    val coinPresets: Flow<List<CoinPreset>> = dataStore.data.map { prefs ->
-        val json = prefs[DataStoreKeys.COIN_PRESETS] ?: "[]"
-        runCatching { jsonConfig.decodeFromString<List<CoinPreset>>(json) }.getOrElse { emptyList() }
+    // CoinPresets — now from Room
+    val coinPresets: Flow<List<CoinPreset>> = coinPresetDao.getAll().map { entities ->
+        entities.map { entity ->
+            CoinPreset(
+                id = entity.id,
+                name = entity.name,
+                headsImagePath = entity.headsImagePath,
+                tailsImagePath = entity.tailsImagePath,
+                createdAt = entity.createdAt,
+            )
+        }
     }
 
     suspend fun setDynamicColorEnabled(enabled: Boolean) {
@@ -187,24 +207,21 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    // OptionGroups — now via Room
     suspend fun saveOptionGroup(group: OptionGroup) {
-        dataStore.edit { prefs ->
-            val current = runCatching {
-                jsonConfig.decodeFromString<List<OptionGroup>>(prefs[DataStoreKeys.OPTION_GROUPS] ?: "[]")
-            }.getOrElse { emptyList() }
-            val updated = current.filter { it.id != group.id } + group
-            prefs[DataStoreKeys.OPTION_GROUPS] = jsonConfig.encodeToString(updated)
-        }
+        optionGroupDao.upsert(
+            OptionGroupEntity(
+                id = group.id,
+                name = group.name,
+                options = jsonConfig.encodeToString(group.options),
+                weights = jsonConfig.encodeToString(group.weights),
+                createdAt = group.createdAt,
+            )
+        )
     }
 
     suspend fun deleteOptionGroup(id: String) {
-        dataStore.edit { prefs ->
-            val current = runCatching {
-                jsonConfig.decodeFromString<List<OptionGroup>>(prefs[DataStoreKeys.OPTION_GROUPS] ?: "[]")
-            }.getOrElse { emptyList() }
-            val updated = current.filter { it.id != id }
-            prefs[DataStoreKeys.OPTION_GROUPS] = jsonConfig.encodeToString(updated)
-        }
+        optionGroupDao.deleteById(id)
     }
 
     suspend fun setCoinHeadsImage(uri: String?) {
@@ -228,24 +245,21 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    // CoinPresets — now via Room
     suspend fun saveCoinPreset(preset: CoinPreset) {
-        dataStore.edit { prefs ->
-            val current = runCatching {
-                jsonConfig.decodeFromString<List<CoinPreset>>(prefs[DataStoreKeys.COIN_PRESETS] ?: "[]")
-            }.getOrElse { emptyList() }
-            val updated = current.filter { it.id != preset.id } + preset
-            prefs[DataStoreKeys.COIN_PRESETS] = jsonConfig.encodeToString(updated)
-        }
+        coinPresetDao.upsert(
+            CoinPresetEntity(
+                id = preset.id,
+                name = preset.name,
+                headsImagePath = preset.headsImagePath,
+                tailsImagePath = preset.tailsImagePath,
+                createdAt = preset.createdAt,
+            )
+        )
     }
 
     suspend fun deleteCoinPreset(id: String) {
-        dataStore.edit { prefs ->
-            val current = runCatching {
-                jsonConfig.decodeFromString<List<CoinPreset>>(prefs[DataStoreKeys.COIN_PRESETS] ?: "[]")
-            }.getOrElse { emptyList() }
-            val updated = current.filter { it.id != id }
-            prefs[DataStoreKeys.COIN_PRESETS] = jsonConfig.encodeToString(updated)
-        }
+        coinPresetDao.deleteById(id)
     }
 
     companion object {
@@ -256,7 +270,6 @@ class SettingsRepository @Inject constructor(
         val presets = coinPresets.first()
         if (presets.any { it.id == DEFAULT_PRESET_ID }) return
 
-        // Load drawable resources and crop to circles
         val headsBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_heads)
         val tailsBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.coin_default_tails)
 
