@@ -1,14 +1,18 @@
 package com.choiceparalysis.turntable.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.model.CoinPreset
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository.Companion.DEFAULT_PRESET_ID
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,20 +20,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
-enum class CoinSide(val displayName: String) {
-    HEADS("正面"),
-    TAILS("反面")
+enum class CoinSide(@StringRes val displayNameRes: Int) {
+    HEADS(R.string.coin_heads_label),
+    TAILS(R.string.coin_tails_label);
+
+    fun displayName(context: Context): String = context.getString(displayNameRes)
 }
 
 @HiltViewModel
 class CoinViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val historyRepository: HistoryRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _coinResult = MutableStateFlow<CoinSide?>(null)
     val coinResult: StateFlow<CoinSide?> = _coinResult.asStateFlow()
+
+    private val _flipTrigger = MutableStateFlow(0)
+    val flipTrigger: StateFlow<Int> = _flipTrigger.asStateFlow()
 
     private val _isAnimating = MutableStateFlow(false)
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
@@ -46,7 +57,6 @@ class CoinViewModel @Inject constructor(
     }
 
     private val _pendingCoinResult = MutableStateFlow<CoinSide?>(null)
-    val pendingCoinResult: StateFlow<CoinSide?> = _pendingCoinResult.asStateFlow()
 
     private val _customCoinHeadsUri = MutableStateFlow<String?>(null)
     val customCoinHeadsUri: StateFlow<String?> = _customCoinHeadsUri.asStateFlow()
@@ -70,6 +80,14 @@ class CoinViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.ensureDefaultCoinPreset()
         }
+        // Restore last persisted result
+        viewModelScope.launch {
+            settingsRepository.lastCoinResult.collect { saved ->
+                if (saved != null && _coinResult.value == null) {
+                    _coinResult.value = runCatching { CoinSide.valueOf(saved) }.getOrNull()
+                }
+            }
+        }
     }
 
     fun flipCoin() {
@@ -80,7 +98,7 @@ class CoinViewModel @Inject constructor(
         // Safety timeout: force end animation if stuck for 10 seconds
         safetyTimeoutJob?.cancel()
         safetyTimeoutJob = viewModelScope.launch {
-            delay(10_000)
+            delay(10_000.milliseconds)
             if (_isAnimating.value) {
                 onCoinFlipAnimationComplete()
             }
@@ -92,26 +110,38 @@ class CoinViewModel @Inject constructor(
         val result = _pendingCoinResult.value ?: return
         _coinResult.value = result
         _isAnimating.value = false
+        _flipTrigger.value++
         viewModelScope.launch {
+            settingsRepository.setLastCoinResult(result.name)
             historyRepository.addEntry(
                 HistoryEntry(
                     method = DecisionMethod.COIN_FLIP,
-                    options = listOf("正面", "反面"),
-                    result = result.displayName,
+                    options = listOf(
+                        appContext.getString(R.string.coin_heads_label),
+                        appContext.getString(R.string.coin_tails_label)
+                    ),
+                    result = result.displayName(appContext),
                 )
             )
         }
     }
 
     fun flipCoinDirectly(result: CoinSide) {
+        safetyTimeoutJob?.cancel()
         _pendingCoinResult.value = result
         _coinResult.value = result
+        _isAnimating.value = false
+        _flipTrigger.value++
         viewModelScope.launch {
+            settingsRepository.setLastCoinResult(result.name)
             historyRepository.addEntry(
                 HistoryEntry(
                     method = DecisionMethod.COIN_FLIP,
-                    options = listOf("正面", "反面"),
-                    result = result.displayName,
+                    options = listOf(
+                        appContext.getString(R.string.coin_heads_label),
+                        appContext.getString(R.string.coin_tails_label)
+                    ),
+                    result = result.displayName(appContext),
                 )
             )
         }
@@ -119,7 +149,11 @@ class CoinViewModel @Inject constructor(
 
     fun clearResult() {
         _coinResult.value = null
-        // Don't reset _isAnimating here — let animation lifecycle manage it
+        viewModelScope.launch { settingsRepository.setLastCoinResult(null) }
+    }
+
+    fun clearDisplayResult() {
+        _coinResult.value = null
     }
 
     fun setCustomCoinImage(side: CoinSide, uri: String?) {

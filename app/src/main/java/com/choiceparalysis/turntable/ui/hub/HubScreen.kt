@@ -13,11 +13,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.ThumbsUpDown
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,23 +31,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.navigation.Route
 
 data class HubCard(
-    val title: String,
-    val description: String,
+    @StringRes val titleRes: Int,
+    @StringRes val descRes: Int,
     val icon: ImageVector,
     val route: Route,
 )
 
 private val hubCards = listOf(
-    HubCard("转盘", "转动命运之轮", Icons.Default.Autorenew, Route.SpinWheel),
-    HubCard("硬币", "抛一枚命运硬币", Icons.Default.MonetizationOn, Route.Coin),
-    HubCard("骰子", "掷出你的答案", Icons.Default.Casino, Route.Dice),
-    HubCard("Yes/No", "让宇宙替你决定", Icons.Default.ThumbsUpDown, Route.YesNo),
-    HubCard("指尖轮盘", "多人淘汰，谁是天选", Icons.Default.TouchApp, Route.FingerRoulette),
-    HubCard("数据洞察", "看看你的决策模式", Icons.Default.BarChart, Route.Stats),
+    HubCard(R.string.hub_card_spin_wheel, R.string.hub_card_spin_wheel_desc, Icons.Default.Autorenew, Route.SpinWheel),
+    HubCard(R.string.hub_card_coin, R.string.hub_card_coin_desc, Icons.Default.MonetizationOn, Route.Coin),
+    HubCard(R.string.hub_card_dice, R.string.hub_card_dice_desc, Icons.Default.Casino, Route.Dice),
+    HubCard(R.string.hub_card_answer_book, R.string.hub_card_answer_book_desc, Icons.Default.AutoStories, Route.YesNo),
+    HubCard(R.string.hub_card_finger_roulette, R.string.hub_card_finger_roulette_desc, Icons.Default.TouchApp, Route.FingerRoulette),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,7 @@ fun HubScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "选择困难症助手",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -96,13 +97,13 @@ fun HubScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = card.title,
+                            text = stringResource(card.titleRes),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = card.description,
+                            text = stringResource(card.descRes),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center

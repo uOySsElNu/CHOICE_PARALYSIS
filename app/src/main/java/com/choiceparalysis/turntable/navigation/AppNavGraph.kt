@@ -6,13 +6,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.choiceparalysis.turntable.ui.coin.CoinScreen
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import com.choiceparalysis.turntable.ui.dice.DiceScreen
+import com.choiceparalysis.turntable.ui.easteregg.EasterEggScreen
 import com.choiceparalysis.turntable.ui.fingerroulette.FingerRouletteScreen
 import com.choiceparalysis.turntable.ui.history.HistoryScreen
 import com.choiceparalysis.turntable.ui.home.SpinWheelScreen
@@ -20,6 +24,7 @@ import com.choiceparalysis.turntable.ui.hub.HubScreen
 import com.choiceparalysis.turntable.ui.settings.SettingsScreen
 import com.choiceparalysis.turntable.ui.stats.StatsScreen
 import com.choiceparalysis.turntable.ui.yesno.YesNoScreen
+import com.choiceparalysis.turntable.viewmodel.SettingsViewModel
 
 @Composable
 fun AppNavGraph(
@@ -74,7 +79,19 @@ fun AppNavGraph(
             HistoryScreen(onBack = { navController.popBackStack() })
         }
         composable<Route.Settings> {
-            SettingsScreen(onBack = { navController.popBackStack() })
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onEasterEgg = { navController.navigate(Route.EasterEgg) }
+            )
+        }
+        composable<Route.EasterEgg> {
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val followSystemTheme by settingsViewModel.followSystemTheme.collectAsState()
+            val darkMode by settingsViewModel.darkMode.collectAsState()
+            EasterEggScreen(
+                followSystemTheme = followSystemTheme,
+                darkMode = darkMode,
+            )
         }
     }
 }

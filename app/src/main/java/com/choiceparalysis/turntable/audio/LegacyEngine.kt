@@ -5,15 +5,19 @@ import android.os.Vibrator
 
 /**
  * Legacy haptic engine using basic Vibrator API.
- * Waveform patterns with max amplitude for small motors (0809 etc).
- * All amplitudes are 200-255 to ensure the motor responds.
+ * Waveform patterns with max amplitude for small motors (0809 etc.).
+ * All amplitudes are 200-255 to ensure the motor responses.
  */
 class LegacyEngine(private val vibrator: Vibrator) : HapticEngine {
 
     override fun isAvailable(): Boolean = true
 
+    /**
+     * Picker/roller detent tick — short, sharp, constant.
+     * 12ms at max amplitude for a crisp click feel.
+     */
     override fun playTick() {
-        vibrator.vibrate(VibrationEffect.createOneShot(15, 255))
+        vibrator.vibrate(VibrationEffect.createOneShot(12, 255))
     }
 
     override fun playEffect(effect: HapticEffect) {

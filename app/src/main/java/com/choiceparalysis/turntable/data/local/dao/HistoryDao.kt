@@ -15,8 +15,11 @@ interface HistoryDao {
     @Insert
     suspend fun insertAll(entities: List<HistoryEntity>)
 
-    @Query("DELETE FROM history WHERE legacyId = :legacyId OR id = :id")
-    suspend fun deleteById(legacyId: String, id: Long)
+    @Query("DELETE FROM history WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
+    @Query("DELETE FROM history WHERE legacyId = :legacyId")
+    suspend fun deleteByLegacyId(legacyId: String)
 
     @Query("DELETE FROM history")
     suspend fun deleteAll()

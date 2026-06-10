@@ -3,7 +3,6 @@ package com.choiceparalysis.turntable.ui.stats
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,12 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +29,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.choiceparalysis.turntable.R
+import com.choiceparalysis.turntable.ui.components.StatsCard
+import com.choiceparalysis.turntable.ui.components.StatsRow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -73,7 +73,7 @@ fun StatsScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "数据洞察",
+                    text = stringResource(R.string.stats_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -82,7 +82,7 @@ fun StatsScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             }
@@ -96,13 +96,13 @@ fun StatsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "还没有决策记录",
+                    text = stringResource(R.string.stats_empty_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "去试试转盘吧！",
+                    text = stringResource(R.string.stats_empty_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -111,19 +111,25 @@ fun StatsScreen(
         }
 
         // Overview section
-        StatsCard(title = "决策总览") {
-            StatsRow("总决策次数", "${stats.totalCount}")
+        StatsCard(
+            title = stringResource(R.string.stats_decision_overview),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            StatsRow(stringResource(R.string.stats_total_decisions), "${stats.totalCount}")
             stats.mostUsedMethod?.let {
-                StatsRow("最常用", "${it.displayName} (${stats.methodDistribution[it] ?: 0}次)")
+                StatsRow(stringResource(R.string.stats_most_used), "${stringResource(it.displayNameRes)} (${stringResource(R.string.stats_count_suffix, stats.methodDistribution[it] ?: 0)})")
             }
             stats.lastDecisionTime?.let {
                 val sdf = SimpleDateFormat("MM/dd HH:mm", Locale.getDefault())
-                StatsRow("最近决策", sdf.format(Date(it)))
+                StatsRow(stringResource(R.string.stats_last_decision), sdf.format(Date(it)))
             }
         }
 
         // Method distribution
-        StatsCard(title = "决策方式占比") {
+        StatsCard(
+            title = stringResource(R.string.stats_method_distribution),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
             val maxCount = stats.methodDistribution.values.maxOrNull() ?: 1
             DecisionMethod.entries.forEach { method ->
                 val count = stats.methodDistribution[method] ?: 0
@@ -135,7 +141,7 @@ fun StatsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = method.displayName,
+                            text = stringResource(method.displayNameRes),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.width(72.dp)
                         )
@@ -156,7 +162,10 @@ fun StatsScreen(
         }
 
         // Top 5 results
-        StatsCard(title = "热门结果 Top 5") {
+        StatsCard(
+            title = stringResource(R.string.stats_top_results),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
             stats.topResults.forEachIndexed { index, (result, count) ->
                 Row(
                     modifier = Modifier
@@ -175,7 +184,7 @@ fun StatsScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "${count}次",
+                        text = stringResource(R.string.stats_count_suffix, count),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -184,7 +193,10 @@ fun StatsScreen(
         }
 
         // Hourly distribution
-        StatsCard(title = "决策时间分布") {
+        StatsCard(
+            title = stringResource(R.string.stats_hourly_distribution),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
             val maxHourly = stats.hourlyDistribution.maxOrNull() ?: 1
             val textMeasurer = rememberTextMeasurer()
             val barColor = MaterialTheme.colorScheme.primary
@@ -230,50 +242,4 @@ fun StatsScreen(
     }
 }
 
-@Composable
-private fun StatsCard(
-    title: String,
-    content: @Composable () -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            content()
-        }
-    }
-}
 
-@Composable
-private fun StatsRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}

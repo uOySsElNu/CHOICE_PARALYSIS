@@ -1,25 +1,55 @@
 package com.choiceparalysis.turntable.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.choiceparalysis.turntable.data.datastore.dataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.audio.AudioHapticManager
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
-import kotlinx.coroutines.flow.Flow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = SettingsRepository(application.dataStore, application)
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val settingsRepository: SettingsRepository,
+    private val audioHapticManager: AudioHapticManager
+) : ViewModel() {
 
-    val dynamicColorEnabled: Flow<Boolean> = repository.dynamicColorEnabled
-    val selectedPreset: Flow<String> = repository.selectedPreset
-    val customColors: Flow<List<Int>> = repository.customColors
-    val currentOptions: Flow<List<String>> = repository.currentOptions
+    fun playHapticTick() = audioHapticManager.playHapticTick()
 
-    suspend fun setDynamicColorEnabled(enabled: Boolean) =
-        repository.setDynamicColorEnabled(enabled)
+    val followSystemTheme = settingsRepository.followSystemTheme
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    suspend fun setSelectedPreset(preset: String) =
-        repository.setSelectedPreset(preset)
+    val darkMode = settingsRepository.darkMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    suspend fun setCustomColors(colors: List<Int>) =
-        repository.setCustomColors(colors)
+    val soundEnabled = settingsRepository.soundEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val hapticEnabled = settingsRepository.hapticEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val appLocale = settingsRepository.appLocale
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
+    fun setFollowSystemTheme(value: Boolean) {
+        viewModelScope.launch { settingsRepository.setFollowSystemTheme(value) }
+    }
+
+    fun setDarkMode(value: Boolean) {
+        viewModelScope.launch { settingsRepository.setDarkMode(value) }
+    }
+
+    fun setSoundEnabled(value: Boolean) {
+        viewModelScope.launch { settingsRepository.setSoundEnabled(value) }
+    }
+
+    fun setHapticEnabled(value: Boolean) {
+        viewModelScope.launch { settingsRepository.setHapticEnabled(value) }
+    }
+
+    fun setAppLocale(value: String) {
+        viewModelScope.launch { settingsRepository.setAppLocale(value) }
+    }
 }

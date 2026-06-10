@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">君に決めた</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_history">履歴</string>
+    <string name="nav_settings">設定</string>
+
+    <!-- Common -->
+    <string name="cd_back">戻る</string>
+    <string name="cd_delete">削除</string>
+    <string name="btn_confirm">OK</string>
+    <string name="btn_cancel">キャンセル</string>
+    <string name="btn_save">保存</string>
+    <string name="btn_close">閉じる</string>
+    <string name="btn_load">読込</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">ルーレット</string>
+    <string name="hub_card_spin_wheel_desc">運命の輪を回そう</string>
+    <string name="hub_card_coin">コイン</string>
+    <string name="hub_card_coin_desc">運命のコインを投げる</string>
+    <string name="hub_card_dice">サイコロ</string>
+    <string name="hub_card_dice_desc">答えを振ろう</string>    <string name="hub_card_yes_no_desc">宇宙に決めてもらおう</string>
+    <string name="hub_card_finger_roulette">フィンガールーレット</string>
+    <string name="hub_card_finger_roulette_desc">多人数淘汰、天選は誰だ</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">ルーレット</string>
+    <string name="method_coin_flip">コイン投げ</string>
+    <string name="method_dice_roll">サイコロ</string>    <string name="method_random_pick">ランダム</string>
+    <string name="method_finger_roulette">フィンガールーレット</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">ルーレット</string>
+    <string name="cd_wheel_settings">ルーレット設定</string>
+    <string name="toast_what_are_you_doing">何してるの？！</string>
+    <string name="btn_spinning">回転中…</string>
+    <string name="btn_start_spin">回す</string>
+    <string name="btn_edit_options">選択肢を編集</string>
+    <string name="toast_dynamic_color_on">ダイナミックカラー有効</string>
+    <string name="option_weight_label">重み: </string>
+    <string name="btn_add_option">+ 選択肢を追加</string>
+    <string name="btn_save_group">グループを保存</string>
+    <string name="btn_load_group">グループを読込</string>
+    <string name="dialog_save_option_group">選択肢グループを保存</string>
+    <string name="label_group_name">グループ名</string>
+    <string name="dialog_load_option_group">選択肢グループを読込</string>
+    <string name="dialog_no_saved_groups">保存されたグループはありません</string>
+
+    <!-- Coin -->
+    <string name="coin_title">コイン投げ</string>
+    <string name="cd_customize_images">画像をカスタマイズ</string>
+    <string name="btn_flipping">回転中…</string>
+    <string name="btn_flip_coin">コインを投げる</string>
+    <string name="toast_coin_heads">おもて！</string>
+    <string name="toast_coin_tails">うら！</string>
+
+    <!-- Dice -->
+    <string name="dice_title">サイコロ</string>
+    <string name="btn_rolling">転がり中…</string>
+    <string name="btn_roll_dice">サイコロを振る</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">出目: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No 決定</string>
+    <string name="yesno_question_label">質問を入力（任意）</string>
+    <string name="btn_deciding">決定中…</string>
+    <string name="btn_decide">決めて！</string>
+    <string name="yesno_result_yes">はい！</string>
+    <string name="yesno_result_no">いいえ！</string>
+    <string name="yesno_result_maybe">たぶん</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">答えの本</string>
+    <string name="answer_book_question_hint">質問を書いてください（任意）</string>
+    <string name="answer_book_reveal">答えを開く</string>
+    <string name="answer_book_revealing">答えが現れています…</string>
+    <string name="method_answer_book">答えの本</string>
+    <string name="hub_card_answer_book">答えの本</string>
+    <string name="hub_card_answer_book_desc">本を開いて、インスピレーションを見つけよう</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">食べたことのないものを試してみよう</string>
+    <string name="answer_food_2">最初の直感に従おう</string>
+    <string name="answer_food_3">お腹が何を欲しがっているか聞いてみよう</string>
+    <string name="answer_food_4">もっとワクワクする方を選ぼう</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">出発しよう、道のりの中で答えが見つかる</string>
+    <string name="answer_outing_2">家で休むのもいい選択だ</string>
+    <string name="answer_outing_3">行ったことのない場所に行ってみよう</string>
+    <string name="answer_outing_4">今一番何をしたいか自分に聞いてみよう</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">3日待って、まだ欲しければ買おう</string>
+    <string name="answer_shopping_2">迷っているなら買わない方がいい</string>
+    <string name="answer_shopping_3">もっと良い代替品がないか探してみよう</string>
+    <string name="answer_shopping_4">1ヶ月後どう感じるか想像してみよう</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">まず一歩を踏み出そう</string>
+    <string name="answer_work_2">考える時間を自分に与えよう</string>
+    <string name="answer_work_3">信頼できる人に話してみよう</string>
+    <string name="answer_work_4">メリット・デメリットを整理してから決めよう</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">自然に任せよう</string>
+    <string name="answer_love_2">自分の気持ちに正直になろう</string>
+    <string name="answer_love_3">時間が答えをくれる</string>
+    <string name="answer_love_4">直感を信じよう</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">やろう</string>
+    <string name="answer_general_2">もう少し考えてみよう</string>
+    <string name="answer_general_3">自然に任せよう</string>
+    <string name="answer_general_4">直感を信じよう</string>
+    <string name="answer_general_5">答えはあなたの心の中にある</string>
+    <string name="answer_general_6">ラッチュな方を選ぼう</string>
+    <string name="answer_general_7">急がなくていい、ゆっくりでいい</string>
+    <string name="answer_general_8">コインを投げた瞬間に答えがわかる</string>
+    <string name="answer_general_9">目を閉じて、最初に浮かんだのが答えだ</string>
+    <string name="answer_general_10">未来の自分にどう選ぶか聞いてみよう</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">フィンガールーレット</string>
+    <string name="winner_chosen_one">天選之人！</string>
+    <string name="btn_play_again">もう一回</string>
+    <string name="status_waiting_fingers">2〜6本の指を置いてください</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">%d本検出、2秒後に開始</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">脱落中… 残り%d人</string>
+    <string name="status_game_over">ゲーム終了</string>
+    <string name="btn_start_now">今すぐ開始</string>
+
+    <!-- History -->
+    <string name="history_title">履歴</string>
+    <string name="history_clear">クリア</string>
+    <string name="history_data_insights">インサイト</string>
+    <string name="history_empty_title">まだ記録がありません</string>
+    <string name="history_empty_subtitle">決定すると結果がここに表示されます</string>
+    <string name="history_result_prefix">結果: %s</string>
+    <string name="history_clear_confirm">すべての履歴を削除しますか？この操作は元に戻せません。</string>
+    <string name="history_delete_entry">記録を削除</string>
+    <string name="history_delete_entry_confirm">この記録を削除しますか？</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">概要</string>
+    <string name="stats_total_decisions">総決定回数</string>
+    <string name="stats_most_used">最も使用</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%d回</string>
+    <string name="stats_last_decision">直近の決定</string>
+    <string name="stats_method_distribution">手段の分布</string>
+    <string name="stats_top_results">人気の結果 Top 5</string>
+    <string name="stats_hourly_distribution">時間帯別分布</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_sound_haptic_section">サウンドと振動</string>
+    <string name="settings_sound">サウンド</string>
+    <string name="settings_sound_description">決定時にサウンドを再生</string>
+    <string name="settings_haptic">振動</string>
+    <string name="settings_haptic_description">決定時に振動フィードバック</string>
+    <string name="settings_display_section">表示</string>
+    <string name="settings_follow_system_theme">システムのダークモードに従う</string>
+    <string name="settings_follow_system_theme_description">オフにすると手動で切替可能</string>
+    <string name="settings_dark_mode">ダークモード</string>
+    <string name="settings_dark_mode_on">ダークモード有効</string>
+    <string name="settings_light_mode_on">ライトモード有効</string>
+    <string name="settings_language">言語</string>
+    <string name="settings_about_section">このアプリについて</string>
+    <string name="settings_version">バージョン</string>
+    <string name="settings_privacy_policy">プライバシーポリシー</string>
+    <string name="settings_terms_of_use">利用規約</string>
+    <string name="settings_open_source_licenses">オープンソースライセンス</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">システムに従う</string>    <string name="dialog_select_language">言語を選択</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">ルーレット設定</string>
+    <string name="settings_dynamic_color">ダイナミックカラー</string>
+    <string name="settings_dynamic_color_desc">時間に基づいて色を自動調整</string>
+    <string name="settings_preset_themes">プリセットテーマ</string>
+    <string name="settings_option_colors">選択肢の色</string>
+    <string name="settings_dynamic_color_active_hint">ダイナミックカラーがオンです。色は自動的に変化します</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">クラシックレインボー</string>
+    <string name="design_monochrome">モノクロ</string>
+    <string name="design_warm_sunset">ウォームサンセット</string>
+    <string name="design_ocean_breeze">オーシャンブリーズ</string>
+    <string name="design_minimal">ミニマル</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">コインプリセット</string>
+    <string name="btn_restore_default">リセット</string>
+    <string name="preset_custom">カスタム</string>
+    <string name="custom_coin_title">カスタムコイン</string>
+    <string name="custom_coin_drag_hint">ドラッグして表裏をプレビュー</string>
+    <string name="coin_heads">おもて</string>
+    <string name="coin_tails">うら</string>
+    <string name="btn_save_as_preset">プリセットとして保存</string>
+    <string name="btn_apply_directly">直接適用</string>
+    <string name="cd_select_image">画像を選択</string>
+    <string name="preset_default">デフォルト</string>
+    <string name="dialog_save_coin_preset">コインプリセットを保存</string>
+    <string name="label_preset_name">プリセット名</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">色を選択</string>
+    <string name="label_color_code">カラーコード</string>
+    <string name="error_invalid_color_code">有効なカラーコードを入力してください（例: FF6200）</string>
+    <string name="color_picker_common_colors">よく使う色</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">結果は</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">コイン画像をトリミング</string>
+    <string name="crop_instructions">ドラッグで移動、ピンチで拡大縮小</string>
+    <string name="btn_processing">処理中…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">インサイト</string>
+    <string name="stats_empty_title">まだ記録がありません</string>
+    <string name="stats_empty_subtitle">ルーレットを試してみよう！</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">おもて</string>
+    <string name="coin_tails_label">うら</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">はい</string>
+    <string name="yesno_default_no">いいえ</string>
+    <string name="yesno_default_maybe">たぶん</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">選択肢%d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">最終更新日：2026年6月8日</string>
+    <string name="privacy_intro">選択肢パラリシスヘルパー（以下「本アプリ」）は、プライバシーを尊重し保護するオープンソースソフトウェアです。</string>
+    <string name="privacy_s1_title">1. 情報の収集</string>
+    <string name="privacy_s1_body">本アプリは個人情報を収集、保存、送信することはありません。すべての決定データ（ルーレットの選択肢や履歴など）はお使いのデバイスにローカル保存されます。</string>
+    <string name="privacy_s2_title">2. データの保存</string>
+    <string name="privacy_s2_body">• すべてのデータはAndroid DataStoreとRoomデータベースを使用してデバイスにローカル保存されます\n• サーバーにアップロードされることはありません\n• アプリをアンインストールするとすべてのデータが削除されます</string>
+    <string name="privacy_s3_title">3. データのセキュリティ</string>
+    <string name="privacy_s3_body">すべてのデータがローカルに保存されるため、プライバシーはAndroidのセキュリティメカニズムによって完全に保護されます。</string>
+    <string name="privacy_s4_title">4. サードパーティサービス</string>
+    <string name="privacy_s4_body">本アプリはサードパーティの分析、広告、追跡サービスを一切使用していません。</string>
+    <string name="privacy_s5_title">5. 権限の使用</string>
+    <string name="privacy_s5_body">• 振動権限：決定時の触覚フィードバックにのみ使用\n• ネットワーク、ストレージ、カメラなどの権限は不要です</string>
+    <string name="privacy_s6_title">6. オープンソースの透明性</string>
+    <string name="privacy_s6_body">本アプリは完全にオープンソースです。GitHubですべてのソースコードを閲覧できます。</string>
+    <string name="privacy_s7_title">7. ポリシーの更新</string>
+    <string name="privacy_s7_body">ポリシーの更新があれば、アプリ内で通知します。</string>
+    <string name="privacy_s8_title">8. お問い合わせ</string>
+    <string name="privacy_s8_body">プライバシーに関するご質問は、GitHub Issuesからお問い合わせください。</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">最終更新日：2026年6月8日</string>
+    <string name="terms_intro">選択肢パラリシスヘルパーへようこそ。本アプリは、優柔不断なユーザーの決定を助けるオープンソースソフトウェアです。</string>
+    <string name="terms_s1_title">1. サービスの説明</string>
+    <string name="terms_s1_body">本アプリは以下の決定ツールを提供します：ルーレット、コイン投げ、サイコロ、Yes/No、フィンガールーレット。すべての機能は無料で、アプリ内課金はありません。</string>
+    <string name="terms_s2_title">2. 利用ガイドライン</string>
+    <string name="terms_s2_body">本アプリを適切にご使用ください。日常的な決定を支援するものであり、ハイリスクな場面には適していません。</string>
+    <string name="terms_s3_title">3. 免責事項</string>
+    <string name="terms_s3_body">本アプリは「現状有姿」で提供され、決定結果の正確性や適合性について一切の保証をいたしません。</string>
+    <string name="terms_s4_title">4. 知的財産権</string>
+    <string name="terms_s4_body">本アプリはApache License 2.0の下で公開されています。</string>
+    <string name="terms_s5_title">5. ユーザーの権利</string>
+    <string name="terms_s5_body">Apache License 2.0の条件に従い、本アプリを自由に使用、変更、配布することができます。</string>
+    <string name="terms_s6_title">6. 責任の制限</string>
+    <string name="terms_s6_body">適用法令で許容される最大限の範囲で、開発者は本アプリの使用に起因する損害について一切の責任を負いません。</string>
+    <string name="terms_s7_title">7. 準拠法</string>
+    <string name="terms_s7_body">本規約は中華人民共和国の法律に準拠します。</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">本アプリは以下のオープンソースライブラリを使用しています：</string>    <string name="oss_compose_desc">Jetpack Composeは、ネイティブUIを構築するためのAndroidのモダンツールキットです。</string>    <string name="oss_hilt_desc">Hiltは、Daggerの使用を簡素化するAndroidの依存性注入ライブラリです。</string>    <string name="oss_room_desc">RoomはSQLiteの上に抽象層を提供し、SQLiteの機能を活用しながら堅牢なデータベースアクセスを実現します。</string>    <string name="oss_coil_desc">CoilはKotlinコルーチンによるAndroidの画像読み込みライブラリです。</string>    <string name="oss_navigation_desc">Navigation ComposeはComposeでのナビゲーションをサポートします。</string>    <string name="oss_datastore_desc">DataStoreは、コルーチンとFlowを使用してキーバリューペアまたはプロトコルバッファオブジェクトを非同期かつ一貫性を持って保存するデータストレージソリューションです。</string>
+    <string name="oss_copyright">全著作権所有</string>    <string name="oss_apache_intro">以下のことができます：</string>
+    <string name="oss_apache_use">• 商用・非商用目的での使用</string>
+    <string name="oss_apache_modify">• ソフトウェアの変更</string>
+    <string name="oss_apache_distribute">• ソフトウェアの配布</string>
+    <string name="oss_apache_conditions">条件：</string>
+    <string name="oss_apache_copyright_notice">• 著作権表示とライセンスの保持</string>
+    <string name="oss_apache_changes">• 変更内容の明記</string>
+    <string name="oss_apache_link">完全なライセンステキストは以下をご覧ください：</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ 本文はAI翻訳です。正式なバージョンは中国語版です。</string>
+</resources>

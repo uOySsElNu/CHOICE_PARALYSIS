@@ -41,8 +41,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.R
+import com.choiceparalysis.turntable.audio.AudioHapticManager
 import com.choiceparalysis.turntable.viewmodel.ColorSchemeVM
 import com.choiceparalysis.turntable.viewmodel.OptionsVM
 import kotlinx.coroutines.launch
@@ -60,6 +63,8 @@ fun WheelSettingsSheet(
     val options by optionsVM.options.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val audioHaptic = remember { AudioHapticManager.getInstance(context) }
     var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
 
     ModalBottomSheet(
@@ -74,7 +79,7 @@ fun WheelSettingsSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "转盘设置",
+                text = stringResource(R.string.wheel_settings_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -88,12 +93,12 @@ fun WheelSettingsSheet(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "动态色彩",
+                        text = stringResource(R.string.settings_dynamic_color),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "根据时间自动调整转盘色彩",
+                        text = stringResource(R.string.settings_dynamic_color_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -101,6 +106,7 @@ fun WheelSettingsSheet(
                 Switch(
                     checked = dynamicColorEnabled,
                     onCheckedChange = { enabled ->
+                        audioHaptic.playHapticTick()
                         scope.launch { colorSchemeVM.setDynamicColorEnabled(enabled) }
                     }
                 )
@@ -113,7 +119,7 @@ fun WheelSettingsSheet(
 
                 // Preset themes
                 Text(
-                    text = "预设主题",
+                    text = stringResource(R.string.settings_preset_themes),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -142,7 +148,7 @@ fun WheelSettingsSheet(
 
                 // Per-option colors
                 Text(
-                    text = "选项颜色",
+                    text = stringResource(R.string.settings_option_colors),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -180,7 +186,7 @@ fun WheelSettingsSheet(
             if (dynamicColorEnabled) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "动态色彩已开启，颜色将根据时间自动变化",
+                    text = stringResource(R.string.settings_dynamic_color_active_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -220,7 +226,6 @@ private fun PresetThemeChip(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
 
     Button(
         onClick = onClick,
@@ -254,7 +259,7 @@ private fun PresetThemeChip(
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-            text = "${design.emoji} ${design.displayName}",
+            text = "${design.emoji} ${stringResource(design.displayNameRes)}",
             style = MaterialTheme.typography.labelMedium
         )
     }

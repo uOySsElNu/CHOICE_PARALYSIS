@@ -26,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.ui.coindice.Dice3DRoll
 import com.choiceparalysis.turntable.ui.coindice.ShakeDetector
 import com.choiceparalysis.turntable.viewmodel.DiceViewModel
@@ -41,6 +43,7 @@ fun DiceScreen(
     onBack: () -> Unit = {},
 ) {
     val diceValue by viewModel.diceValue.collectAsState()
+    val rollTrigger by viewModel.rollTrigger.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val context = LocalContext.current
 
@@ -50,6 +53,7 @@ fun DiceScreen(
             if (isAnimating) {
                 viewModel.onDiceRollAnimationComplete()
             }
+            viewModel.clearDisplayResult()
         }
     }
 
@@ -63,12 +67,11 @@ fun DiceScreen(
         onDispose { shakeDetector.stop() }
     }
 
-    val toastMessage = diceValue?.let { "点数: $it" }
+    val toastMessage = diceValue?.let { stringResource(R.string.toast_dice_value, it) }
 
-    LaunchedEffect(toastMessage) {
-        toastMessage?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            viewModel.clearResult()
+    LaunchedEffect(rollTrigger) {
+        if (rollTrigger > 0) {
+            toastMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
         }
     }
 
@@ -82,7 +85,7 @@ fun DiceScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "掷骰子",
+                    text = stringResource(R.string.dice_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -91,7 +94,7 @@ fun DiceScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             }
@@ -114,7 +117,7 @@ fun DiceScreen(
                 .height(56.dp)
         ) {
             Text(
-                text = if (isAnimating) "滚动中..." else "掷骰子",
+                text = if (isAnimating) stringResource(R.string.btn_rolling) else stringResource(R.string.btn_roll_dice),
                 style = MaterialTheme.typography.titleMedium
             )
         }

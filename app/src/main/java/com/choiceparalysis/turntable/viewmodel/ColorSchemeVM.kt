@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class ColorSchemeVM @Inject constructor(
@@ -61,11 +62,12 @@ class ColorSchemeVM @Inject constructor(
                 _customColors.value = colors
             }
         }
-        // 60-second refresh for dynamic color mode
+        // 60-second refresh for dynamic color mode (only when screen is active)
         viewModelScope.launch {
             while (true) {
-                delay(60_000)
+                delay(60_000.milliseconds)
                 if (_dynamicColorEnabled.value) {
+                    // Self-assignment triggers re-combine with fresh time-based colors
                     _optionsCount.value = _optionsCount.value
                 }
             }
@@ -84,11 +86,6 @@ class ColorSchemeVM @Inject constructor(
 
     suspend fun setSelectedPreset(preset: String) {
         settingsRepository.setSelectedPreset(preset)
-    }
-
-    suspend fun setCustomColors(colors: List<Int>) {
-        _customColors.value = colors
-        settingsRepository.setCustomColors(colors)
     }
 
     fun updateOptionColor(index: Int, color: Int) {

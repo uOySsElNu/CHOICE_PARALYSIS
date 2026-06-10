@@ -1,6 +1,5 @@
 package com.choiceparalysis.turntable.ui.fingerroulette
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -8,8 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,16 +38,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.audio.AudioHapticManager
 import com.choiceparalysis.turntable.audio.SoundEffect
 
@@ -56,14 +56,16 @@ import com.choiceparalysis.turntable.audio.SoundEffect
 @Composable
 fun FingerRouletteScreen(
     modifier: Modifier = Modifier,
-    viewModel: FingerRouletteViewModel = viewModel(),
+    viewModel: FingerRouletteViewModel = hiltViewModel(),
     onBack: () -> Unit = {},
 ) {
     val fingers by viewModel.fingers.collectAsState()
     val phase by viewModel.phase.collectAsState()
     val winnerId by viewModel.winnerId.collectAsState()
-    val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
-    val markerRadius = with(LocalDensity.current) { 36.dp.toPx() }
+    val targetFlash by viewModel.targetFlash.collectAsState()
+    val context = LocalContext.current
+    val audioHaptic = remember { AudioHapticManager.getInstance(context) }
+    val markerRadius = with(LocalDensity.current) { 52.dp.toPx() }
     val textMeasurer = rememberTextMeasurer()
     val primaryColor = MaterialTheme.colorScheme.primary
 
@@ -75,6 +77,11 @@ fun FingerRouletteScreen(
             winnerScale.animateTo(2f, tween(600))
             winnerScale.animateTo(1.5f, tween(300))
         }
+    }
+
+    // Target flash haptic
+    LaunchedEffect(targetFlash) {
+        if (targetFlash > 0) audioHaptic.playHapticTick()
     }
 
     // Elimination feedback
@@ -91,7 +98,7 @@ fun FingerRouletteScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "指尖轮盘",
+                    text = stringResource(R.string.finger_roulette_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -100,7 +107,7 @@ fun FingerRouletteScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             }
@@ -110,32 +117,45 @@ fun FingerRouletteScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .pointerInput(phase) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        val pointerId = down.id
-                        val fingerId = viewModel.addFinger(
-                            down.position.x,
-                            down.position.y
-                        )
-                        try {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val pointer = event.changes.find { it.id == pointerId }
-                                if (pointer == null || !pointer.pressed) {
-                                    viewModel.removeFinger(fingerId)
-                                    break
-                                } else {
+                .pointerInput(Unit) {
+                    // Map PointerId → our finger ID
+                    val pointerToFinger = mutableMapOf<PointerId, Int>()
+
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val currentIds = mutableSetOf<PointerId>()
+
+                            for (change in event.changes) {
+                                if (!change.pressed) continue
+                                currentIds.add(change.id)
+
+                                val existingFingerId = pointerToFinger[change.id]
+                                if (existingFingerId != null) {
+                                    // Existing finger → update position
                                     viewModel.updateFingerPosition(
-                                        fingerId,
-                                        pointer.position.x,
-                                        pointer.position.y
+                                        existingFingerId,
+                                        change.position.x,
+                                        change.position.y
                                     )
-                                    pointer.consume()
+                                } else {
+                                    // New finger → add
+                                    val fingerId = viewModel.addFinger(
+                                        change.position.x,
+                                        change.position.y
+                                    )
+                                    pointerToFinger[change.id] = fingerId
+                                    audioHaptic.playHapticTick()
                                 }
+                                change.consume()
                             }
-                        } catch (_: Exception) {
-                            viewModel.removeFinger(fingerId)
+
+                            // Remove fingers that are no longer pressed
+                            val released = pointerToFinger.keys - currentIds
+                            for (pointerId in released) {
+                                pointerToFinger[pointerId]?.let { viewModel.removeFinger(it) }
+                                pointerToFinger.remove(pointerId)
+                            }
                         }
                     }
                 },
@@ -161,14 +181,14 @@ fun FingerRouletteScreen(
                         color = Color.White,
                         radius = radius,
                         center = Offset(finger.x, finger.y),
-                        style = Stroke(width = 3f)
+                        style = Stroke(width = 4f)
                     )
 
                     val number = fingers.indexOf(finger) + 1
                     val textResult = textMeasurer.measure(
                         text = number.toString(),
                         style = TextStyle(
-                            fontSize = (16 * scale).sp,
+                            fontSize = (22 * scale).sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -194,14 +214,14 @@ fun FingerRouletteScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "天选之人！",
+                        text = stringResource(R.string.winner_chosen_one),
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFFFD700)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { viewModel.reset() }) {
-                        Text("再来一局")
+                        Text(stringResource(R.string.btn_play_again))
                     }
                 }
             }
@@ -216,10 +236,10 @@ fun FingerRouletteScreen(
         ) {
             val activeCount = fingers.count { !it.isEliminated }
             val statusText = when (phase) {
-                RoulettePhase.WAITING -> "请放置 2-6 根手指"
-                RoulettePhase.READY -> "检测到 $activeCount 根手指"
-                RoulettePhase.PLAYING -> "淘汰中... 剩余 $activeCount 人"
-                RoulettePhase.FINISHED -> "游戏结束"
+                RoulettePhase.WAITING -> stringResource(R.string.status_waiting_fingers)
+                RoulettePhase.READY -> stringResource(R.string.status_ready_count, activeCount)
+                RoulettePhase.PLAYING -> stringResource(R.string.status_eliminating, activeCount)
+                RoulettePhase.FINISHED -> stringResource(R.string.status_game_over)
             }
             Text(
                 text = statusText,
@@ -233,7 +253,7 @@ fun FingerRouletteScreen(
                 onClick = { viewModel.startElimination() },
                 enabled = phase == RoulettePhase.READY
             ) {
-                Text("开始淘汰")
+                Text(stringResource(R.string.btn_start_now))
             }
         }
     }

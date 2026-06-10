@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أنت المختار!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_history">السجل</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Common -->
+    <string name="cd_back">رجوع</string>
+    <string name="cd_delete">حذف</string>
+    <string name="btn_confirm">موافق</string>
+    <string name="btn_cancel">إلغاء</string>
+    <string name="btn_save">حفظ</string>
+    <string name="btn_close">إغلاق</string>
+    <string name="btn_load">تحميل</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">العجلة</string>
+    <string name="hub_card_spin_wheel_desc">أدر عجلة القدر</string>
+    <string name="hub_card_coin">العملة</string>
+    <string name="hub_card_coin_desc">ارمِ عملة القدر</string>
+    <string name="hub_card_dice">النرد</string>
+    <string name="hub_card_dice_desc">ارمِ إجابتك</string>    <string name="hub_card_yes_no_desc">دع الكون يقرر</string>
+    <string name="hub_card_finger_roulette">روليت الأصابع</string>
+    <string name="hub_card_finger_roulette_desc">لعبة إقصاء، من هو المختار</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">العجلة</string>
+    <string name="method_coin_flip">العملة</string>
+    <string name="method_dice_roll">النرد</string>    <string name="method_random_pick">عشوائي</string>
+    <string name="method_finger_roulette">روليت الأصابع</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">العجلة</string>
+    <string name="cd_wheel_settings">إعدادات العجلة</string>
+    <string name="toast_what_are_you_doing">ماذا تفعل؟!</string>
+    <string name="btn_spinning">تدور…</string>
+    <string name="btn_start_spin">أدر</string>
+    <string name="btn_edit_options">تعديل الخيارات</string>
+    <string name="toast_dynamic_color_on">تم تفعيل اللون الديناميكي</string>
+    <string name="option_weight_label">الوزن: </string>
+    <string name="btn_add_option">+ إضافة خيار</string>
+    <string name="btn_save_group">حفظ المجموعة</string>
+    <string name="btn_load_group">تحميل المجموعة</string>
+    <string name="dialog_save_option_group">حفظ مجموعة الخيارات</string>
+    <string name="label_group_name">اسم المجموعة</string>
+    <string name="dialog_load_option_group">تحميل مجموعة الخيارات</string>
+    <string name="dialog_no_saved_groups">لا توجد مجموعات محفوظة</string>
+
+    <!-- Coin -->
+    <string name="coin_title">العملة</string>
+    <string name="cd_customize_images">تخصيص الصور</string>
+    <string name="btn_flipping">يُلقى…</string>
+    <string name="btn_flip_coin">ارمِ العملة</string>
+    <string name="toast_coin_heads">وجه!</string>
+    <string name="toast_coin_tails">كتابة!</string>
+
+    <!-- Dice -->
+    <string name="dice_title">النرد</string>
+    <string name="btn_rolling">يتدحرج…</string>
+    <string name="btn_roll_dice">ارمِ النرد</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">النتيجة: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No قرار</string>
+    <string name="yesno_question_label">أدخل سؤالك (اختياري)</string>
+    <string name="btn_deciding">يقرر…</string>
+    <string name="btn_decide">قرر عني!</string>
+    <string name="yesno_result_yes">نعم!</string>
+    <string name="yesno_result_no">لا!</string>
+    <string name="yesno_result_maybe">ربما</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">كتاب الأجوبة</string>
+    <string name="answer_book_question_hint">اكتب سؤالك (اختياري)</string>
+    <string name="answer_book_reveal">اكشف الجواب</string>
+    <string name="answer_book_revealing">يتم كشف الجواب…</string>
+    <string name="method_answer_book">كتاب الأجوبة</string>
+    <string name="hub_card_answer_book">كتاب الأجوبة</string>
+    <string name="hub_card_answer_book_desc">افتح الكتاب، دع الإلهام يظهر</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">جرّب شيئًا لم تأكله من قبل</string>
+    <string name="answer_food_2">اتبع حدسك الأول</string>
+    <string name="answer_food_3">اسأل معدتك ماذا تريد</string>
+    <string name="answer_food_4">اختر ما يثيرك أكثر</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">انطلاق، ستجد الإجابة في الطريق</string>
+    <string name="answer_outing_2">البقاء في المنزل والراحة خيار جيد أيضًا</string>
+    <string name="answer_outing_3">جرّب مكانًا لم تذهب إليه من قبل</string>
+    <string name="answer_outing_4">اسأل نفسك ماذا تريد أن تفعل أكثر الآن</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">انتظر ثلاثة أيام، إذا كنت لا تزال تريده اشتريه</string>
+    <string name="answer_shopping_2">إذا كنت مترددًا فلا تشترِ</string>
+    <string name="answer_shopping_3">ابحث عن بديل أفضل</string>
+    <string name="answer_shopping_4">تصور كيف ستشعر بعد شهر</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">اخطو الخطوة الأولى</string>
+    <string name="answer_work_2">امنح نفسك وقتًا للتفكير</string>
+    <string name="answer_work_3">تحدث مع شخص تثق به</string>
+    <string name="answer_work_4">اذكر الإيجابيات والسلبيات قبل اتخاذ القرار</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">دع الأمور تسير بشكل طبيعي</string>
+    <string name="answer_love_2">كن صادقًا مع مشاعرك</string>
+    <string name="answer_love_3">الوقت سيمنحك الإجابة</string>
+    <string name="answer_love_4">ثق بحدسك</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">افعلها</string>
+    <string name="answer_general_2">فكّر قليلاً أكثر</string>
+    <string name="answer_general_3">دع الأمور تسير بشكل طبيعي</string>
+    <string name="answer_general_4">ثق بحدسك</string>
+    <string name="answer_general_5">الإجابة في قلبك</string>
+    <string name="answer_general_6">اختر ما يبدو أسهل</string>
+    <string name="answer_general_7">لا تستعجل، خذ وقتك</string>
+    <string name="answer_general_8">في لحظة رمي العملة ستعرف الإجابة</string>
+    <string name="answer_general_9">أغمض عينيك، أول فكرة تخطر ببالك هي الإجابة</string>
+    <string name="answer_general_10">اسأل نفسك المستقبلية ماذا ستختار</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">روليت الأصابع</string>
+    <string name="winner_chosen_one">المختار!</string>
+    <string name="btn_play_again">العب مرة أخرى</string>
+    <string name="status_waiting_fingers">ضع 2–6 أصابع</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">تم اكتشاف %d أصابع، البدء خلال ثانيتين</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">إقصاء… متبقي %d</string>
+    <string name="status_game_over">انتهت اللعبة</string>
+    <string name="btn_start_now">ابدأ الآن</string>
+
+    <!-- History -->
+    <string name="history_title">السجل</string>
+    <string name="history_clear">مسح</string>
+    <string name="history_data_insights">إحصائيات</string>
+    <string name="history_empty_title">لا توجد قرارات بعد</string>
+    <string name="history_empty_subtitle">ستظهر نتائجك هنا بعد اتخاذ قرار</string>
+    <string name="history_result_prefix">النتيجة: %s</string>
+    <string name="history_clear_confirm">هل أنت متأكد من أنك تريد مسح كل السجل؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="history_delete_entry">حذف السجل</string>
+    <string name="history_delete_entry_confirm">هل أنت متأكد من أنك تريد حذف هذا السجل؟</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">نظرة عامة</string>
+    <string name="stats_total_decisions">إجمالي القرارات</string>
+    <string name="stats_most_used">الأكثر استخداماً</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%d مرات</string>
+    <string name="stats_last_decision">آخر قرار</string>
+    <string name="stats_method_distribution">التوزيع حسب الطريقة</string>
+    <string name="stats_top_results">أفضل 5 نتائج</string>
+    <string name="stats_hourly_distribution">التوزيع حسب الساعة</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_sound_haptic_section">الصوت والاهتزاز</string>
+    <string name="settings_sound">الصوت</string>
+    <string name="settings_sound_description">تشغيل الصوت عند اتخاذ القرار</string>
+    <string name="settings_haptic">الاهتزاز</string>
+    <string name="settings_haptic_description">اهتزاز عند اتخاذ القرار</string>
+    <string name="settings_display_section">العرض</string>
+    <string name="settings_follow_system_theme">اتباع الوضع الداكن للنظام</string>
+    <string name="settings_follow_system_theme_description">عند الإيقاف، تبديل يدوي بين الفاتح/الداكن</string>
+    <string name="settings_dark_mode">الوضع الداكن</string>
+    <string name="settings_dark_mode_on">تم تفعيل الوضع الداكن</string>
+    <string name="settings_light_mode_on">تم تفعيل الوضع الفاتح</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_about_section">حول</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_privacy_policy">سياسة الخصوصية</string>
+    <string name="settings_terms_of_use">شروط الاستخدام</string>
+    <string name="settings_open_source_licenses">تراخيص المصادر المفتوحة</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">اتباع النظام</string>    <string name="dialog_select_language">اختر اللغة</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">إعدادات العجلة</string>
+    <string name="settings_dynamic_color">اللون الديناميكي</string>
+    <string name="settings_dynamic_color_desc">ضبط الألوان تلقائياً حسب الوقت</string>
+    <string name="settings_preset_themes">السمات المسبقة</string>
+    <string name="settings_option_colors">ألوان الخيارات</string>
+    <string name="settings_dynamic_color_active_hint">اللون الديناميكي مفعل، تتغير الألوان تلقائياً</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">قوس قزح كلاسيكي</string>
+    <string name="design_monochrome">أحادي اللون</string>
+    <string name="design_warm_sunset">غروب دافئ</string>
+    <string name="design_ocean_breeze">نسيم المحيط</string>
+    <string name="design_minimal">بسيط</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">الإعدادات المسبقة للعملة</string>
+    <string name="btn_restore_default">إعادة التعيين</string>
+    <string name="preset_custom">مخصص</string>
+    <string name="custom_coin_title">عملة مخصصة</string>
+    <string name="custom_coin_drag_hint">اسحب لمعاينة الجانبين</string>
+    <string name="coin_heads">وجه</string>
+    <string name="coin_tails">كتابة</string>
+    <string name="btn_save_as_preset">حفظ كإعداد مسبق</string>
+    <string name="btn_apply_directly">تطبيق</string>
+    <string name="cd_select_image">اختر صورة</string>
+    <string name="preset_default">افتراضي</string>
+    <string name="dialog_save_coin_preset">حفظ إعداد مسبق للعملة</string>
+    <string name="label_preset_name">اسم الإعداد المسبق</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">اختر اللون</string>
+    <string name="label_color_code">رمز اللون</string>
+    <string name="error_invalid_color_code">أدخل رمز لون صالح، مثال: FF6200</string>
+    <string name="color_picker_common_colors">الألوان الشائعة</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">النتيجة هي</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">قص صورة العملة</string>
+    <string name="crop_instructions">اسحب للتحريك، قرص للتكبير/التصغير</string>
+    <string name="btn_processing">جاري المعالجة…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">إحصائيات</string>
+    <string name="stats_empty_title">لا توجد قرارات بعد</string>
+    <string name="stats_empty_subtitle">جرب العجلة!</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">وجه</string>
+    <string name="coin_tails_label">كتابة</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">نعم</string>
+    <string name="yesno_default_no">لا</string>
+    <string name="yesno_default_maybe">ربما</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">خيار %d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">آخر تحديث: 8 يونيو 2026</string>
+    <string name="privacy_intro">Choice Paralysis Helper (\"هذا التطبيق\") هو برنامج مفتوح المصدر يحترم خصوصيتك ويحميها.</string>
+    <string name="privacy_s1_title">1. جمع المعلومات</string>
+    <string name="privacy_s1_body">لا يقوم هذا التطبيق بجمع أو تخزين أو نقل أي معلومات شخصية. جميع بيانات القرارات (مثل خيارات العجلة والسجل) مخزنة محلياً على جهازك فقط.</string>
+    <string name="privacy_s2_title">2. تخزين البيانات</string>
+    <string name="privacy_s2_body">• جميع البيانات مخزنة محلياً باستخدام Android DataStore وقاعدة بيانات Room\n• لا يتم تحميل أي بيانات إلى أي خادم\n• إلغاء تثبيت التطبيق سيحذف جميع البيانات</string>
+    <string name="privacy_s3_title">3. أمان البيانات</string>
+    <string name="privacy_s3_body">بما أن جميع البيانات مخزنة محلياً، فإن خصوصيتك محمية بالكامل بواسطة آليات أمان Android.</string>
+    <string name="privacy_s4_title">4. خدمات الطرف الثالث</string>
+    <string name="privacy_s4_body">لا يدمج هذا التطبيق أي خدمات تحليلات أو إعلانات أو تتبع من أطراف ثالثة.</string>
+    <string name="privacy_s5_title">5. استخدام الأذونات</string>
+    <string name="privacy_s5_body">• إذن الاهتزاز: يُستخدم فقط للتغذية الراجعة اللمسية أثناء القرارات\n• لا تتطلب أذونات الشبكة أو التخزين أو الكاميرا أو غيرها</string>
+    <string name="privacy_s6_title">6. شفافية المصادر المفتوحة</string>
+    <string name="privacy_s6_body">هذا التطبيق مفتوح المصدر بالكامل. يمكنك الاطلاع على جميع الشيفرات المصدرية على GitHub.</string>
+    <string name="privacy_s7_title">7. تحديثات السياسات</string>
+    <string name="privacy_s7_body">سيتم إخطارك بأي تحديثات للسياسات داخل التطبيق.</string>
+    <string name="privacy_s8_title">8. اتصل بنا</string>
+    <string name="privacy_s8_body">لأي أسئلة متعلقة بالخصوصية، يرجى الاتصال بنا عبر GitHub Issues.</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">آخر تحديث: 8 يونيو 2026</string>
+    <string name="terms_intro">مرحباً بك في Choice Paralysis Helper. هذا التطبيق برنامج مفتوح المصدر مصمم لمساعدة المستخدمين المتذبذبين في اتخاذ القرارات.</string>
+    <string name="terms_s1_title">1. وصف الخدمة</string>
+    <string name="terms_s1_body">يوفر هذا التطبيق أدوات القرار التالية: العجلة، العملة، النرد، Yes/No، وروليت الأصابع. جميع الميزات مجانية بدون مشتريات داخل التطبيق.</string>
+    <string name="terms_s2_title">2. إرشادات الاستخدام</string>
+    <string name="terms_s2_body">يرجى استخدام هذا التطبيق بمسؤولية. إنه مخصص للقرارات اليومية فقط ولا يناسب سيناريوهات المخاطر العالية.</string>
+    <string name="terms_s3_title">3. إخلاء المسؤولية</string>
+    <string name="terms_s3_body">يُقدم هذا التطبيق \"كما هو\" دون أي ضمان regarding دقة أو ملاءمة نتائج القرارات.</string>
+    <string name="terms_s4_title">4. الملكية الفكرية</string>
+    <string name="terms_s4_body">يُصدر هذا التطبيق بموجب رخصة Apache 2.0.</string>
+    <string name="terms_s5_title">5. حقوق المستخدم</string>
+    <string name="terms_s5_body">أنت حر في استخدام هذا التطبيق وتعدّله وتوزيعه، وفقاً لشروط رخصة Apache 2.0.</string>
+    <string name="terms_s6_title">6. تحديد المسؤولية</string>
+    <string name="terms_s6_body">في أقصى حد يسمح به القانون المعمول به، لن يكون المطور مسؤولاً عن أي أضرار ناتجة عن استخدام هذا التطبيق.</string>
+    <string name="terms_s7_title">7. القانون المعمول به</string>
+    <string name="terms_s7_body">تخضع هذه الشروط لقوانين جمهورية الصين الشعبية.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">يستخدم هذا التطبيق مكتبات المصادر المفتوحة التالية:</string>    <string name="oss_compose_desc">Jetpack Compose هو أدوات Android الحديثة لبناء واجهات أصلية.</string>    <string name="oss_hilt_desc">Hilt هو مكتبة حقن التبعية لـ Android التي تبسّط استخدام Dagger.</string>    <string name="oss_room_desc">يوفر Room طبقة تجريد فوق SQLite للسماح بوصول سلس لقاعدة البيانات مع الاستفادة من جميع إمكانيات SQLite.</string>    <string name="oss_coil_desc">Coil هو مكتبة تحميل الصور لـ Android مدعومة بـ Kotlin Coroutines.</string>    <string name="oss_navigation_desc">يوفر Navigation Compose دعم التنقل في Compose.</string>    <string name="oss_datastore_desc">DataStore هو حل تخزين البيانات يتيح تخزين أزواج القيمة-المفتاح أو كائنات بروتوكول الع缓冲 بشكل غير متزامن ومتسق باستخدام Coroutines و Flow.</string>
+    <string name="oss_copyright">جميع الحقوق محفوظة</string>    <string name="oss_apache_intro">أنت حر في:</string>
+    <string name="oss_apache_use">• استخدام البرنامج لأغراض تجارية أو غير تجارية</string>
+    <string name="oss_apache_modify">• تعديل البرنامج</string>
+    <string name="oss_apache_distribute">• توزيع البرنامج</string>
+    <string name="oss_apache_conditions">الشروط:</string>
+    <string name="oss_apache_copyright_notice">• الاحتفاظ بإشعار حقوق النشر والرخصة</string>
+    <string name="oss_apache_changes">• تحديد التغييرات المُدخلة</string>
+    <string name="oss_apache_link">للنص الكامل للرخصة، قم بزيارة:</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ هذا ترجمة ذكاء اصطناعي. النسخة الصينية هي النسخة الرسمية.</string>
+</resources>

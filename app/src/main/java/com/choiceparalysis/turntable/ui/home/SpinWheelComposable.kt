@@ -41,6 +41,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.core.graphics.withTranslation
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Pre-computed per-segment data that doesn't depend on Canvas size. */
 private data class SegmentLayout(
@@ -58,16 +59,33 @@ fun SpinWheel(
     weights: List<Int>,
     colorScheme: WheelColorScheme,
     modifier: Modifier = Modifier,
+    lastResult: String? = null,
     onSpinResult: (String) -> Unit = {},
     onSpinStart: () -> Unit = {},
     onSpinEnd: () -> Unit = {},
     onResultDragged: () -> Unit = {},
 ) {
-    val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
+    val context = LocalContext.current
+    val audioHaptic = remember { AudioHapticManager.getInstance(context) }
     val animatable = remember { Animatable(0f) }
     var settledResult by remember { mutableStateOf<String?>(null) }
     var isDragging by remember { mutableStateOf(false) }
     var isSpinning by remember { mutableStateOf(false) }
+
+    // Snap wheel to lastResult when it arrives from persistence
+    LaunchedEffect(lastResult, options, weights) {
+        if (lastResult == null || isSpinning) return@LaunchedEffect
+        val idx = options.indexOf(lastResult)
+        if (idx < 0) return@LaunchedEffect
+        if (settledResult == lastResult) return@LaunchedEffect
+        val safeW = options.indices.map { weights.getOrElse(it) { 1 } }
+        val total = safeW.sum().coerceAtLeast(options.size)
+        val angles = safeW.map { (it.toFloat() / total) * 360f }
+        val centerAngle = angles.take(idx).sum() + angles[idx] / 2f
+        val targetRotation = (360f - centerAngle) % 360f
+        animatable.snapTo(targetRotation)
+        settledResult = lastResult
+    }
     var spinTrigger by remember { mutableIntStateOf(0) }
 
     // --- Pre-compute segment layout (angles, colors, text) — independent of Canvas size ---
@@ -102,7 +120,11 @@ fun SpinWheel(
         return segmentLayouts.indices.last
     }
 
-    // --- Haptic tick with 80ms throttle + delta > 180° skip ---
+    // --- Haptic tick — picker/roller detent feel ---
+    // Each tick is identical: short, sharp, constant.
+    // Fast spin → ticks arrive faster (natural frequency increase).
+    // Slow spin → ticks spaced out (natural deceleration feel).
+    // Throttle: 50ms minimum between ticks (Android docs: ≥50ms for discernible gaps).
     LaunchedEffect(options, weights) {
         var lastRotation = animatable.value
         var lastSegment = segmentIndexAt(lastRotation)
@@ -114,7 +136,7 @@ fun SpinWheel(
             val currentSegment = segmentIndexAt(rotation)
             if (currentSegment != lastSegment) {
                 val now = System.currentTimeMillis()
-                if (now - lastTickTime > 80) {
+                if (now - lastTickTime > 50) {
                     audioHaptic.playFeedback(SoundEffect.WHEEL_TICK)
                     lastTickTime = now
                 }
@@ -130,21 +152,17 @@ fun SpinWheel(
         onSpinStart()
         settledResult = null
         try {
-            // Random velocity in range of a strong manual fling
-            val simulatedVelocity = (2000..4000).random().toFloat()
-            val absV = abs(simulatedVelocity)
-            val minRotation = 1440f
-            val current = animatable.value
-            val target = current + maxOf(absV * 1.5f, minRotation)
-            val duration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
+            // Random velocity in range of a moderate manual fling
+            // Random extra rotation beyond minimum to land on a random segment
+            val extraDegrees = (0..360).random().toFloat()
+            val totalRotation = 1440f + extraDegrees  // 4+ full turns + random offset
+            val duration = maxOf(2000, (totalRotation / 720f * 2000f).toInt()).coerceAtMost(5000)
 
             if (!animatable.isRunning) {
                 animatable.snapTo(0f)
             }
-            animatable.animateTo(
-                if (animatable.isRunning) animatable.value + target - current else target,
-                tween(duration, easing = StandardEasing.EaseOutQuart)
-            )
+            val animateTarget = animatable.value + totalRotation
+            animatable.animateTo(animateTarget, tween(duration, easing = StandardEasing.EaseOutQuart))
             val idx = segmentIndexAt(animatable.value)
             settledResult = options[idx]
             onSpinResult(options[idx])
@@ -158,7 +176,7 @@ fun SpinWheel(
     // --- Result-drag detection ---
     LaunchedEffect(isDragging, settledResult) {
         if (!isDragging && settledResult != null) {
-            delay(300)
+            delay(300.milliseconds)
             val idx = segmentIndexAt(animatable.value)
             if (options.getOrNull(idx) != settledResult) {
                 onResultDragged()

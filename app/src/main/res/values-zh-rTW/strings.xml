@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">就決定是你了</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">首頁</string>
+    <string name="nav_history">歷史記錄</string>
+    <string name="nav_settings">設定</string>
+
+    <!-- Common -->
+    <string name="cd_back">返回</string>
+    <string name="cd_delete">刪除</string>
+    <string name="btn_confirm">確定</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_save">儲存</string>
+    <string name="btn_close">關閉</string>
+    <string name="btn_load">載入</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">轉盤</string>
+    <string name="hub_card_spin_wheel_desc">轉動命運之輪</string>
+    <string name="hub_card_coin">硬幣</string>
+    <string name="hub_card_coin_desc">轉一枚命運硬幣</string>
+    <string name="hub_card_dice">骰子</string>
+    <string name="hub_card_dice_desc">擲出你的答案</string>    <string name="hub_card_yes_no_desc">讓宇宙替你決定</string>
+    <string name="hub_card_finger_roulette">指尖輪盤</string>
+    <string name="hub_card_finger_roulette_desc">多人淘汰，誰是天選</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">轉盤</string>
+    <string name="method_coin_flip">轉硬幣</string>
+    <string name="method_dice_roll">擲骰子</string>    <string name="method_random_pick">隨機選擇</string>
+    <string name="method_finger_roulette">指尖輪盤</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">轉盤決策</string>
+    <string name="cd_wheel_settings">轉盤設定</string>
+    <string name="toast_what_are_you_doing">你在幹嘛？！</string>
+    <string name="btn_spinning">轉動中…</string>
+    <string name="btn_start_spin">開始轉動</string>
+    <string name="btn_edit_options">編輯選項</string>
+    <string name="toast_dynamic_color_on">動態色彩已開啟</string>
+    <string name="option_weight_label">權重: </string>
+    <string name="btn_add_option">+ 新增選項</string>
+    <string name="btn_save_group">儲存組合</string>
+    <string name="btn_load_group">載入組合</string>
+    <string name="dialog_save_option_group">儲存選項組合</string>
+    <string name="label_group_name">組合名稱</string>
+    <string name="dialog_load_option_group">載入選項組合</string>
+    <string name="dialog_no_saved_groups">暫無儲存的組合</string>
+
+    <!-- Coin -->
+    <string name="coin_title">轉硬幣</string>
+    <string name="cd_customize_images">自訂圖片</string>
+    <string name="btn_flipping">翻轉中…</string>
+    <string name="btn_flip_coin">轉硬幣</string>
+    <string name="toast_coin_heads">正面朝上</string>
+    <string name="toast_coin_tails">反面朝上</string>
+
+    <!-- Dice -->
+    <string name="dice_title">擲骰子</string>
+    <string name="btn_rolling">滾動中…</string>
+    <string name="btn_roll_dice">擲骰子</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">點數: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No 決策</string>
+    <string name="yesno_question_label">輸入你的問題 (選填)</string>
+    <string name="btn_deciding">決定中…</string>
+    <string name="btn_decide">幫我決定!</string>
+    <string name="yesno_result_yes">是的!</string>
+    <string name="yesno_result_no">不行!</string>
+    <string name="yesno_result_maybe">也許吧</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">答案之書</string>
+    <string name="answer_book_question_hint">寫下你的問題（可留空）</string>
+    <string name="answer_book_reveal">翻開答案</string>
+    <string name="answer_book_revealing">答案正在顯現…</string>
+    <string name="method_answer_book">答案之書</string>
+    <string name="hub_card_answer_book">答案之書</string>
+    <string name="hub_card_answer_book_desc">翻開答案，讓靈感浮現</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">今天試試你沒吃過的吧</string>
+    <string name="answer_food_2">跟隨你的第一個念頭</string>
+    <string name="answer_food_3">問問你的胃想吃什麼</string>
+    <string name="answer_food_4">選那個讓你更期待的</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">出發吧，路上會有答案</string>
+    <string name="answer_outing_2">在家休息也是好選擇</string>
+    <string name="answer_outing_3">試試你沒去過的地方</string>
+    <string name="answer_outing_4">問問自己現在最想做什麼</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">先等三天，還想就買</string>
+    <string name="answer_shopping_2">如果猶豫就不買</string>
+    <string name="answer_shopping_3">看看有沒有更好的替代</string>
+    <string name="answer_shopping_4">想象擁有一個月後的感受</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">先邁出第一步</string>
+    <string name="answer_work_2">給自己一些時間思考</string>
+    <string name="answer_work_3">和信任的人聊聊</string>
+    <string name="answer_work_4">列出利弊再做決定</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">順其自然</string>
+    <string name="answer_love_2">誠實面對自己的感受</string>
+    <string name="answer_love_3">時間會給你答案</string>
+    <string name="answer_love_4">相信你的直覺</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">去做吧</string>
+    <string name="answer_general_2">再想想</string>
+    <string name="answer_general_3">順其自然</string>
+    <string name="answer_general_4">相信你的直覺</string>
+    <string name="answer_general_5">答案在你心中</string>
+    <string name="answer_general_6">選那個讓你更輕鬆的</string>
+    <string name="answer_general_7">不急，慢慢來</string>
+    <string name="answer_general_8">拋硬幣的瞬間你就知道答案了</string>
+    <string name="answer_general_9">閉上眼，第一個念頭就是答案</string>
+    <string name="answer_general_10">問問未來的自己會怎麼選</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">指尖輪盤</string>
+    <string name="winner_chosen_one">天選之人！</string>
+    <string name="btn_play_again">再來一局</string>
+    <string name="status_waiting_fingers">請放置 2–6 根手指</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">偵測到 %d 根手指，2秒後自動開始</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">淘汰中… 剩餘 %d 人</string>
+    <string name="status_game_over">遊戲結束</string>
+    <string name="btn_start_now">立即開始</string>
+
+    <!-- History -->
+    <string name="history_title">歷史記錄</string>
+    <string name="history_clear">清空</string>
+    <string name="history_data_insights">資料洞察</string>
+    <string name="history_empty_title">還沒有決策記錄</string>
+    <string name="history_empty_subtitle">使用任意決策方式後，結果會顯示在這裡</string>
+    <string name="history_result_prefix">結果: %s</string>
+    <string name="history_clear_confirm">確定要清空所有歷史記錄嗎？此操作無法撤銷。</string>
+    <string name="history_delete_entry">刪除記錄</string>
+    <string name="history_delete_entry_confirm">確定要刪除這條記錄嗎？</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">決策總覽</string>
+    <string name="stats_total_decisions">總決策次數</string>
+    <string name="stats_most_used">最常用</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%d次</string>
+    <string name="stats_last_decision">最近決策</string>
+    <string name="stats_method_distribution">決策方式佔比</string>
+    <string name="stats_top_results">熱門結果 Top 5</string>
+    <string name="stats_hourly_distribution">決策時間分佈</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_sound_haptic_section">音效與震動</string>
+    <string name="settings_sound">音效</string>
+    <string name="settings_sound_description">決策時播放音效</string>
+    <string name="settings_haptic">震動</string>
+    <string name="settings_haptic_description">決策時觸覺回饋</string>
+    <string name="settings_display_section">顯示</string>
+    <string name="settings_follow_system_theme">跟隨系統深色模式</string>
+    <string name="settings_follow_system_theme_description">關閉後可手動切換深色/淺色</string>
+    <string name="settings_dark_mode">深色模式</string>
+    <string name="settings_dark_mode_on">深色模式已開啟</string>
+    <string name="settings_light_mode_on">淺色模式已開啟</string>
+    <string name="settings_language">語言</string>
+    <string name="settings_about_section">關於</string>
+    <string name="settings_version">版本</string>
+    <string name="settings_privacy_policy">隱私政策</string>
+    <string name="settings_terms_of_use">使用條款</string>
+    <string name="settings_open_source_licenses">開源授權</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">跟隨系統</string>    <string name="dialog_select_language">選擇語言</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">轉盤設定</string>
+    <string name="settings_dynamic_color">動態色彩</string>
+    <string name="settings_dynamic_color_desc">根據時間自動調整轉盤色彩</string>
+    <string name="settings_preset_themes">預設主題</string>
+    <string name="settings_option_colors">選項顏色</string>
+    <string name="settings_dynamic_color_active_hint">動態色彩已開啟，顏色將根據時間自動變化</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">經典彩虹</string>
+    <string name="design_monochrome">單色漸層</string>
+    <string name="design_warm_sunset">溫暖日落</string>
+    <string name="design_ocean_breeze">海洋微風</string>
+    <string name="design_minimal">極簡風格</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">硬幣預設</string>
+    <string name="btn_restore_default">恢復預設</string>
+    <string name="preset_custom">自訂</string>
+    <string name="custom_coin_title">自訂硬幣</string>
+    <string name="custom_coin_drag_hint">拖曳硬幣預覽正反面效果</string>
+    <string name="coin_heads">正面</string>
+    <string name="coin_tails">反面</string>
+    <string name="btn_save_as_preset">儲存為預設</string>
+    <string name="btn_apply_directly">直接套用</string>
+    <string name="cd_select_image">選擇圖片</string>
+    <string name="preset_default">預設</string>
+    <string name="dialog_save_coin_preset">儲存硬幣預設</string>
+    <string name="label_preset_name">預設名稱</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">選擇顏色</string>
+    <string name="label_color_code">顏色代碼</string>
+    <string name="error_invalid_color_code">請輸入有效的顏色代碼，如 FF6200</string>
+    <string name="color_picker_common_colors">常用顏色</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">結果是</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">裁剪硬幣圖片</string>
+    <string name="crop_instructions">拖動移動位置，雙指縮放大小</string>
+    <string name="btn_processing">處理中…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">資料洞察</string>
+    <string name="stats_empty_title">還沒有決策記錄</string>
+    <string name="stats_empty_subtitle">去試試轉盤吧！</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">正面</string>
+    <string name="coin_tails_label">反面</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">是</string>
+    <string name="yesno_default_no">否</string>
+    <string name="yesno_default_maybe">也許</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">選項%d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">最後更新日期：2026年6月8日</string>
+    <string name="privacy_intro">選擇困難症助手（以下簡稱「本應用」）是一款開源軟體，尊重並保護您的隱私。</string>
+    <string name="privacy_s1_title">1. 資訊收集</string>
+    <string name="privacy_s1_body">本應用不會收集、儲存或傳輸任何個人資訊。所有決策資料（如轉盤選項、歷史記錄等）僅儲存在您的裝置本地。</string>
+    <string name="privacy_s2_title">2. 資料儲存</string>
+    <string name="privacy_s2_body">• 所有資料均使用 Android DataStore 和 Room 資料庫儲存在裝置本地\n• 不會上傳至任何伺服器\n• 解除安裝應用將清除所有資料</string>
+    <string name="privacy_s3_title">3. 資料安全</string>
+    <string name="privacy_s3_body">由於所有資料均儲存在本地，您的隱私完全由 Android 系統的安全機制保護。</string>
+    <string name="privacy_s4_title">4. 第三方服務</string>
+    <string name="privacy_s4_body">本應用不整合任何第三方分析、廣告或追蹤服務。</string>
+    <string name="privacy_s5_title">5. 權限使用</string>
+    <string name="privacy_s5_body">• 振動權限：僅用於決策時的觸覺回饋\n• 不需要網路、儲存、相機等任何其他權限</string>
+    <string name="privacy_s6_title">6. 開源透明</string>
+    <string name="privacy_s6_body">本應用完全開源，您可以在 GitHub 上檢視所有原始碼。</string>
+    <string name="privacy_s7_title">7. 政策更新</string>
+    <string name="privacy_s7_body">如有政策更新，將在應用內通知使用者。</string>
+    <string name="privacy_s8_title">8. 聯絡我們</string>
+    <string name="privacy_s8_body">如有任何隱私相關問題，請透過 GitHub Issues 聯絡我們。</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">最後更新日期：2026年6月8日</string>
+    <string name="terms_intro">歡迎使用選擇困難症助手。本應用是一款開源軟體，旨在幫助選擇困難的使用者做出決策。</string>
+    <string name="terms_s1_title">1. 服務說明</string>
+    <string name="terms_s1_body">本應用提供以下決策工具：轉盤、轉硬幣、擲骰子、Yes/No 和指尖輪盤。所有功能均免費使用，無內購。</string>
+    <string name="terms_s2_title">2. 使用規範</string>
+    <string name="terms_s2_body">請合理使用本應用。本應用僅用於輔助日常決策，不適用於任何高風險場景。</string>
+    <string name="terms_s3_title">3. 免責聲明</string>
+    <string name="terms_s3_body">本應用按「現狀」提供，不對決策結果的準確性或適用性做任何保證。</string>
+    <string name="terms_s4_title">4. 智慧財產權</string>
+    <string name="terms_s4_body">本應用採用 Apache License 2.0 開源授權發佈。</string>
+    <string name="terms_s5_title">5. 使用者權利</string>
+    <string name="terms_s5_body">您可以自由使用、修改和分發本應用，但需遵守 Apache License 2.0 的條款。</string>
+    <string name="terms_s6_title">6. 責任限制</string>
+    <string name="terms_s6_body">在適用法律允許的最大範圍內，開發者不對因使用本應用而產生的任何損害承擔責任。</string>
+    <string name="terms_s7_title">7. 適用法律</string>
+    <string name="terms_s7_body">本條款受中華人民共和國法律管轄。</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">本應用使用了以下開源函式庫：</string>    <string name="oss_compose_desc">Jetpack Compose 是 Android 的現代工具包，用於建構原生 UI。</string>    <string name="oss_hilt_desc">Hilt 是 Android 的依賴注入函式庫，簡化了 Dagger 的使用。</string>    <string name="oss_room_desc">Room 在 SQLite 之上提供了一個抽象層，以便在充分利用 SQLite 功能的前提下實現穩健的資料庫存取。</string>    <string name="oss_coil_desc">Coil 是一個 Android 圖片載入函式庫，由 Kotlin 協程驅動。</string>    <string name="oss_navigation_desc">Navigation Compose 提供 Compose 中的導航支援。</string>    <string name="oss_datastore_desc">DataStore 是一個資料儲存解決方案，允許使用協程和 Flow 以非同步、一致的方式儲存鍵值對或協定緩衝區物件。</string>
+    <string name="oss_copyright">版權所有</string>    <string name="oss_apache_intro">您可以自由地：</string>
+    <string name="oss_apache_use">• 出於商業或非商業目的使用本軟體</string>
+    <string name="oss_apache_modify">• 修改本軟體</string>
+    <string name="oss_apache_distribute">• 分發本軟體</string>
+    <string name="oss_apache_conditions">條件：</string>
+    <string name="oss_apache_copyright_notice">• 保留版權聲明和授權</string>
+    <string name="oss_apache_changes">• 標註修改內容</string>
+    <string name="oss_apache_link">詳細授權文字請造訪：</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ 本文為 AI 翻譯，以簡體中文版本為準。</string>
+</resources>

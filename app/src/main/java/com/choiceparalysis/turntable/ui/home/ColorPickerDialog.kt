@@ -37,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.choiceparalysis.turntable.R
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -67,7 +69,7 @@ fun ColorPickerDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("选择颜色", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.dialog_select_color), fontWeight = FontWeight.Bold)
         },
         text = {
             Column(
@@ -102,11 +104,11 @@ fun ColorPickerDialog(
                             hexError = input.length >= 6
                         }
                     },
-                    label = { Text("颜色代码") },
+                    label = { Text(stringResource(R.string.label_color_code)) },
                     prefix = { Text("#") },
                     isError = hexError,
                     supportingText = if (hexError) {
-                        { Text("请输入有效的颜色代码，如 FF6200") }
+                        { Text(stringResource(R.string.error_invalid_color_code)) }
                     } else null,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
@@ -147,7 +149,7 @@ fun ColorPickerDialog(
 
                 // Common colors palette
                 Text(
-                    text = "常用颜色",
+                    text = stringResource(R.string.color_picker_common_colors),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -184,12 +186,12 @@ fun ColorPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(currentColor) }) {
-                Text("确定")
+                Text(stringResource(R.string.btn_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("取消")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )

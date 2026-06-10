@@ -18,16 +18,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.choiceparalysis.turntable.audio.AudioHapticManager
+import com.choiceparalysis.turntable.audio.HapticEffect
 import com.choiceparalysis.turntable.audio.SoundEffect
 import com.choiceparalysis.turntable.ui.components.StandardEasing
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 /*
  * Standard die face adjacency (right-hand convention):
@@ -56,7 +59,6 @@ private val COLOR_FRONT = Color(0xFFE4E4E4)
 private val COLOR_DOT_DARK = Color(0xFF444444)
 private val COLOR_DOT_MED = Color(0xFF707070)
 private val COLOR_DOT_LIGHT = Color(0xFF686868)
-private val COLOR_SHADOW = Color.Black.copy(alpha = 0.15f)
 private val COLOR_HIGHLIGHT_80 = Color.White.copy(alpha = 0.8f)
 private val COLOR_HIGHLIGHT_60 = Color.White.copy(alpha = 0.6f)
 private val COLOR_HIGHLIGHT_50 = Color.White.copy(alpha = 0.5f)
@@ -91,7 +93,8 @@ fun Dice3DRoll(
     var isSpinning by remember { mutableStateOf(false) }
 
     // Full dice roll sound at animation start
-    val audioHaptic = AudioHapticManager.getInstance(LocalContext.current)
+    val context = LocalContext.current
+    val audioHaptic = remember { AudioHapticManager.getInstance(context) }
 
     // Sync result from ViewModel + pop animation
     LaunchedEffect(value) {
@@ -114,6 +117,7 @@ fun Dice3DRoll(
     LaunchedEffect(isAnimating) {
         if (!isAnimating) return@LaunchedEffect
 
+        // Sound only — haptic is driven by waveform-synced ticks below
         audioHaptic.playFeedback(SoundEffect.DICE_ROLL)
         breathAnim.stop()
         bounceAnim.snapTo(0f)
@@ -127,7 +131,7 @@ fun Dice3DRoll(
                 spinFront = (1..6).random()
                 spinTop = topFaceFor(spinFront)
                 spinRight = rightFace(spinFront, spinTop)
-                delay(60L)
+                delay(60L.milliseconds)
             }
         }
 
@@ -144,8 +148,8 @@ fun Dice3DRoll(
         launch {
             bounceAnim.animateTo(0f, keyframes {
                 durationMillis = 1000
-                0f at 0; -60f at 150; 0f at 350; -25f at 500
-                0f at 650; -8f at 750; 0f at 850
+                0f at 0; 60f at 150; 0f at 350; 25f at 500
+                0f at 650; 8f at 750; 0f at 850
             })
         }
 
@@ -154,6 +158,24 @@ fun Dice3DRoll(
                 durationMillis = 1000
                 1f at 0; 1.15f at 100; 0.95f at 300; 1.05f at 500; 1f at 700
             })
+        }
+
+        // Haptic ticks synced to dice_roll.wav waveform peaks — "嘎达嘎达"
+        // Peak analysis: 50ms(heavy), 150ms, 240ms, 310ms, 370ms, 430ms, 490ms, 550ms
+        launch {
+            // Heavy first impact
+            delay(50.milliseconds); audioHaptic.playHapticEffect(HapticEffect.THUD)
+            // Second impact
+            delay(100.milliseconds); audioHaptic.playHapticTick()
+            // Third impact
+            delay(90.milliseconds); audioHaptic.playHapticTick()
+            // Rattling — rapid ticks matching audio transients
+            delay(70.milliseconds); audioHaptic.playHapticTick()
+            delay(60.milliseconds); audioHaptic.playHapticTick()
+            delay(60.milliseconds); audioHaptic.playHapticTick()
+            // Settling — slower ticks
+            delay(60.milliseconds); audioHaptic.playHapticTick()
+            delay(60.milliseconds); audioHaptic.playHapticTick()
         }
 
         // Wait for all parallel animations to complete
@@ -187,6 +209,41 @@ fun Dice3DRoll(
 
     BoxWithConstraints(modifier = modifier) {
         val diceSize = minOf(maxWidth, 225.dp)
+
+        // Ground shadow — independent layer, barely follows bounce (10%)
+        Canvas(
+            modifier = Modifier
+                .size(diceSize)
+                .graphicsLayer {
+                    translationY = bounceAnim.value * 0.1f
+                }
+        ) {
+            val sizeCube = size.width * 0.35f
+            val depth = sizeCube * 0.6f
+            val cx = size.width / 2f - depth * 0.5f
+            val cy = size.height / 2f + sizeCube * 0.1f
+            val shadowCx = cx + depth * 0.3f
+            val shadowCy = cy + sizeCube * 0.55f
+            val shadowRx = sizeCube * 1.8f
+            val shadowRy = sizeCube * 0.7f
+            drawRect(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.55f),
+                        Color.Black.copy(alpha = 0.55f),
+                        Color.Black.copy(alpha = 0.45f),
+                        Color.Black.copy(alpha = 0.20f),
+                        Color.Black.copy(alpha = 0.0f),
+                    ),
+                    center = Offset(shadowCx, shadowCy),
+                    radius = maxOf(shadowRx, shadowRy),
+                ),
+                topLeft = Offset(shadowCx - shadowRx, shadowCy - shadowRy),
+                size = Size(shadowRx * 2f, shadowRy * 2f),
+            )
+        }
+
+        // Dice — bounces and scales
         Canvas(
             modifier = Modifier
                 .size(diceSize)
@@ -213,13 +270,6 @@ fun Dice3DRoll(
 
         // Right face: extends lower-right, shares topTR
         val rightBR = Offset(cx + sizeCube + depth, cy + sizeCube - depth)
-
-        // Ground shadow
-        drawOval(
-            COLOR_SHADOW,
-            topLeft = Offset(cx - sizeCube - depth * 0.2f, cy + sizeCube + 6f),
-            size = Size(sizeCube * 2f + depth * 1.2f, depth * 0.6f)
-        )
 
         // === Draw order: top → right → front ===
         drawPath(Path().apply {

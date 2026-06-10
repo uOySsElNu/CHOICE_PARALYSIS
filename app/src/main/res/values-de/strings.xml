@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Du bist es!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Startseite</string>
+    <string name="nav_history">Verlauf</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Common -->
+    <string name="cd_back">Zurück</string>
+    <string name="cd_delete">Löschen</string>
+    <string name="btn_confirm">OK</string>
+    <string name="btn_cancel">Abbrechen</string>
+    <string name="btn_save">Speichern</string>
+    <string name="btn_close">Schließen</string>
+    <string name="btn_load">Laden</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">Rad</string>
+    <string name="hub_card_spin_wheel_desc">Drehe das Schicksalsrad</string>
+    <string name="hub_card_coin">Münze</string>
+    <string name="hub_card_coin_desc">Wirf eine Münze des Schicksals</string>
+    <string name="hub_card_dice">Würfel</string>
+    <string name="hub_card_dice_desc">Würfle deine Antwort</string>    <string name="hub_card_yes_no_desc">Lass das Universum entscheiden</string>
+    <string name="hub_card_finger_roulette">Finger-Roulette</string>
+    <string name="hub_card_finger_roulette_desc">Ausscheidungsspiel, wer ist der Auserwählte</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">Rad</string>
+    <string name="method_coin_flip">Münze</string>
+    <string name="method_dice_roll">Würfel</string>    <string name="method_random_pick">Zufällig</string>
+    <string name="method_finger_roulette">Finger-Roulette</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">Rad</string>
+    <string name="cd_wheel_settings">Rad-Einstellungen</string>
+    <string name="toast_what_are_you_doing">Was machst du da?!</string>
+    <string name="btn_spinning">Dreht sich…</string>
+    <string name="btn_start_spin">Drehen</string>
+    <string name="btn_edit_options">Optionen bearbeiten</string>
+    <string name="toast_dynamic_color_on">Dynamische Farbe aktiviert</string>
+    <string name="option_weight_label">Gewicht: </string>
+    <string name="btn_add_option">+ Option hinzufügen</string>
+    <string name="btn_save_group">Gruppe speichern</string>
+    <string name="btn_load_group">Gruppe laden</string>
+    <string name="dialog_save_option_group">Optionsgruppe speichern</string>
+    <string name="label_group_name">Gruppenname</string>
+    <string name="dialog_load_option_group">Optionsgruppe laden</string>
+    <string name="dialog_no_saved_groups">Keine gespeicherten Gruppen</string>
+
+    <!-- Coin -->
+    <string name="coin_title">Münze</string>
+    <string name="cd_customize_images">Bilder anpassen</string>
+    <string name="btn_flipping">Wird geworfen…</string>
+    <string name="btn_flip_coin">Münze werfen</string>
+    <string name="toast_coin_heads">Kopf!</string>
+    <string name="toast_coin_tails">Zahl!</string>
+
+    <!-- Dice -->
+    <string name="dice_title">Würfel</string>
+    <string name="btn_rolling">Wird geworfen…</string>
+    <string name="btn_roll_dice">Würfeln</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">Ergebnis: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No Entscheidung</string>
+    <string name="yesno_question_label">Gib deine Frage ein (optional)</string>
+    <string name="btn_deciding">Entscheidung…</string>
+    <string name="btn_decide">Entscheide für mich!</string>
+    <string name="yesno_result_yes">Ja!</string>
+    <string name="yesno_result_no">Nein!</string>
+    <string name="yesno_result_maybe">Vielleicht</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">Buch der Antworten</string>
+    <string name="answer_book_question_hint">Schreibe deine Frage (optional)</string>
+    <string name="answer_book_reveal">Antwort aufdecken</string>
+    <string name="answer_book_revealing">Antwort wird enthüllt…</string>
+    <string name="method_answer_book">Buch der Antworten</string>
+    <string name="hub_card_answer_book">Buch der Antworten</string>
+    <string name="hub_card_answer_book_desc">Öffne das Buch und lass die Inspiration kommen</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">Probiere etwas, das du noch nie gegessen hast</string>
+    <string name="answer_food_2">Folge deinem ersten Instinkt</string>
+    <string name="answer_food_3">Frag deinen Magen, was er will</string>
+    <string name="answer_food_4">Wähle das, was dich mehr begeistert</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">Geh los, die Antwort wird unterwegs kommen</string>
+    <string name="answer_outing_2">Zu Hause zu bleiben und sich auszuruhen ist auch eine gute Wahl</string>
+    <string name="answer_outing_3">Probiere einen Ort, an dem du noch nie warst</string>
+    <string name="answer_outing_4">Frag dich, was du jetzt am liebsten tun würdest</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">Warte drei Tage, wenn du es noch willst, kaufe es</string>
+    <string name="answer_shopping_2">Wenn du zögerst, kaufe es nicht</string>
+    <string name="answer_shopping_3">Suche nach einer besseren Alternative</string>
+    <string name="answer_shopping_4">Stell dir vor, wie du dich in einem Monat damit fühlst</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">Mach den ersten Schritt</string>
+    <string name="answer_work_2">Gib dir Zeit zum Nachdenken</string>
+    <string name="answer_work_3">Sprich mit jemandem, dem du vertraust</string>
+    <string name="answer_work_4">Liste die Vor- und Nachteile auf, bevor du dich entscheidest</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">Lass es natürlich laufen</string>
+    <string name="answer_love_2">Sei ehrlich zu deinen Gefühlen</string>
+    <string name="answer_love_3">Die Zeit wird dir die Antwort geben</string>
+    <string name="answer_love_4">Vertraue deinem Bauchgefühl</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">Tu es</string>
+    <string name="answer_general_2">Denk nochmal darüber nach</string>
+    <string name="answer_general_3">Lass es natürlich laufen</string>
+    <string name="answer_general_4">Vertraue deinem Bauchgefühl</string>
+    <string name="answer_general_5">Die Antwort liegt in deinem Herzen</string>
+    <string name="answer_general_6">Wähle das, was sich leichter anfühlt</string>
+    <string name="answer_general_7">Keine Eile, nimm dir Zeit</string>
+    <string name="answer_general_8">Im Moment, in dem du die Münze wirfst, wirst du die Antwort kennen</string>
+    <string name="answer_general_9">Schließe die Augen, dein erster Gedanke ist die Antwort</string>
+    <string name="answer_general_10">Frage dein zukünftiges Ich, was es wählen würde</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">Finger-Roulette</string>
+    <string name="winner_chosen_one">Der Auserwählte!</string>
+    <string name="btn_play_again">Nochmal</string>
+    <string name="status_waiting_fingers">Lege 2–6 Finger</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">%d Finger erkannt, Start in 2s</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">Ausscheiden… %d übrig</string>
+    <string name="status_game_over">Spiel vorbei</string>
+    <string name="btn_start_now">Jetzt starten</string>
+
+    <!-- History -->
+    <string name="history_title">Verlauf</string>
+    <string name="history_clear">Löschen</string>
+    <string name="history_data_insights">Einblicke</string>
+    <string name="history_empty_title">Noch keine Entscheidungen</string>
+    <string name="history_empty_subtitle">Deine Ergebnisse erscheinen hier nach einer Entscheidung</string>
+    <string name="history_result_prefix">Ergebnis: %s</string>
+    <string name="history_clear_confirm">Möchten Sie wirklich den gesamten Verlauf löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="history_delete_entry">Eintrag löschen</string>
+    <string name="history_delete_entry_confirm">Möchten Sie diesen Eintrag wirklich löschen?</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">Übersicht</string>
+    <string name="stats_total_decisions">Gesamtentscheidungen</string>
+    <string name="stats_most_used">Am häufigsten</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%dmal</string>
+    <string name="stats_last_decision">Letzte Entscheidung</string>
+    <string name="stats_method_distribution">Methodenverteilung</string>
+    <string name="stats_top_results">Top 5 Ergebnisse</string>
+    <string name="stats_hourly_distribution">Stündliche Verteilung</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_sound_haptic_section">Ton und Vibration</string>
+    <string name="settings_sound">Ton</string>
+    <string name="settings_sound_description">Ton bei Entscheidung abspielen</string>
+    <string name="settings_haptic">Vibration</string>
+    <string name="settings_haptic_description">Vibrationsfeedback bei Entscheidung</string>
+    <string name="settings_display_section">Anzeige</string>
+    <string name="settings_follow_system_theme">System-Dunkelmodus folgen</string>
+    <string name="settings_follow_system_theme_description">Deaktiviert: manuell Hell/Dunkel wechseln</string>
+    <string name="settings_dark_mode">Dunkelmodus</string>
+    <string name="settings_dark_mode_on">Dunkelmodus aktiviert</string>
+    <string name="settings_light_mode_on">Hellmodus aktiviert</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_about_section">Über</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_privacy_policy">Datenschutzrichtlinie</string>
+    <string name="settings_terms_of_use">Nutzungsbedingungen</string>
+    <string name="settings_open_source_licenses">Open-Source-Lizenzen</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">System folgen</string>    <string name="dialog_select_language">Sprache wählen</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">Rad-Einstellungen</string>
+    <string name="settings_dynamic_color">Dynamische Farbe</string>
+    <string name="settings_dynamic_color_desc">Farben automatisch nach Tageszeit anpassen</string>
+    <string name="settings_preset_themes">Voreingestellte Themes</string>
+    <string name="settings_option_colors">Optionsfarben</string>
+    <string name="settings_dynamic_color_active_hint">Dynamische Farbe ist aktiv, Farben ändern sich automatisch</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">Klassischer Regenbogen</string>
+    <string name="design_monochrome">Monochrom</string>
+    <string name="design_warm_sunset">Warmer Sonnenuntergang</string>
+    <string name="design_ocean_breeze">Ozeanbrise</string>
+    <string name="design_minimal">Minimalistisch</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">Münz-Voreinstellungen</string>
+    <string name="btn_restore_default">Zurücksetzen</string>
+    <string name="preset_custom">Benutzerdefiniert</string>
+    <string name="custom_coin_title">Eigene Münze</string>
+    <string name="custom_coin_drag_hint">Ziehen zum Vorschau beider Seiten</string>
+    <string name="coin_heads">Kopf</string>
+    <string name="coin_tails">Zahl</string>
+    <string name="btn_save_as_preset">Als Voreinstellung speichern</string>
+    <string name="btn_apply_directly">Anwenden</string>
+    <string name="cd_select_image">Bild auswählen</string>
+    <string name="preset_default">Standard</string>
+    <string name="dialog_save_coin_preset">Münz-Voreinstellung speichern</string>
+    <string name="label_preset_name">Name der Voreinstellung</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">Farbe auswählen</string>
+    <string name="label_color_code">Farbcode</string>
+    <string name="error_invalid_color_code">Gib einen gültigen Farbcode ein, z.B. FF6200</string>
+    <string name="color_picker_common_colors">Häufige Farben</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">Ergebnis ist</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">Münzbild zuschneiden</string>
+    <string name="crop_instructions">Ziehen zum Verschieben, Pinchen zum Zoomen</string>
+    <string name="btn_processing">Verarbeitung…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">Einblicke</string>
+    <string name="stats_empty_title">Noch keine Entscheidungen</string>
+    <string name="stats_empty_subtitle">Probiere das Rad aus!</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">Kopf</string>
+    <string name="coin_tails_label">Zahl</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">Ja</string>
+    <string name="yesno_default_no">Nein</string>
+    <string name="yesno_default_maybe">Vielleicht</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">Option %d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">Letzte Aktualisierung: 8. Juni 2026</string>
+    <string name="privacy_intro">Choice Paralysis Helper (\"diese App\") ist Open-Source-Software, die Ihre Privatsphäre respektiert und schützt.</string>
+    <string name="privacy_s1_title">1. Informationssammlung</string>
+    <string name="privacy_s1_body">Diese App sammelt, speichert oder überträgt keine persönlichen Informationen. Alle Entscheidungsdaten (wie Radoptionen und Verlauf) werden nur lokal auf Ihrem Gerät gespeichert.</string>
+    <string name="privacy_s2_title">2. Datenspeicherung</string>
+    <string name="privacy_s2_body">• Alle Daten werden lokal mit Android DataStore und der Room-Datenbank gespeichert\n• Keine Daten werden auf einen Server hochgeladen\n• Das Deinstallieren der App löscht alle Daten</string>
+    <string name="privacy_s3_title">3. Datensicherheit</string>
+    <string name="privacy_s3_body">Da alle Daten lokal gespeichert werden, wird Ihre Privatsphäre vollständig durch Androids Sicherheitsmechanismen geschützt.</string>
+    <string name="privacy_s4_title">4. Drittanbieterdienste</string>
+    <string name="privacy_s4_body">Diese App integriert keine Drittanbieter-Analyse-, Werbe- oder Tracking-Dienste.</string>
+    <string name="privacy_s5_title">5. Berechtigungen</string>
+    <string name="privacy_s5_body">• Vibrationsberechtigung: nur für haptisches Feedback bei Entscheidungen\n• Keine Netzwerk-, Speicher-, Kamera- oder anderen Berechtigungen erforderlich</string>
+    <string name="privacy_s6_title">6. Open-Source-Transparenz</string>
+    <string name="privacy_s6_body">Diese App ist vollständig Open Source. Sie können den gesamten Quellcode auf GitHub einsehen.</string>
+    <string name="privacy_s7_title">7. Richtlinienaktualisierungen</string>
+    <string name="privacy_s7_body">Richtlinienaktualisierungen werden in der App mitgeteilt.</string>
+    <string name="privacy_s8_title">8. Kontaktieren Sie uns</string>
+    <string name="privacy_s8_body">Bei datenschutzbezogenen Fragen kontaktieren Sie uns bitte über GitHub Issues.</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">Letzte Aktualisierung: 8. Juni 2026</string>
+    <string name="terms_intro">Willkommen bei Choice Paralysis Helper. Diese App ist Open-Source-Software, die unentschlossenen Nutzern hilft, Entscheidungen zu treffen.</string>
+    <string name="terms_s1_title">1. Beschreibung des Dienstes</string>
+    <string name="terms_s1_body">Diese App bietet folgende Entscheidungswerkzeuge: Rad, Münze, Würfel, Yes/No und Finger-Roulette. Alle Funktionen sind kostenlos ohne In-App-Käufe.</string>
+    <string name="terms_s2_title">2. Nutzungsrichtlinien</string>
+    <string name="terms_s2_body">Bitte nutzen Sie diese App verantwortungsbewusst. Sie ist nur für alltägliche Entscheidungen gedacht und nicht für risikoreiche Szenarien geeignet.</string>
+    <string name="terms_s3_title">3. Haftungsausschluss</string>
+    <string name="terms_s3_body">Diese App wird \"wie besehen\" ohne jegliche Gewährleistung hinsichtlich der Genauigkeit oder Eignung der Entscheidungsergebnisse bereitgestellt.</string>
+    <string name="terms_s4_title">4. Geistiges Eigentum</string>
+    <string name="terms_s4_body">Diese App wird unter der Apache-Lizenz 2.0 veröffentlicht.</string>
+    <string name="terms_s5_title">5. Nutzerrechte</string>
+    <string name="terms_s5_body">Sie dürfen diese App frei nutzen, ändern und verbreiten, vorbehaltlich der Bedingungen der Apache-Lizenz 2.0.</string>
+    <string name="terms_s6_title">6. Haftungsbeschränkung</string>
+    <string name="terms_s6_body">Im gesetzlich zulässigen Umfang haftet der Entwickler nicht für Schäden, die aus der Nutzung dieser App entstehen.</string>
+    <string name="terms_s7_title">7. Anwendbares Recht</string>
+    <string name="terms_s7_body">Diese Bedingungen unterliegen den Gesetzen der Volksrepublik China.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">Diese App verwendet die folgenden Open-Source-Bibliotheken:</string>    <string name="oss_compose_desc">Jetpack Compose ist Androids modernes Toolkit zum Erstellen nativer Benutzeroberflächen.</string>    <string name="oss_hilt_desc">Hilt ist eine Dependency-Injection-Bibliothek für Android, die die Verwendung von Dagger vereinfacht.</string>    <string name="oss_room_desc">Room bietet eine Abstraktionsebene über SQLite, um einen flüssigen Datenbankzugriff unter Nutzung aller SQLite-Funktionen zu ermöglichen.</string>    <string name="oss_coil_desc">Coil ist eine Bildladebibliothek für Android, angetrieben von Kotlin-Coroutines.</string>    <string name="oss_navigation_desc">Navigation Compose bietet Navigationsunterstützung in Compose.</string>    <string name="oss_datastore_desc">DataStore ist eine Datenspeicherlösung, die das asynchrone und konsistente Speichern von Schlüssel-Wert-Paaren oder Protokollpufferobjekten mithilfe von Coroutines und Flow ermöglicht.</string>
+    <string name="oss_copyright">Alle Rechte vorbehalten</string>    <string name="oss_apache_intro">Sie sind frei:</string>
+    <string name="oss_apache_use">• Die Software für kommerzielle oder nicht-kommerzielle Zwecke zu nutzen</string>
+    <string name="oss_apache_modify">• Die Software zu ändern</string>
+    <string name="oss_apache_distribute">• Die Software zu verbreiten</string>
+    <string name="oss_apache_conditions">Bedingungen:</string>
+    <string name="oss_apache_copyright_notice">• Copyright-Vermerk und Lizenz beibehalten</string>
+    <string name="oss_apache_changes">• Änderungen kennzeichnen</string>
+    <string name="oss_apache_link">Den vollständigen Lizenztext finden Sie unter:</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ Dies ist eine KI-Übersetzung. Die chinesische Version ist die maßgebliche Version.</string>
+</resources>

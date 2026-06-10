@@ -1,13 +1,13 @@
 package com.choiceparalysis.turntable.di
 
 import android.content.Context
-import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
 import com.choiceparalysis.turntable.audio.CompositionEngine
 import com.choiceparalysis.turntable.audio.HapticEngine
 import com.choiceparalysis.turntable.audio.LegacyEngine
-import com.choiceparalysis.turntable.audio.MiHapticEngineImpl
+import com.choiceparalysis.turntable.audio.RichTapEngineImpl
+import com.choiceparalysis.turntable.audio.RichTapSdkEngineImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,23 +24,23 @@ object HapticModule {
     @Singleton
     @Named("defaultVibrator")
     fun provideVibrator(@ApplicationContext context: Context): Vibrator {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            manager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
+        val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        return manager.defaultVibrator
     }
 
     @Provides
     @Singleton
     fun provideHapticEngine(
+        @ApplicationContext context: Context,
         @Named("defaultVibrator") vibrator: Vibrator
     ): HapticEngine {
-        // Auto-detect best available engine: MiHaptic (Xiaomi) > Composition > Legacy
-        val mi = MiHapticEngineImpl()
-        if (mi.isAvailable()) return mi
+        // Auto-detect best available engine:
+        // RichTap SDK (AAC official) > RichTap reflection > Composition > Legacy
+        val richTapSdk = RichTapSdkEngineImpl(context)
+        if (richTapSdk.isAvailable()) return richTapSdk
+
+        val richTap = RichTapEngineImpl()
+        if (richTap.isAvailable()) return richTap
 
         val composition = CompositionEngine(vibrator)
         if (composition.isAvailable()) return composition

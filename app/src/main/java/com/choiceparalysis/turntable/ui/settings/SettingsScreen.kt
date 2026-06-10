@@ -1,5 +1,9 @@
 package com.choiceparalysis.turntable.ui.settings
 
+import android.app.Activity
+import android.content.res.Configuration
+import android.content.res.Resources
+import java.util.Locale
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,35 +33,57 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.choiceparalysis.turntable.BuildConfig
+import com.choiceparalysis.turntable.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.choiceparalysis.turntable.data.datastore.dataStore
-import com.choiceparalysis.turntable.data.repository.SettingsRepository
+import com.choiceparalysis.turntable.viewmodel.SettingsViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
+    onEasterEgg: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     var showPrivacyPolicy by remember { mutableStateOf(false) }
     var showTermsOfUse by remember { mutableStateOf(false) }
     var showOpenSourceLicenses by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val settingsRepository = remember { SettingsRepository(context.dataStore, context) }
-    val followSystemTheme by settingsRepository.followSystemTheme.collectAsState(initial = true)
-    val soundEnabled by settingsRepository.soundEnabled.collectAsState(initial = true)
-    val hapticEnabled by settingsRepository.hapticEnabled.collectAsState(initial = true)
+    val followSystemTheme by viewModel.followSystemTheme.collectAsState()
+    val darkMode by viewModel.darkMode.collectAsState()
+    val soundEnabled by viewModel.soundEnabled.collectAsState()
+    val hapticEnabled by viewModel.hapticEnabled.collectAsState()
+    val appLocale by viewModel.appLocale.collectAsState()
+
+    // Easter egg: 6 consecutive taps on version
+    var versionTapCount by remember { mutableIntStateOf(0) }
+    var versionTapReset by remember { mutableStateOf(false) }
+    LaunchedEffect(versionTapReset) {
+        if (versionTapCount > 0) {
+            delay(2000.milliseconds)
+            versionTapCount = 0
+        }
+    }
 
     Column(
         modifier = modifier
@@ -67,7 +93,7 @@ fun SettingsScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "设置",
+                    text = stringResource(R.string.settings_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -76,7 +102,7 @@ fun SettingsScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             }
@@ -86,7 +112,7 @@ fun SettingsScreen(
 
         // Sound & Haptic section
         Text(
-            text = "音效与震动",
+            text = stringResource(R.string.settings_sound_haptic_section),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -104,25 +130,27 @@ fun SettingsScreen(
         ) {
             Column {
                 ListItem(
-                    headlineContent = { Text("音效") },
-                    supportingContent = { Text("决策时播放音效") },
+                    headlineContent = { Text(stringResource(R.string.settings_sound)) },
+                    supportingContent = { Text(stringResource(R.string.settings_sound_description)) },
                     trailingContent = {
                         Switch(
                             checked = soundEnabled,
                             onCheckedChange = { value ->
-                                scope.launch { settingsRepository.setSoundEnabled(value) }
+                                viewModel.playHapticTick()
+                                viewModel.setSoundEnabled(value)
                             }
                         )
                     }
                 )
                 ListItem(
-                    headlineContent = { Text("震动") },
-                    supportingContent = { Text("决策时触觉反馈") },
+                    headlineContent = { Text(stringResource(R.string.settings_haptic)) },
+                    supportingContent = { Text(stringResource(R.string.settings_haptic_description)) },
                     trailingContent = {
                         Switch(
                             checked = hapticEnabled,
                             onCheckedChange = { value ->
-                                scope.launch { settingsRepository.setHapticEnabled(value) }
+                                viewModel.playHapticTick()
+                                viewModel.setHapticEnabled(value)
                             }
                         )
                     }
@@ -134,7 +162,7 @@ fun SettingsScreen(
 
         // Display section
         Text(
-            text = "显示",
+            text = stringResource(R.string.settings_display_section),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -152,16 +180,59 @@ fun SettingsScreen(
         ) {
             Column {
                 ListItem(
-                    headlineContent = { Text("跟随系统深色模式") },
-                    supportingContent = { Text("关闭后始终使用浅色模式") },
+                    headlineContent = { Text(stringResource(R.string.settings_follow_system_theme)) },
+                    supportingContent = { Text(stringResource(R.string.settings_follow_system_theme_description)) },
                     trailingContent = {
                         Switch(
                             checked = followSystemTheme,
                             onCheckedChange = { value ->
-                                scope.launch { settingsRepository.setFollowSystemTheme(value) }
+                                viewModel.playHapticTick()
+                                viewModel.setFollowSystemTheme(value)
                             }
                         )
                     }
+                )
+                if (!followSystemTheme) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.settings_dark_mode)) },
+                        supportingContent = { Text(stringResource(if (darkMode) R.string.settings_dark_mode_on else R.string.settings_light_mode_on)) },
+                        trailingContent = {
+                            Switch(
+                                checked = darkMode,
+                                onCheckedChange = { value ->
+                                    viewModel.playHapticTick()
+                                    viewModel.setDarkMode(value)
+                                }
+                            )
+                        }
+                    )
+                }
+                val localeLabel = when (appLocale) {
+                    "system" -> stringResource(R.string.locale_follow_system)
+                    "zh" -> stringResource(R.string.locale_simplified_chinese)
+                    "zh-TW" -> stringResource(R.string.locale_traditional_chinese)
+                    "en" -> stringResource(R.string.locale_english)
+                    "ja" -> stringResource(R.string.locale_japanese)
+                    "ko" -> stringResource(R.string.locale_korean)
+                    "es" -> stringResource(R.string.locale_spanish)
+                    "fr" -> stringResource(R.string.locale_french)
+                    "de" -> stringResource(R.string.locale_german)
+                    "ru" -> stringResource(R.string.locale_russian)
+                    "pt" -> stringResource(R.string.locale_portuguese)
+                    "ar" -> stringResource(R.string.locale_arabic)
+                    else -> stringResource(R.string.locale_follow_system)
+                }
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_language)) },
+                    supportingContent = { Text(localeLabel) },
+                    trailingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    modifier = Modifier.clickable { showLanguageDialog = true }
                 )
             }
         }
@@ -170,7 +241,7 @@ fun SettingsScreen(
 
         // About section
         Text(
-            text = "关于",
+            text = stringResource(R.string.settings_about_section),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -188,17 +259,25 @@ fun SettingsScreen(
         ) {
             Column {
                 ListItem(
-                    headlineContent = { Text("版本") },
+                    headlineContent = { Text(stringResource(R.string.settings_version)) },
                     trailingContent = {
                         Text(
-                            text = "1.5.0",
+                            text = BuildConfig.VERSION_NAME,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    },
+                    modifier = Modifier.clickable {
+                        versionTapCount++
+                        versionTapReset = !versionTapReset
+                        if (versionTapCount >= 6) {
+                            versionTapCount = 0
+                            onEasterEgg()
+                        }
                     }
                 )
                 ListItem(
-                    headlineContent = { Text("隐私政策") },
+                    headlineContent = { Text(stringResource(R.string.settings_privacy_policy)) },
                     leadingContent = {
                         Icon(
                             Icons.Default.Security,
@@ -216,7 +295,7 @@ fun SettingsScreen(
                     modifier = Modifier.clickable { showPrivacyPolicy = true }
                 )
                 ListItem(
-                    headlineContent = { Text("使用条款") },
+                    headlineContent = { Text(stringResource(R.string.settings_terms_of_use)) },
                     leadingContent = {
                         Icon(
                             Icons.Default.Info,
@@ -234,7 +313,7 @@ fun SettingsScreen(
                     modifier = Modifier.clickable { showTermsOfUse = true }
                 )
                 ListItem(
-                    headlineContent = { Text("开源许可") },
+                    headlineContent = { Text(stringResource(R.string.settings_open_source_licenses)) },
                     leadingContent = {
                         Icon(
                             Icons.Default.Code,
@@ -263,7 +342,7 @@ fun SettingsScreen(
             onDismissRequest = { showPrivacyPolicy = false },
             title = {
                 Text(
-                    text = "隐私政策",
+                    text = stringResource(R.string.settings_privacy_policy),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
@@ -271,53 +350,43 @@ fun SettingsScreen(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    Text(
-                        text = """
-                            最后更新日期：2026年5月14日
-
-                            选择困难症助手（以下简称"本应用"）是一款开源软件，尊重并保护您的隐私。
-
-                            1. 信息收集
-
-                            本应用不收集任何个人身份信息。所有数据（包括选项列表、历史记录等）均存储在您的设备本地，不会上传到任何服务器。
-
-                            2. 数据存储
-
-                            • 选项列表：您创建的决策选项存储在设备本地
-                            • 历史记录：决策历史记录存储在设备本地
-                            • 设置偏好：应用设置存储在设备本地
-
-                            3. 数据安全
-
-                            所有数据均存储在应用私有目录中，其他应用无法访问。您可以随时通过应用内功能删除所有数据。
-
-                            4. 第三方服务
-
-                            本应用不集成任何第三方分析、广告或追踪服务。
-
-                            5. 权限说明
-
-                            本应用仅请求必要的存储权限，用于保存和读取用户自定义的图片资源。
-
-                            6. 开源透明
-
-                            本应用完全开源，源代码公开可审计。您可以在 GitHub 上查看完整源代码，确认本隐私政策的真实性。
-
-                            7. 政策更新
-
-                            我们可能会不时更新本隐私政策。更新后的政策将在应用内和 GitHub 仓库中发布。
-
-                            8. 联系我们
-
-                            如有任何隐私相关问题，请在 GitHub 上提交 Issue：
-                            https://github.com/uOySsElNu/CHOICE_PARALYSIS/issues
-                        """.trimIndent()
-                    )
+                    Text(text = stringResource(R.string.privacy_last_updated))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_intro))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s1_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s1_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s2_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s2_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s3_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s3_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s4_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s4_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s5_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s5_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s6_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s6_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s7_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s7_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.privacy_s8_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.privacy_s8_body))
+                    val disclaimer = stringResource(R.string.ai_translation_disclaimer)
+                    if (disclaimer.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(text = disclaimer, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { showPrivacyPolicy = false }) {
-                    Text("确定")
+                    Text(stringResource(R.string.btn_confirm))
                 }
             }
         )
@@ -329,7 +398,7 @@ fun SettingsScreen(
             onDismissRequest = { showTermsOfUse = false },
             title = {
                 Text(
-                    text = "使用条款",
+                    text = stringResource(R.string.settings_terms_of_use),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
@@ -337,53 +406,40 @@ fun SettingsScreen(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    Text(
-                        text = """
-                            最后更新日期：2026年5月14日
-
-                            欢迎使用选择困难症助手。本应用是一款开源软件，使用 MIT 许可证发布。使用本应用即表示您同意以下条款：
-
-                            1. 服务说明
-
-                            本应用是一款决策辅助工具，提供转盘、硬币、骰子、是非选择等决策方式。本应用仅供娱乐和辅助决策使用，不保证决策结果的合理性或准确性。
-
-                            2. 开源许可
-
-                            本应用基于 MIT 许可证开源，您可以：
-                            • 自由使用、复制和分发本软件
-                            • 修改本软件并用于个人或商业目的
-                            • 在 MIT 许可证条款下继续分发修改后的版本
-
-                            3. 用户责任
-
-                            • 您应合理使用本应用，不得将其用于任何非法目的
-                            • 您应对自己的决策负责，本应用仅提供辅助参考
-
-                            4. 免责声明
-
-                            • 本应用按"现状"提供，不作任何明示或暗示的保证
-                            • 我们不对因使用本应用而产生的任何损失承担责任
-                            • 本应用的决策结果仅供娱乐参考，不构成任何建议
-
-                            5. 条款更新
-
-                            我们保留随时修改本使用条款的权利。继续使用本应用即表示您同意修改后的条款。
-
-                            6. 源代码
-
-                            本应用完整源代码可在以下地址获取：
-                            https://github.com/uOySsElNu/CHOICE_PARALYSIS
-
-                            7. 适用法律
-
-                            本条款受中华人民共和国法律管辖。
-                        """.trimIndent()
-                    )
+                    Text(text = stringResource(R.string.terms_last_updated))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_intro))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s1_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s1_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s2_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s2_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s3_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s3_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s4_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s4_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s5_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s5_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s6_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s6_body))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.terms_s7_title), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.terms_s7_body))
+                    val disclaimer = stringResource(R.string.ai_translation_disclaimer)
+                    if (disclaimer.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(text = disclaimer, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { showTermsOfUse = false }) {
-                    Text("确定")
+                    Text(stringResource(R.string.btn_confirm))
                 }
             }
         )
@@ -395,7 +451,7 @@ fun SettingsScreen(
             onDismissRequest = { showOpenSourceLicenses = false },
             title = {
                 Text(
-                    text = "开源许可",
+                    text = stringResource(R.string.settings_open_source_licenses),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
@@ -403,88 +459,124 @@ fun SettingsScreen(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    Text(
-                        text = """
-                            本应用使用了以下开源库：
+                    Text(text = stringResource(R.string.oss_intro))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
+                    Text(text = stringResource(R.string.oss_compose_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Android Open Source Project")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_compose_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            Android Jetpack Compose
-                            版权所有 © Android Open Source Project
-                            许可证：Apache License 2.0
+                    Text(text = stringResource(R.string.oss_hilt_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Google LLC")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_hilt_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            Jetpack Compose 是 Android 的现代工具包，用于构建原生 UI。
+                    Text(text = stringResource(R.string.oss_room_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Google LLC")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_room_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
+                    Text(text = stringResource(R.string.oss_coil_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Coil Contributors")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_coil_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            Material Design 3
-                            版权所有 © Google LLC
-                            许可证：Apache License 2.0
+                    Text(text = stringResource(R.string.oss_navigation_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Android Open Source Project")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_navigation_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            Material Design 是 Google 的设计系统，用于创建高质量的数字体验。
+                    Text(text = stringResource(R.string.oss_datastore_name), fontWeight = FontWeight.Bold)
+                    Text(text = "${stringResource(R.string.oss_copyright)} © Android Open Source Project")
+                    Text(text = stringResource(R.string.oss_license_label))
+                    Text(text = stringResource(R.string.oss_datastore_desc))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            Coil
-                            版权所有 © Coil Contributors
-                            许可证：Apache License 2.0
-
-                            Coil 是一个 Android 图片加载库，使用 Kotlin 协程构建。
-
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            Kotlin
-                            版权所有 © JetBrains s.r.o.
-                            许可证：Apache License 2.0
-
-                            Kotlin 是一种现代、简洁、安全的编程语言。
-
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            Kotlinx Serialization
-                            版权所有 © JetBrains s.r.o.
-                            许可证：Apache License 2.0
-
-                            Kotlinx Serialization 是 Kotlin 的序列化库。
-
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            AndroidX DataStore
-                            版权所有 © Android Open Source Project
-                            许可证：Apache License 2.0
-
-                            DataStore 是一种数据存储解决方案，用于替代 SharedPreferences。
-
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            AndroidX Navigation
-                            版权所有 © Android Open Source Project
-                            许可证：Apache License 2.0
-
-                            Navigation 组件用于处理应用内的导航。
-
-                            ━━━━━━━━━━━━━━━━━━━━━━━━
-
-                            Apache License 2.0 摘要：
-
-                            您可以自由地：
-                            • 使用、复制和分发本软件
-                            • 修改本软件
-                            • 在商业项目中使用本软件
-
-                            条件：
-                            • 保留版权声明和许可证
-                            • 标注修改内容
-
-                            详细许可证文本请访问：
-                            https://www.apache.org/licenses/LICENSE-2.0
-                        """.trimIndent()
-                    )
+                    Text(text = "Apache License 2.0 — ${stringResource(R.string.oss_apache_intro)}", fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.oss_apache_use))
+                    Text(text = stringResource(R.string.oss_apache_modify))
+                    Text(text = stringResource(R.string.oss_apache_distribute))
+                    Text(text = stringResource(R.string.oss_apache_conditions))
+                    Text(text = stringResource(R.string.oss_apache_copyright_notice))
+                    Text(text = stringResource(R.string.oss_apache_changes))
+                    Text(text = "${stringResource(R.string.oss_apache_link)}\nhttps://www.apache.org/licenses/LICENSE-2.0")
+                    val disclaimer = stringResource(R.string.ai_translation_disclaimer)
+                    if (disclaimer.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(text = disclaimer, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { showOpenSourceLicenses = false }) {
-                    Text("确定")
+                    Text(stringResource(R.string.btn_confirm))
+                }
+            }
+        )
+    }
+
+    // Language selector dialog
+    if (showLanguageDialog) {
+        val languages = listOf(
+            "system" to stringResource(R.string.locale_follow_system),
+            "zh" to stringResource(R.string.locale_simplified_chinese),
+            "zh-TW" to stringResource(R.string.locale_traditional_chinese),
+            "en" to stringResource(R.string.locale_english),
+            "ja" to stringResource(R.string.locale_japanese),
+            "ko" to stringResource(R.string.locale_korean),
+            "es" to stringResource(R.string.locale_spanish),
+            "fr" to stringResource(R.string.locale_french),
+            "de" to stringResource(R.string.locale_german),
+            "ru" to stringResource(R.string.locale_russian),
+            "pt" to stringResource(R.string.locale_portuguese),
+            "ar" to stringResource(R.string.locale_arabic),
+        )
+        val configuration = LocalConfiguration.current
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(stringResource(R.string.dialog_select_language)) },
+            text = {
+                Column {
+                    languages.forEach { (code, label) ->
+                        ListItem(
+                            headlineContent = { Text(label) },
+                            trailingContent = {
+                                if (appLocale == code) {
+                                    Text("✓", color = MaterialTheme.colorScheme.primary)
+                                }
+                            },
+                            modifier = Modifier.clickable {
+                                viewModel.playHapticTick()
+                                scope.launch {
+                                    viewModel.setAppLocale(code)
+                                    val targetLocale = if (code == "system") {
+                                        // Get the REAL system locale, not the app-overridden one
+                                        Resources.getSystem().configuration.locales[0]
+                                    } else {
+                                        Locale.forLanguageTag(code)
+                                    }
+                                    Locale.setDefault(targetLocale)
+                                    val config = Configuration(Resources.getSystem().configuration)
+                                    config.setLocale(targetLocale)
+                                    @Suppress("DEPRECATION")
+                                    context.resources.updateConfiguration(config, context.resources.displayMetrics)
+                                    (context as? Activity)?.recreate()
+                                }
+                                showLanguageDialog = false
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         )

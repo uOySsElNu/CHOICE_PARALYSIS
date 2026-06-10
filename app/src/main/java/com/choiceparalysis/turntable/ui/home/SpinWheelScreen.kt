@@ -49,6 +49,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,12 +61,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.viewmodel.ColorSchemeVM
 import com.choiceparalysis.turntable.viewmodel.OptionsVM
 import com.choiceparalysis.turntable.viewmodel.SpinWheelVM
@@ -77,18 +80,23 @@ fun SpinWheelScreen(
     spinWheelVM: SpinWheelVM = hiltViewModel(),
     optionsVM: OptionsVM = hiltViewModel(),
     colorSchemeVM: ColorSchemeVM = hiltViewModel(),
-    onNavigateToSettings: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
     val options by optionsVM.options.collectAsState()
     val weights by optionsVM.weights.collectAsState()
     val isAnimating by spinWheelVM.isAnimating.collectAsState()
     val result by spinWheelVM.result.collectAsState()
+    val spinTrigger by spinWheelVM.spinTrigger.collectAsState()
     val colorScheme by colorSchemeVM.colorScheme.collectAsState()
     val optionsEditorOpen by optionsVM.optionsEditorOpen.collectAsState()
     val dynamicColorEnabled by colorSchemeVM.dynamicColorEnabled.collectAsState()
     val customColors by colorSchemeVM.customColors.collectAsState()
     val optionGroups by optionsVM.optionGroups.collectAsState()
+
+    // Clear display result when leaving screen so it restores from persistence on re-enter
+    DisposableEffect(Unit) {
+        onDispose { spinWheelVM.clearDisplayResult() }
+    }
 
     // Keep ColorSchemeVM in sync with current options count
     LaunchedEffect(options.size) {
@@ -100,6 +108,8 @@ fun SpinWheelScreen(
     var colorPickerIndex by remember { mutableStateOf<Int?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val toastWhatAreYouDoing = stringResource(R.string.toast_what_are_you_doing)
+    val toastDynamicColorOn = stringResource(R.string.toast_dynamic_color_on)
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -116,11 +126,11 @@ fun SpinWheelScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
                 Text(
-                    text = "转盘决策",
+                    text = stringResource(R.string.spin_wheel_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -128,7 +138,7 @@ fun SpinWheelScreen(
                 IconButton(onClick = { showSettingsSheet = true }) {
                     Icon(
                         Icons.Default.Settings,
-                        contentDescription = "转盘设置",
+                        contentDescription = stringResource(R.string.cd_wheel_settings),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -141,6 +151,7 @@ fun SpinWheelScreen(
                 options = options,
                 weights = weights,
                 colorScheme = colorScheme,
+                lastResult = result,
                 modifier = Modifier.padding(bottom = 16.dp),
                 onSpinResult = { selected ->
                     spinWheelVM.recordSpinResult(selected, options)
@@ -148,7 +159,7 @@ fun SpinWheelScreen(
                 onSpinStart = { spinWheelVM.startSpin() },
                 onSpinEnd = { spinWheelVM.endSpin() },
                 onResultDragged = {
-                    Toast.makeText(context, "你在干嘛？！", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, toastWhatAreYouDoing, Toast.LENGTH_SHORT).show()
                 }
             )
 
@@ -165,7 +176,7 @@ fun SpinWheelScreen(
                 )
             ) {
                 Text(
-                    text = if (isAnimating) "转动中..." else "开始转动",
+                    text = if (isAnimating) stringResource(R.string.btn_spinning) else stringResource(R.string.btn_start_spin),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -180,7 +191,7 @@ fun SpinWheelScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "编辑选项",
+                    text = stringResource(R.string.btn_edit_options),
                     style = MaterialTheme.typography.titleSmall
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -210,7 +221,7 @@ fun SpinWheelScreen(
                     onAddOption = { optionsVM.addOption() },
                     onColorClick = { colorPickerIndex = it },
                     onDynamicColorClick = {
-                        Toast.makeText(context, "动态色彩已开启", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, toastDynamicColorOn, Toast.LENGTH_SHORT).show()
                     },
                     onUpdateWeight = { index, weight -> optionsVM.updateWeight(index, weight) },
                     onSaveGroup = { showSaveGroupDialog = true },
@@ -228,11 +239,10 @@ fun SpinWheelScreen(
         )
     }
 
-    // Show Android Toast for result
-    LaunchedEffect(result) {
-        result?.let { resultText ->
-            Toast.makeText(context, resultText, Toast.LENGTH_SHORT).show()
-            spinWheelVM.clearResult()
+    // Show Android Toast only for new spin results (not restored from persistence)
+    LaunchedEffect(spinTrigger) {
+        if (spinTrigger > 0) {
+            result?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
         }
     }
 
@@ -356,7 +366,7 @@ private fun OptionsEditorPanel(
                     ) {
                         Icon(
                             Icons.Default.Remove,
-                            contentDescription = "删除",
+                            contentDescription = stringResource(R.string.cd_delete),
                             tint = if (options.size > 2) MaterialTheme.colorScheme.error
                             else MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
                         )
@@ -370,7 +380,7 @@ private fun OptionsEditorPanel(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "权重: ${weights.getOrElse(index) { 1 }}",
+                        text = stringResource(R.string.option_weight_label) + weights.getOrElse(index) { 1 }.toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.width(48.dp)
@@ -393,7 +403,7 @@ private fun OptionsEditorPanel(
                         .padding(top = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("+ 添加选项")
+                    Text(stringResource(R.string.btn_add_option))
                 }
             }
 
@@ -411,14 +421,14 @@ private fun OptionsEditorPanel(
                 ) {
                     Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("保存组合")
+                    Text(stringResource(R.string.btn_save_group))
                 }
                 FilledTonalButton(
                     onClick = onLoadGroup,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("加载组合")
+                    Text(stringResource(R.string.btn_load_group))
                 }
             }
         }
@@ -434,12 +444,12 @@ private fun SaveGroupDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("保存选项组合") },
+        title = { Text(stringResource(R.string.dialog_save_option_group)) },
         text = {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("组合名称") },
+                label = { Text(stringResource(R.string.label_group_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -449,12 +459,12 @@ private fun SaveGroupDialog(
                 onClick = { if (name.isNotBlank()) onSave(name) },
                 enabled = name.isNotBlank()
             ) {
-                Text("保存")
+                Text(stringResource(R.string.btn_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("取消")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )
@@ -469,10 +479,10 @@ private fun LoadGroupDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("加载选项组合") },
+        title = { Text(stringResource(R.string.dialog_load_option_group)) },
         text = {
             if (groups.isEmpty()) {
-                Text("暂无保存的组合")
+                Text(stringResource(R.string.dialog_no_saved_groups))
             } else {
                 Column {
                     groups.forEach { group ->
@@ -497,12 +507,12 @@ private fun LoadGroupDialog(
                                 )
                             }
                             TextButton(onClick = { onLoad(group) }) {
-                                Text("加载")
+                                Text(stringResource(R.string.btn_load))
                             }
                             IconButton(onClick = { onDelete(group.id) }) {
                                 Icon(
                                     Icons.Default.Remove,
-                                    contentDescription = "删除",
+                                    contentDescription = stringResource(R.string.cd_delete),
                                     tint = MaterialTheme.colorScheme.error,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -514,7 +524,7 @@ private fun LoadGroupDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("关闭")
+                Text(stringResource(R.string.btn_close))
             }
         }
     )

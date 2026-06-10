@@ -3,18 +3,14 @@ package com.choiceparalysis.turntable.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.BitmapShader
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
-import android.graphics.RectF
-import android.graphics.Shader
 import android.net.Uri
 import java.io.File
 import java.io.FileOutputStream
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withClip
 
 object CircularCropUtil {
 
@@ -39,7 +35,7 @@ object CircularCropUtil {
             context.contentResolver.openInputStream(uri)?.use { stream ->
                 BitmapFactory.decodeStream(stream, null, decodeOptions)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -69,19 +65,18 @@ object CircularCropUtil {
         val srcRect = Rect(srcLeft.toInt(), srcTop.toInt(), srcRight.toInt(), srcBottom.toInt())
         val dstRect = Rect(0, 0, outputSize, outputSize)
 
-        val output = Bitmap.createBitmap(outputSize, outputSize, Bitmap.Config.ARGB_8888)
+        val output = createBitmap(outputSize, outputSize)
         val canvas = Canvas(output)
 
         val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
 
         // Draw circular clipped image
         val circleRadius = outputSize / 2f
-        canvas.save()
-        canvas.clipPath(android.graphics.Path().apply {
+        canvas.withClip(android.graphics.Path().apply {
             addCircle(circleRadius, circleRadius, circleRadius, android.graphics.Path.Direction.CW)
-        })
-        canvas.drawBitmap(source, srcRect, dstRect, paint)
-        canvas.restore()
+        }) {
+            drawBitmap(source, srcRect, dstRect, paint)
+        }
 
         return output
     }
@@ -96,11 +91,4 @@ object CircularCropUtil {
         return file.absolutePath
     }
 
-    fun deleteOldImage(context: Context, path: String?) {
-        path?.let {
-            if (it.startsWith(context.filesDir.absolutePath)) {
-                File(it).delete()
-            }
-        }
-    }
 }

@@ -1,10 +1,16 @@
 package com.choiceparalysis.turntable.data.model
 
-enum class DecisionMethod(val displayName: String) {
-    SPIN_WHEEL("转盘"),
-    COIN_FLIP("抛硬币"),
-    DICE_ROLL("掷骰子"),
-    YES_NO("Yes/No"),
-    RANDOM_PICK("随机选择"),
-    FINGER_ROULETTE("指尖轮盘")
+import android.content.Context
+import androidx.annotation.StringRes
+import com.choiceparalysis.turntable.R
+
+enum class DecisionMethod(@StringRes val displayNameRes: Int) {
+    SPIN_WHEEL(R.string.method_spin_wheel),
+    COIN_FLIP(R.string.method_coin_flip),
+    DICE_ROLL(R.string.method_dice_roll),
+    YES_NO(R.string.method_answer_book),
+    RANDOM_PICK(R.string.method_random_pick),
+    FINGER_ROULETTE(R.string.method_finger_roulette);
+
+    fun displayName(context: Context): String = context.getString(displayNameRes)
 }

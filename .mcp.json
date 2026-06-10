@@ -10,6 +10,15 @@
         "MIMO_API_BASE": "https://token-plan-cn.xiaomimimo.com/v1",
         "MIMO_MODEL": "mimo-v2.5"
       }
+    },
+    "searxng": {
+      "command": "C:/Users/m1368/.claude/cloakFetch/.venv/Scripts/python.exe",
+      "args": [
+        "C:/Users/m1368/.claude/searxng-mcp/server.py"
+      ],
+      "env": {
+        "SEARXNG_BASE_URL": "http://127.0.0.1:8888"
+      }
     }
   }
 }

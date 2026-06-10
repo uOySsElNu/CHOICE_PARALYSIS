@@ -14,10 +14,11 @@ Choice Paralysis is an open-source Android app designed for people who struggle 
 
 #### 🎡 Spin Wheel
 - Canvas-drawn colorful wheel with smooth rotation animation
-- Customize up to 10 options per wheel
+- Customize up to 10 options per wheel with adjustable weights
 - Real-time option editing (add, remove, modify)
 - Satisfying deceleration animation with result highlight
 - Save and load option group presets
+- Drag-to-spin with fling physics
 
 #### 🪙 Coin Flip
 - 3D coin flip animation with silver coin body and raised rim
@@ -33,19 +34,23 @@ Choice Paralysis is an open-source Android app designed for people who struggle 
 - Throttled face tumbling during spin
 - Pop bounce effect on result
 
-#### 👍 Yes / No
-- Weighted random decisions (Yes 45% / No 45% / Maybe 10%)
+#### 📖 Answer Book
+- Scene-aware answer engine with keyword matching
+- Covers food, travel, shopping, work, and relationship topics
+- Multi-language keyword recognition (11 languages)
+- Thoughtful, neutral answers that guide reflection
 - Optional question input for context
-- Large emoji-based result display
 
-#### 📋 Custom Lists
-- Create and save option lists for repeated use
-- Quick access from spin wheel screen
-- Persistent storage via DataStore
+#### 👆 Finger Roulette
+- Multi-touch finger elimination game
+- Randomly eliminates fingers one by one
+- Dramatic drum-roll sound and haptic feedback
+- Perfect for group decisions
 
-#### 📜 History
+#### 📜 History & Stats
 - Automatic recording of all decisions (up to 100 entries)
 - Shows decision method, options considered, and result
+- Inline data insights: method distribution, top results, hourly patterns
 - Clear all or delete individual records
 
 ### Tech Stack
@@ -55,10 +60,12 @@ Choice Paralysis is an open-source Android app designed for people who struggle 
 | Language | Kotlin 2.2.10 |
 | UI Framework | Jetpack Compose |
 | Design System | Material 3 with Dynamic Color |
-| Navigation | Navigation Compose + NavigationSuiteScaffold |
+| Navigation | Navigation Compose + NavigationSuiteScaffold (type-safe routes) |
 | State Management | ViewModel + StateFlow |
-| Persistence | DataStore Preferences + kotlinx-serialization |
+| Persistence | Room + DataStore Preferences + kotlinx-serialization |
+| DI | Hilt |
 | Image Loading | Coil 3.2.0 |
+| Haptic | RichTap SDK + MiHaptic + Legacy Vibrator (strategy pattern) |
 | Architecture | MVVM |
 | Min SDK | 34 (Android 14) |
 
@@ -90,10 +97,11 @@ Open in Android Studio and run on device or emulator (API 34+).
 
 #### 🎡 转盘决策
 - Canvas 绘制的彩色转盘，旋转动画流畅
-- 支持自定义最多 10 个选项
+- 支持自定义最多 10 个选项，可调整权重
 - 实时编辑选项（添加、删除、修改）
 - 减速动画效果，结果高亮显示
 - 支持保存和加载选项组合预设
+- 拖拽旋转，支持惯性滑动
 
 #### 🪙 抛硬币
 - 3D 硬币翻转动画，银色硬币主体带凸起边缘
@@ -109,19 +117,23 @@ Open in Android Studio and run on device or emulator (API 34+).
 - 旋转过程中节流的点数切换
 - 结果弹出效果
 
-#### 👍 Yes / No 决策
-- 加权随机决策（是 45% / 否 45% / 也许 10%）
+#### 📖 答案之书
+- 基于关键词场景匹配的智能回答引擎
+- 覆盖饮食、出行、购物、工作、感情等场景
+- 支持 11 种语言关键词识别
+- 温暖中性的回答，引导思考而非直接给答案
 - 可输入问题作为决策背景
-- 大号 Emoji 结果展示
 
-#### 📋 自定义选项列表
-- 创建并保存常用选项列表，方便重复使用
-- 从转盘界面快速加载已保存的列表
-- 使用 DataStore 持久化存储
+#### 👆 手指轮盘
+- 多点触控手指淘汰游戏
+- 随机逐个淘汰手指
+- 紧张的鼓点音效和触觉反馈
+- 适合群体决策
 
-#### 📜 历史记录
+#### 📜 历史记录与统计
 - 自动记录所有决策结果（最多 100 条）
 - 显示决策方式、考虑的选项和最终结果
+- 内联数据洞察：方式分布、热门结果、时段分布
 - 支持清空全部或删除单条记录
 
 ### 技术栈
@@ -131,10 +143,12 @@ Open in Android Studio and run on device or emulator (API 34+).
 | 开发语言 | Kotlin 2.2.10 |
 | UI 框架 | Jetpack Compose |
 | 设计系统 | Material 3 + 动态取色 |
-| 导航 | Navigation Compose + NavigationSuiteScaffold |
+| 导航 | Navigation Compose + NavigationSuiteScaffold（类型安全路由） |
 | 状态管理 | ViewModel + StateFlow |
-| 持久化 | DataStore Preferences + kotlinx-serialization |
+| 持久化 | Room + DataStore Preferences + kotlinx-serialization |
+| 依赖注入 | Hilt |
 | 图片加载 | Coil 3.2.0 |
+| 触觉反馈 | RichTap SDK + MiHaptic + Legacy Vibrator（策略模式） |
 | 架构模式 | MVVM |
 | 最低 SDK | 34 (Android 14) |
 

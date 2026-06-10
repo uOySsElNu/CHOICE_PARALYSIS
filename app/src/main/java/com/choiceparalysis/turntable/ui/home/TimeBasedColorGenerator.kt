@@ -1,9 +1,7 @@
 package com.choiceparalysis.turntable.ui.home
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import java.util.Calendar
-import kotlin.math.roundToInt
 
 object TimeBasedColorGenerator {
 

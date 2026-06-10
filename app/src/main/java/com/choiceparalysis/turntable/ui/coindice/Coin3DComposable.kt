@@ -1,7 +1,6 @@
 package com.choiceparalysis.turntable.ui.coindice
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -41,8 +40,7 @@ import com.choiceparalysis.turntable.viewmodel.CoinSide
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-
-private val CoinSpinEasing = CubicBezierEasing(0.12f, 0.0f, 0.12f, 1.0f)
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * 3D 硬币翻面组件。
@@ -63,12 +61,10 @@ private val CoinSpinEasing = CubicBezierEasing(0.12f, 0.0f, 0.12f, 1.0f)
 @Composable
 fun Coin3DFlip(
     result: CoinSide?,
-    pendingResult: CoinSide?,
     isAnimating: Boolean,
     headsImage: ImageBitmap?,
     tailsImage: ImageBitmap?,
     modifier: Modifier = Modifier,
-    onAnimationComplete: () -> Unit = {},
     onDragFlipComplete: (CoinSide) -> Unit = {},
     onFlingChanged: (Boolean) -> Unit = {},
 ) {
@@ -89,11 +85,12 @@ fun Coin3DFlip(
     // 首帧用轻量静态图，避免 Canvas+graphicsLayer 阻塞导航动画
     var canvasReady by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(100)
+        delay(100.milliseconds)
         canvasReady = true
     }
 
-    val audioHaptic = AudioHapticManager.getInstance(androidx.compose.ui.platform.LocalContext.current)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val audioHaptic = remember { AudioHapticManager.getInstance(context) }
 
     // SpinWheel 风格逐帧速度追踪
     var prevTime by remember { mutableLongStateOf(0L) }
@@ -120,45 +117,53 @@ fun Coin3DFlip(
         }
     }
 
-    // === 按钮动画：始终逆时针旋转 5 圈 + 停在随机面 ===
+    // === 按钮动画：与向右滑动 Fling 完全一致 ===
     LaunchedEffect(isAnimating) {
         if (!isAnimating || isFling) return@LaunchedEffect
 
-        audioHaptic.playFeedback(SoundEffect.COIN_BUTTON)
-        val target = pendingResult ?: CoinSide.HEADS
-        val endAngle = faceAngle(target)
-        // 逆时针 = 正方向，固定5整圈(1800°)，修正负角度取模
-        val remainder = ((rotation.value % 360f) + 360f) % 360f
-        val totalRotation = rotation.value + 1800f - remainder + endAngle
+        // 模拟向右滑动的随机速度
+        val simulatedVelocity = (600..1200).random().toFloat()
+        val absV = abs(simulatedVelocity)
+        val minRotation = 3600f  // 最少 10 圈
+        val current = rotation.value
+        val target = current + maxOf(absV * 1.5f, minRotation)
+        val animDuration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
+
+        audioHaptic.playSound(SoundEffect.COIN_BUTTON)
+        audioHaptic.playCoinSpinHaptic(animDuration)
 
         // 缩放动画
         launch {
             scale.snapTo(1f)
             scale.animateTo(1f, keyframes {
-                durationMillis = 2000
+                durationMillis = animDuration
                 1f at 0
                 1.06f at 400 using StandardEasing.EaseOutQuart
                 1f at 1000 using StandardEasing.EaseInQuart
             })
         }
 
-        rotation.animateTo(totalRotation, tween(2000, easing = CoinSpinEasing))
+        // 主旋转动画
+        rotation.animateTo(target, tween(animDuration, easing = StandardEasing.EaseOutQuart))
 
-        // 精准停在目标角度
-        var finalAngle = endAngle
-        while (finalAngle - rotation.value > 180f) finalAngle -= 360f
-        while (finalAngle - rotation.value < -180f) finalAngle += 360f
-        rotation.snapTo(finalAngle)
+        // 根据最终角度判定正反面（与手动 Fling 完全一致）
+        val endAngle = rotation.value
+        val endNorm = ((endAngle % 360f) + 360f) % 360f
+        val newFace = if (endNorm in 90f..270f) CoinSide.TAILS else CoinSide.HEADS
+        var snap = faceAngle(newFace)
+        while (snap - endAngle > 180f) snap -= 360f
+        while (snap - endAngle < -180f) snap += 360f
+        rotation.animateTo(snap, tween(400, easing = StandardEasing.EaseOutQuart))
+        settledAngle = faceAngle(newFace)
 
-        settledAngle = endAngle
         highlightTrigger++
-        onAnimationComplete()
+        onDragFlipComplete(newFace)
     }
 
     // === 高光扫过 ===
     LaunchedEffect(highlightTrigger) {
         if (highlightTrigger > 0) {
-            delay(200)
+            delay(200.milliseconds)
             highlight.snapTo(0f)
             highlight.animateTo(1f, tween(800, easing = StandardEasing.EaseOutCubic))
         }
@@ -241,13 +246,14 @@ fun Coin3DFlip(
                                 // ===== Fling：无缝衔接滑动方向 =====
                                 val sign = if (avgVelocity > 0) 1f else -1f
                                 val absV = abs(avgVelocity)
-                                val minRotation = 1440f
+                                val minRotation = 3600f  // 最少 10 圈
                                 val current = rotation.value
                                 val target = current + sign * maxOf(absV * 1.5f, minRotation)
                                 val animDuration = maxOf(2000, (absV * 1.5f / 720f * 2000f).toInt()).coerceAtMost(5000)
 
                                 isFling = true
-                                audioHaptic.playFeedback(SoundEffect.COIN_DRAG)
+                                audioHaptic.playSound(SoundEffect.COIN_BUTTON)
+                                audioHaptic.playCoinSpinHaptic(animDuration)
                                 coroutineScope.launch {
                                     rotation.animateTo(target, tween(animDuration, easing = StandardEasing.EaseOutQuart))
 

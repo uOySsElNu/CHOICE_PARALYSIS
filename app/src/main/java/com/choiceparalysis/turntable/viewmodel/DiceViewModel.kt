@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.choiceparalysis.turntable.data.model.DecisionMethod
 import com.choiceparalysis.turntable.data.model.HistoryEntry
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
+import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,20 +14,36 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class DiceViewModel @Inject constructor(
-    private val historyRepository: HistoryRepository
+    private val historyRepository: HistoryRepository,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _diceValue = MutableStateFlow<Int?>(null)
     val diceValue: StateFlow<Int?> = _diceValue.asStateFlow()
+
+    private val _rollTrigger = MutableStateFlow(0)
+    val rollTrigger: StateFlow<Int> = _rollTrigger.asStateFlow()
 
     private val _isAnimating = MutableStateFlow(false)
     val isAnimating: StateFlow<Boolean> = _isAnimating.asStateFlow()
 
     private val _pendingDiceValue = MutableStateFlow<Int?>(null)
     private var safetyTimeoutJob: Job? = null
+
+    init {
+        // Restore last persisted result
+        viewModelScope.launch {
+            settingsRepository.lastDiceResult.collect { saved ->
+                if (saved != null && _diceValue.value == null) {
+                    _diceValue.value = saved.toIntOrNull()
+                }
+            }
+        }
+    }
 
     fun rollDice() {
         if (_isAnimating.value) return
@@ -36,7 +53,7 @@ class DiceViewModel @Inject constructor(
         // Safety timeout: force end animation if stuck for 10 seconds
         safetyTimeoutJob?.cancel()
         safetyTimeoutJob = viewModelScope.launch {
-            delay(10_000)
+            delay(10_000.milliseconds)
             if (_isAnimating.value) {
                 onDiceRollAnimationComplete()
             }
@@ -48,7 +65,9 @@ class DiceViewModel @Inject constructor(
         val result = _pendingDiceValue.value ?: return
         _diceValue.value = result
         _isAnimating.value = false
+        _rollTrigger.value++
         viewModelScope.launch {
+            settingsRepository.setLastDiceResult(result.toString())
             historyRepository.addEntry(
                 HistoryEntry(
                     method = DecisionMethod.DICE_ROLL,
@@ -61,6 +80,10 @@ class DiceViewModel @Inject constructor(
 
     fun clearResult() {
         _diceValue.value = null
-        // Don't reset _isAnimating here — let animation lifecycle manage it
+        viewModelScope.launch { settingsRepository.setLastDiceResult(null) }
+    }
+
+    fun clearDisplayResult() {
+        _diceValue.value = null
     }
 }

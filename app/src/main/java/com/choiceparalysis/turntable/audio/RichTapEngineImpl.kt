@@ -1,18 +1,33 @@
 package com.choiceparalysis.turntable.audio
 
 /**
- * MiHaptic engine for Xiaomi devices.
- * Uses reflection to access miui.os.DynamicEffect and miui.os.HapticPlayer
- * without compile-time dependency on the Xiaomi SDK.
+ * RichTap engine for OEMs using AAC Technologies RichTap SDK.
  *
- * API signatures (from device):
- *   DynamicEffect.startCompose() -> DynamicEffect
- *   DynamicEffect.createTransient(float intensity, float sharpness) -> PrimitiveEffect
+ * Both Xiaomi (MiHaptic / DynamicEffect) and vivo (VivoHaptic / DynamicEffect)
+ * expose the same RichTap API surface under different package names:
+ *
+ *   Xiaomi: miui.os.DynamicEffect + miui.os.HapticPlayer
+ *   vivo:   com.vivo.os.dynamicEffect.DynamicEffect + ...HapticPlayer
+ *           (also android.os.DynamicEffect on some ROM versions)
+ *
+ * This engine auto-discovers whichever package is present at runtime.
+ *
+ * RichTap API signatures (same across OEMs):
+ *   DynamicEffect.startCompose() -> DynamicEffect *   .createTransient(float intensity, float sharpness) -> PrimitiveEffect
+ *     - intensity: 0.0~1.0, vibration strength
+ *     - sharpness: 0.0~1.0, higher = crisper/shorter, lower = softer/longer
  *   DynamicEffect.createContinuous(float intensity, float sharpness, float duration) -> PrimitiveEffect
+ *     - duration in seconds
  *   effect.addPrimitive(float timeSec, PrimitiveEffect pe)
  *   HapticPlayer() + player.start(DynamicEffect)
+ *
+ * Key tuning principles for linear motor:
+ * - Transient (short pulse): high sharpness (0.8-1.0) for crisp click feel
+ * - Continuous (sustained): lower sharpness (0.3-0.6) for rumble/buzz feel
+ * - Intensity controls amplitude, sharpness controls frequency envelope
+ * - X-axis linear motor optimal range: 50-500Hz, resonance ~130Hz
  */
-class MiHapticEngineImpl : HapticEngine {
+class RichTapEngineImpl : HapticEngine {
 
     private var startComposeMethod: java.lang.reflect.Method? = null
     private var createTransientMethod: java.lang.reflect.Method? = null
@@ -36,8 +51,29 @@ class MiHapticEngineImpl : HapticEngine {
         if (initDone) return
         initDone = true
         try {
-            val deClass = Class.forName("miui.os.DynamicEffect")
-            val hpClass = Class.forName("miui.os.HapticPlayer")
+            // Try known RichTap package paths across OEMs
+            val packageCandidates = listOf(
+                // Xiaomi (MiHaptic)
+                "miui.os" to "DynamicEffect" to "HapticPlayer",
+                "android.os" to "DynamicEffect" to "HapticPlayer",
+                // vivo (OriginOS)
+                "com.vivo.os.dynamicEffect" to "DynamicEffect" to "HapticPlayer",
+                "com.vivo.os" to "DynamicEffect" to "HapticPlayer",
+            )
+            for ((pair, hpName) in packageCandidates) {
+                val (pkg, deName) = pair
+                if (tryInitFromPackage(pkg, deName, hpName)) return
+            }
+            initFailed = true
+        } catch (_: Exception) {
+            initFailed = true
+        }
+    }
+
+    private fun tryInitFromPackage(pkg: String, deName: String, hpName: String): Boolean {
+        return try {
+            val deClass = Class.forName("$pkg.$deName")
+            val hpClass = Class.forName("$pkg.$hpName")
 
             startComposeMethod = deClass.getMethod("startCompose")
             createTransientMethod = deClass.methods.find {
@@ -68,17 +104,26 @@ class MiHapticEngineImpl : HapticEngine {
                     hapticPlayerConstructor != null &&
                     hapticPlayerStartEffectMethod != null
 
-            if (!ok) initFailed = true
-        } catch (_: Exception) {
-            initFailed = true
+            if (!ok) return false
+            true
+        } catch (_: ClassNotFoundException) {
+            false
         }
     }
 
+    /**
+     * Picker/roller detent tick — constant, short, sharp.
+     *
+     * Tuning:
+     * - Max sharpness (1.0) for ultra-crisp "擦过" transient attack
+     * - Moderate intensity (0.5) — brief enough to not fatigue, strong enough to feel
+     * - Each tick is identical; fast spin = more ticks/sec (natural frequency)
+     */
     override fun playTick() {
         if (!isAvailable()) return
         try {
             val effect = startComposeMethod!!.invoke(null)!!
-            val primitive = createTransientMethod!!.invoke(null, 1.0f, 0.9f)!!
+            val primitive = createTransientMethod!!.invoke(null, 0.5f, 1.0f)!!
             addPrimitiveMethod!!.invoke(effect, 0f, primitive)
             val player = getOrCreatePlayer()
             hapticPlayerStartEffectMethod!!.invoke(player, effect)
@@ -95,30 +140,29 @@ class MiHapticEngineImpl : HapticEngine {
 
     private fun mapEffect(effect: HapticEffect): List<HapticPrimitive> = when (effect) {
         HapticEffect.TICK -> listOf(
-            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 70)
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 60, sharpness = 95)
         )
         HapticEffect.CLICK -> listOf(
-            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 50),
-            HapticPrimitive(PrimitiveType.CONTINUOUS, 40, 30, 80, 200)
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 85, sharpness = 75)
         )
         HapticEffect.THUD -> listOf(
-            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 20),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 25, 180),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 60, 30, 350),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 40, 35, 500),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 25, 40, 630)
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 100, sharpness = 40),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 65, sharpness = 45, startTimeMs = 50),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 35, sharpness = 50, startTimeMs = 100)
         )
         HapticEffect.RISE -> listOf(
-            HapticPrimitive(PrimitiveType.CONTINUOUS, 50, 60, 0, 600),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 50, 350),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 60, 40, 500)
+            HapticPrimitive(PrimitiveType.CONTINUOUS, intensity = 30, sharpness = 45, startTimeMs = 0, durationMs = 600),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 50, sharpness = 60, startTimeMs = 200),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 70, sharpness = 70, startTimeMs = 400),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 100, sharpness = 85, startTimeMs = 600)
         )
         HapticEffect.CELEBRATION -> listOf(
-            HapticPrimitive(PrimitiveType.CONTINUOUS, 40, 50, 0, 800),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 60, 200),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 80, 50, 350),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 100, 60, 500),
-            HapticPrimitive(PrimitiveType.TRANSIENT, 50, 40, 700)
+            HapticPrimitive(PrimitiveType.CONTINUOUS, intensity = 25, sharpness = 35, startTimeMs = 0, durationMs = 900),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 100, sharpness = 90, startTimeMs = 50),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 85, sharpness = 75, startTimeMs = 200),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 95, sharpness = 80, startTimeMs = 350),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 75, sharpness = 65, startTimeMs = 500),
+            HapticPrimitive(PrimitiveType.TRANSIENT, intensity = 100, sharpness = 85, startTimeMs = 700)
         )
     }
 
@@ -128,10 +172,10 @@ class MiHapticEngineImpl : HapticEngine {
             for (p in primitives) {
                 val primitive = when (p.type) {
                     PrimitiveType.TRANSIENT -> createTransientMethod!!.invoke(
-                        null, p.intensity / 100f, p.frequency / 100f
+                        null, p.intensity / 100f, p.sharpness / 100f
                     )!!
                     PrimitiveType.CONTINUOUS -> createContinuousMethod!!.invoke(
-                        null, p.intensity / 100f, p.frequency / 100f, p.durationMs / 1000f
+                        null, p.intensity / 100f, p.sharpness / 100f, p.durationMs / 1000f
                     )!!
                 }
                 addPrimitiveMethod!!.invoke(effect, p.startTimeMs / 1000f, primitive)
@@ -154,10 +198,10 @@ class MiHapticEngineImpl : HapticEngine {
 
     private data class HapticPrimitive(
         val type: PrimitiveType,
-        val intensity: Int,    // 0-100
-        val frequency: Int,    // 0-100
+        val intensity: Int,     // 0-100, maps to 0.0-1.0
+        val sharpness: Int,     // 0-100, maps to 0.0-1.0 (higher = crisper)
         val startTimeMs: Long = 0,
-        val durationMs: Long = 0,
+        val durationMs: Long = 0,  // only for CONTINUOUS
     )
 
     private enum class PrimitiveType {

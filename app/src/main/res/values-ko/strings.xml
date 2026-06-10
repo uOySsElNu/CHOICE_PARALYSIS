@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">너로 정했어</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">홈</string>
+    <string name="nav_history">기록</string>
+    <string name="nav_settings">설정</string>
+
+    <!-- Common -->
+    <string name="cd_back">뒤로</string>
+    <string name="cd_delete">삭제</string>
+    <string name="btn_confirm">확인</string>
+    <string name="btn_cancel">취소</string>
+    <string name="btn_save">저장</string>
+    <string name="btn_close">닫기</string>
+    <string name="btn_load">불러오기</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">룰렛</string>
+    <string name="hub_card_spin_wheel_desc">운명의 바퀴를 돌려라</string>
+    <string name="hub_card_coin">동전</string>
+    <string name="hub_card_coin_desc">운명의 동전을 던져라</string>
+    <string name="hub_card_dice">주사위</string>
+    <string name="hub_card_dice_desc">답을 굴려라</string>    <string name="hub_card_yes_no_desc">우주가 결정하게 하라</string>
+    <string name="hub_card_finger_roulette">핑거 룰렛</string>
+    <string name="hub_card_finger_roulette_desc">多人 탈락, 천생은 누구</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">룰렛</string>
+    <string name="method_coin_flip">동전 던지기</string>
+    <string name="method_dice_roll">주사위</string>    <string name="method_random_pick">랜덤</string>
+    <string name="method_finger_roulette">핑거 룰렛</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">룰렛</string>
+    <string name="cd_wheel_settings">룰렛 설정</string>
+    <string name="toast_what_are_you_doing">뭐 하고 있어?!</string>
+    <string name="btn_spinning">회전 중…</string>
+    <string name="btn_start_spin">돌리기</string>
+    <string name="btn_edit_options">옵션 편집</string>
+    <string name="toast_dynamic_color_on">다이나믹 컬러 활성화</string>
+    <string name="option_weight_label">가중치: </string>
+    <string name="btn_add_option">+ 옵션 추가</string>
+    <string name="btn_save_group">그룹 저장</string>
+    <string name="btn_load_group">그룹 불러오기</string>
+    <string name="dialog_save_option_group">옵션 그룹 저장</string>
+    <string name="label_group_name">그룹 이름</string>
+    <string name="dialog_load_option_group">옵션 그룹 불러오기</string>
+    <string name="dialog_no_saved_groups">저장된 그룹이 없습니다</string>
+
+    <!-- Coin -->
+    <string name="coin_title">동전 던지기</string>
+    <string name="cd_customize_images">이미지 커스터마이즈</string>
+    <string name="btn_flipping">회전 중…</string>
+    <string name="btn_flip_coin">동전 던지기</string>
+    <string name="toast_coin_heads">앞면!</string>
+    <string name="toast_coin_tails">뒷면!</string>
+
+    <!-- Dice -->
+    <string name="dice_title">주사위</string>
+    <string name="btn_rolling">굴러가는 중…</string>
+    <string name="btn_roll_dice">주사위 던지기</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">나온 수: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No 결정</string>
+    <string name="yesno_question_label">질문 입력 (선택사항)</string>
+    <string name="btn_deciding">결정 중…</string>
+    <string name="btn_decide">결정해 줘!</string>
+    <string name="yesno_result_yes">예!</string>
+    <string name="yesno_result_no">아니요!</string>
+    <string name="yesno_result_maybe">아마도</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">답의 책</string>
+    <string name="answer_book_question_hint">질문을 작성하세요 (선택사항)</string>
+    <string name="answer_book_reveal">답 열기</string>
+    <string name="answer_book_revealing">답이 나타나고 있습니다…</string>
+    <string name="method_answer_book">답의 책</string>
+    <string name="hub_card_answer_book">답의 책</string>
+    <string name="hub_card_answer_book_desc">책을 열어 영감을 찾아보세요</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">먹어보지 않은 것을 시도해 보세요</string>
+    <string name="answer_food_2">첫 번째 직감을 따르세요</string>
+    <string name="answer_food_3">배가 뭘 원하는지 물어보세요</string>
+    <string name="answer_food_4">더 기대되는 것을 선택하세요</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">떠나세요, 가는 길에 답이 있을 거예요</string>
+    <string name="answer_outing_2">집에서 쉬는 것도 좋은 선택이에요</string>
+    <string name="answer_outing_3">가보지 않은 곳을 가보세요</string>
+    <string name="answer_outing_4">지금 가장 하고 싶은 게 뭔지 자신에게 물어보세요</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">3일 기다렸다 그래도 사고 싶으면 사세요</string>
+    <string name="answer_shopping_2">망설여지면 사지 마세요</string>
+    <string name="answer_shopping_3">더 좋은 대안이 없는지 찾아보세요</string>
+    <string name="answer_shopping_4">한 달 후에 어떤 기분일지 상상해 보세요</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">먼저 한 걸음을 내딛으세요</string>
+    <string name="answer_work_2">자신에게 생각할 시간을 주세요</string>
+    <string name="answer_work_3">믿을 수 있는 사람과 이야기해 보세요</string>
+    <string name="answer_work_4">장단점을 정리한 후 결정하세요</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">자연스럽게 흘러가게 두세요</string>
+    <string name="answer_love_2">자신의 감정에 솔직해지세요</string>
+    <string name="answer_love_3">시간이 답을 줄 거예요</string>
+    <string name="answer_love_4">직감을 믿으세요</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">해보세요</string>
+    <string name="answer_general_2">좀 더 생각해 보세요</string>
+    <string name="answer_general_3">자연스럽게 흘러가게 두세요</string>
+    <string name="answer_general_4">직감을 믿으세요</string>
+    <string name="answer_general_5">답은 당신의 마음속에 있어요</string>
+    <string name="answer_general_6">더 편안한 것을 선택하세요</string>
+    <string name="answer_general_7">급하지 않아요, 천천히 하세요</string>
+    <string name="answer_general_8">동전을 던지는 순간 답을 알게 될 거예요</string>
+    <string name="answer_general_9">눈을 감으세요, 처음 떠오른 생각이 답이에요</string>
+    <string name="answer_general_10">미래의 자신에게 어떻게 선택할지 물어보세요</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">핑거 룰렛</string>
+    <string name="winner_chosen_one">천생之人！</string>
+    <string name="btn_play_again">다시 하기</string>
+    <string name="status_waiting_fingers">2~6개의 손가락을 놓아주세요</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">%d개 감지됨, 2초 후 시작</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">탈락 중… %d명 남음</string>
+    <string name="status_game_over">게임 종료</string>
+    <string name="btn_start_now">지금 시작</string>
+
+    <!-- History -->
+    <string name="history_title">기록</string>
+    <string name="history_clear">지우기</string>
+    <string name="history_data_insights">인사이트</string>
+    <string name="history_empty_title">아직 기록이 없습니다</string>
+    <string name="history_empty_subtitle">결정하면 결과가 여기에 표시됩니다</string>
+    <string name="history_result_prefix">결과: %s</string>
+    <string name="history_clear_confirm">모든 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="history_delete_entry">기록 삭제</string>
+    <string name="history_delete_entry_confirm">이 기록을 삭제하시겠습니까?</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">개요</string>
+    <string name="stats_total_decisions">총 결정 횟수</string>
+    <string name="stats_most_used">가장 많이 사용</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%d회</string>
+    <string name="stats_last_decision">최근 결정</string>
+    <string name="stats_method_distribution">수단 분포</string>
+    <string name="stats_top_results">인기 결과 Top 5</string>
+    <string name="stats_hourly_distribution">시간대별 분포</string>
+
+    <!-- Settings -->
+    <string name="settings_title">설정</string>
+    <string name="settings_sound_haptic_section">사운드 및 진동</string>
+    <string name="settings_sound">사운드</string>
+    <string name="settings_sound_description">결정 시 사운드 재생</string>
+    <string name="settings_haptic">진동</string>
+    <string name="settings_haptic_description">결정 시 진동 피드백</string>
+    <string name="settings_display_section">디스플레이</string>
+    <string name="settings_follow_system_theme">시스템 다크모ード 따르기</string>
+    <string name="settings_follow_system_theme_description">끄면 수동으로 라이트/다크 전환</string>
+    <string name="settings_dark_mode">다크모드</string>
+    <string name="settings_dark_mode_on">다크모드 활성화</string>
+    <string name="settings_light_mode_on">라이트모드 활성화</string>
+    <string name="settings_language">언어</string>
+    <string name="settings_about_section">정보</string>
+    <string name="settings_version">버전</string>
+    <string name="settings_privacy_policy">개인정보 처리방침</string>
+    <string name="settings_terms_of_use">이용약관</string>
+    <string name="settings_open_source_licenses">오픈소스 라이선스</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">시스템 따르기</string>    <string name="dialog_select_language">언어 선택</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">룰렛 설정</string>
+    <string name="settings_dynamic_color">다이나믹 컬러</string>
+    <string name="settings_dynamic_color_desc">시간에 따라 색상 자동 조절</string>
+    <string name="settings_preset_themes">프리셋 테마</string>
+    <string name="settings_option_colors">옵션 색상</string>
+    <string name="settings_dynamic_color_active_hint">다이나믹 컬러가 켜져 있습니다. 색상이 자동으로 변합니다</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">클래식 레인보우</string>
+    <string name="design_monochrome">모노크롬</string>
+    <string name="design_warm_sunset">웜 선셋</string>
+    <string name="design_ocean_breeze">오션 브리즈</string>
+    <string name="design_minimal">미니멀</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">코인 프리셋</string>
+    <string name="btn_restore_default">초기화</string>
+    <string name="preset_custom">사용자 정의</string>
+    <string name="custom_coin_title">커스텀 코인</string>
+    <string name="custom_coin_drag_hint">드래그하여 양면 미리보기</string>
+    <string name="coin_heads">앞면</string>
+    <string name="coin_tails">뒷면</string>
+    <string name="btn_save_as_preset">프리셋으로 저장</string>
+    <string name="btn_apply_directly">바로 적용</string>
+    <string name="cd_select_image">이미지 선택</string>
+    <string name="preset_default">기본값</string>
+    <string name="dialog_save_coin_preset">코인 프리셋 저장</string>
+    <string name="label_preset_name">프리셋 이름</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">색상 선택</string>
+    <string name="label_color_code">색상 코드</string>
+    <string name="error_invalid_color_code">유효한 색상 코드를 입력하세요 (예: FF6200)</string>
+    <string name="color_picker_common_colors">자주 사용하는 색상</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">결과는</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">코인 이미지 자르기</string>
+    <string name="crop_instructions">드래그로 이동, 핀치로 확대/축소</string>
+    <string name="btn_processing">처리 중…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">인사이트</string>
+    <string name="stats_empty_title">아직 기록이 없습니다</string>
+    <string name="stats_empty_subtitle">룰렛을 사용해 보세요!</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">앞면</string>
+    <string name="coin_tails_label">뒷면</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">예</string>
+    <string name="yesno_default_no">아니요</string>
+    <string name="yesno_default_maybe">아마도</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">옵션%d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">최종 업데이트: 2026년 6월 8일</string>
+    <string name="privacy_intro">초이스 패럴시스 헬퍼(이하 "본 앱")는 개인정보를 존중하고 보호하는 오픈소스 소프트웨어입니다.</string>
+    <string name="privacy_s1_title">1. 정보 수집</string>
+    <string name="privacy_s1_body">본 앱은 어떠한 개인정보도 수집, 저장, 전송하지 않습니다. 모든 결정 데이터(룰렛 옵션, 기록 등)는 사용자의 기기에만 로컬 저장됩니다.</string>
+    <string name="privacy_s2_title">2. 데이터 저장</string>
+    <string name="privacy_s2_body">• 모든 데이터는 Android DataStore와 Room 데이터베이스를 사용하여 기기에 로컬 저장됩니다\n• 서버에 업로드되지 않습니다\n• 앱을 삭제하면 모든 데이터가 삭제됩니다</string>
+    <string name="privacy_s3_title">3. 데이터 보안</string>
+    <string name="privacy_s3_body">모든 데이터가 로컬에 저장되므로 개인정보는 Android의 보안 메커니즘에 의해 완전히 보호됩니다.</string>
+    <string name="privacy_s4_title">4. 타사 서비스</string>
+    <string name="privacy_s4_body">본 앱은 타사 분석, 광고, 추적 서비스를 일체 사용하지 않습니다.</string>
+    <string name="privacy_s5_title">5. 권한 사용</string>
+    <string name="privacy_s5_body">• 진동 권한: 결정 시 햅틱 피드백에만 사용\n• 네트워크, 저장소, 카메라 등 다른 권한은 필요하지 않습니다</string>
+    <string name="privacy_s6_title">6. 오픈소스 투명성</string>
+    <string name="privacy_s6_body">본 앱은 완전한 오픈소스입니다. GitHub에서 모든 소스 코드를 확인할 수 있습니다.</string>
+    <string name="privacy_s7_title">7. 정책 업데이트</string>
+    <string name="privacy_s7_body">정책 업데이트가 있으면 앱 내에서 알림을 드립니다.</string>
+    <string name="privacy_s8_title">8. 문의하기</string>
+    <string name="privacy_s8_body">개인정보 관련 문의사항은 GitHub Issues를 통해 연락해 주세요.</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">최종 업데이트: 2026년 6월 8일</string>
+    <string name="terms_intro">초이스 패럴시스 헬퍼에 오신 것을 환영합니다. 본 앱은 우유부단한 사용자의 결정을 돕는 오픈소스 소프트웨어입니다.</string>
+    <string name="terms_s1_title">1. 서비스 설명</string>
+    <string name="terms_s1_body">본 앱은 다음과 같은 결정 도구를 제공합니다: 룰렛, 동전 던지기, 주사위, Yes/No, 핑거 룰렛. 모든 기능은 무료이며 인앱 결제가 없습니다.</string>
+    <string name="terms_s2_title">2. 사용 가이드라인</string>
+    <string name="terms_s2_body">본 앱을 적절하게 사용해 주세요. 일상적인 결정을 위한 것이며 고위험 시나리오에는 적합하지 않습니다.</string>
+    <string name="terms_s3_title">3. 면책 조항</string>
+    <string name="terms_s3_body">본 앱은 "있는 그대로" 제공되며, 결정 결과의 정확성이나 적합성에 대해 어떠한 보증도 하지 않습니다.</string>
+    <string name="terms_s4_title">4. 지적 재산권</string>
+    <string name="terms_s4_body">본 앱은 Apache License 2.0에 따라 배포됩니다.</string>
+    <string name="terms_s5_title">5. 사용자 권리</string>
+    <string name="terms_s5_body">Apache License 2.0의 조건에 따라 본 앱을 자유롭게 사용, 수정, 배포할 수 있습니다.</string>
+    <string name="terms_s6_title">6. 책임 제한</string>
+    <string name="terms_s6_body">적용 법률이 허용하는 최대 범위에서, 개발자는 본 앱의 사용으로 인한 어떠한 손해에 대해서도 책임을 지지 않습니다.</string>
+    <string name="terms_s7_title">7. 준거법</string>
+    <string name="terms_s7_body">본 약관은 중화인민공화국 법률의 적용을 받습니다.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">본 앱은 다음과 같은 오픈소스 라이브러리를 사용합니다:</string>    <string name="oss_compose_desc">Jetpack Compose는 네이티브 UI를 구축하기 위한 Android의 최신 툴킷입니다.</string>    <string name="oss_hilt_desc">Hilt는 Dagger 사용을 간소화하는 Android의 의존성 주입 라이브러리입니다.</string>    <string name="oss_room_desc">Room은 SQLite 위에 추상화 계층을 제공하여 SQLite의 기능을 활용하면서 견고한 데이터베이스 액세스를 구현합니다.</string>    <string name="oss_coil_desc">Coil은 Kotlin 코루틴으로 구동되는 Android 이미지 로딩 라이브러리입니다.</string>    <string name="oss_navigation_desc">Navigation Compose는 Compose에서의 내비게이션을 지원합니다.</string>    <string name="oss_datastore_desc">DataStore는 코루틴과 Flow를 사용하여 키-값 쌍 또는 프로토콜 버퍼 객체를 비동기적이고 일관되게 저장할 수 있는 데이터 스토리지 솔루션입니다.</string>
+    <string name="oss_copyright">모든 권리 보유</string>    <string name="oss_apache_intro">다음을 자유롭게 할 수 있습니다:</string>
+    <string name="oss_apache_use">• 상업적 또는 비상업적 목적으로 소프트웨어 사용</string>
+    <string name="oss_apache_modify">• 소프트웨어 수정</string>
+    <string name="oss_apache_distribute">• 소프트웨어 배포</string>
+    <string name="oss_apache_conditions">조건:</string>
+    <string name="oss_apache_copyright_notice">• 저작권 표시 및 라이선스 유지</string>
+    <string name="oss_apache_changes">• 변경 사항 표시</string>
+    <string name="oss_apache_link">전체 라이선스 텍스트는 다음을 방문하세요:</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ 본문은 AI 번역입니다. 공식 버전은 중국어 버전입니다.</string>
+</resources>

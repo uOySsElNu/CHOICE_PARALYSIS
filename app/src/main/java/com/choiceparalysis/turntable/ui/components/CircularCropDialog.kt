@@ -24,12 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
@@ -38,9 +38,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.choiceparalysis.turntable.R
 import androidx.compose.ui.window.Dialog
 import coil3.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CircularCropDialog(
@@ -49,6 +54,7 @@ fun CircularCropDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var cropCenterX by remember { mutableFloatStateOf(0.5f) }
     var cropCenterY by remember { mutableFloatStateOf(0.5f) }
     var cropRadius by remember { mutableFloatStateOf(0.4f) }
@@ -65,7 +71,7 @@ fun CircularCropDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "裁剪硬币图片",
+                    text = stringResource(R.string.dialog_crop_coin_image),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -140,7 +146,7 @@ fun CircularCropDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "拖动移动位置，双指缩放大小",
+                    text = stringResource(R.string.crop_instructions),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -156,32 +162,38 @@ fun CircularCropDialog(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("取消")
+                        Text(stringResource(R.string.btn_cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
                             if (!isProcessing) {
                                 isProcessing = true
-                                val sourceBitmap = CircularCropUtil.loadBitmapFromUri(context, imageUri)
-                                if (sourceBitmap != null) {
-                                    val cropped = CircularCropUtil.cropToCircle(
-                                        sourceBitmap, cropCenterX, cropCenterY, cropRadius
-                                    )
-                                    val path = CircularCropUtil.saveToInternalStorage(
-                                        context, cropped, "coin_${System.currentTimeMillis()}.png"
-                                    )
-                                    sourceBitmap.recycle()
-                                    onCropConfirmed(path)
-                                } else {
-                                    isProcessing = false
+                                scope.launch {
+                                    val path = withContext(Dispatchers.IO) {
+                                        val sourceBitmap = CircularCropUtil.loadBitmapFromUri(context, imageUri)
+                                            ?: return@withContext null
+                                        val cropped = CircularCropUtil.cropToCircle(
+                                            sourceBitmap, cropCenterX, cropCenterY, cropRadius
+                                        )
+                                        val result = CircularCropUtil.saveToInternalStorage(
+                                            context, cropped, "coin_${System.currentTimeMillis()}.png"
+                                        )
+                                        sourceBitmap.recycle()
+                                        result
+                                    }
+                                    if (path != null) {
+                                        onCropConfirmed(path)
+                                    } else {
+                                        isProcessing = false
+                                    }
                                 }
                             }
                         },
                         modifier = Modifier.weight(1f),
                         enabled = !isProcessing
                     ) {
-                        Text(if (isProcessing) "处理中..." else "确认")
+                        Text(if (isProcessing) stringResource(R.string.btn_processing) else stringResource(R.string.btn_confirm))
                     }
                 }
             }

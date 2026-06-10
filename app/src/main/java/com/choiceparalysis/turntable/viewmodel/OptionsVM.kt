@@ -1,10 +1,13 @@
 package com.choiceparalysis.turntable.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.choiceparalysis.turntable.R
 import com.choiceparalysis.turntable.data.model.OptionGroup
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OptionsVM @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
@@ -49,14 +53,17 @@ class OptionsVM @Inject constructor(
 
     fun updateOptions(newOptions: List<String>) {
         _options.value = newOptions
-        viewModelScope.launch { settingsRepository.setCurrentOptions(newOptions) }
+        viewModelScope.launch {
+            settingsRepository.setCurrentOptions(newOptions)
+            settingsRepository.clearAllLastResults()
+        }
     }
 
     fun addOption() {
         val current = _options.value
         if (current.size < 10) {
-            updateOptions(current + "选项${current.size + 1}")
-            _weights.value = _weights.value + 1
+            updateOptions(current + appContext.getString(R.string.default_option_name, current.size + 1))
+            _weights.value += 1
             viewModelScope.launch { settingsRepository.setCurrentWeights(_weights.value) }
         }
     }

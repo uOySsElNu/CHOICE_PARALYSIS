@@ -1,5 +1,6 @@
 package com.choiceparalysis.turntable.audio
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -10,10 +11,11 @@ import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.pow
+import kotlin.time.Duration.Companion.milliseconds
 
 enum class SoundEffect(val resId: Int) {
     SPIN_DING(R.raw.spin_ding),
@@ -23,7 +25,6 @@ enum class SoundEffect(val resId: Int) {
     WHEEL_TICK(R.raw.wheel_tick),
     DICE_ROLL(R.raw.dice_roll),
     COIN_BUTTON(R.raw.coin_button),
-    COIN_DRAG(R.raw.coin_drag),
 }
 
 class AudioHapticManager private constructor(
@@ -32,6 +33,7 @@ class AudioHapticManager private constructor(
 ) {
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         private var instance: AudioHapticManager? = null
 
@@ -49,13 +51,11 @@ class AudioHapticManager private constructor(
     }
 
     private val settingsRepository = SettingsRepository(context.dataStore, context)
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.Main)
 
     private val _soundEnabled = MutableStateFlow(true)
-    val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
 
     private val _hapticEnabled = MutableStateFlow(true)
-    val hapticEnabled: StateFlow<Boolean> = _hapticEnabled.asStateFlow()
 
     // Low-latency audio path: USAGE_GAME routes through fast mixer
     private val audioAttributes = AudioAttributes.Builder()
@@ -99,11 +99,86 @@ class AudioHapticManager private constructor(
     }
 
     /**
+     * Sound-only playback — no haptic. For when haptic is handled separately.
+     */
+    fun playSound(effect: SoundEffect) {
+        val soundReady = _soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT
+        if (soundReady) {
+            try {
+                if (!loaded) loadSounds()
+                val soundId = soundMap[effect]
+                if (soundId != null && soundId != 0) {
+                    soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * Haptic-only tick — no sound. For syncing haptic to existing audio.
+     */
+    fun playHapticTick() {
+        if (_hapticEnabled.value) {
+            try { hapticEngine.playTick() } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * Haptic-only effect — no sound. For syncing haptic to existing audio.
+     */
+    fun playHapticEffect(effect: HapticEffect) {
+        if (_hapticEnabled.value) {
+            try { hapticEngine.playEffect(effect) } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * Coin spin haptic — simulates coin spinning on table surface.
+     * Starts with a sharp flick, then rapid tapping that decelerates,
+     * ending with a thud when the coin settles.
+     */
+    fun playCoinSpinHaptic(durationMs: Int) {
+        if (!_hapticEnabled.value) return
+        scope.launch {
+            // 1. Initial flick impact
+            try { hapticEngine.playEffect(HapticEffect.CLICK) } catch (_: Exception) {}
+
+            // 2. Spinning phase — ticks that decelerate over the animation duration
+            val spinStart = 30L      // fastest interval (ms)
+            val spinEnd = 250L       // slowest interval (ms)
+            val startTime = System.currentTimeMillis()
+            val endTime = startTime + durationMs - 300L  // stop 300ms before end
+
+            while (System.currentTimeMillis() < endTime) {
+                // EaseOutQuart curve: fast at start, slow at end
+                val progress = ((System.currentTimeMillis() - startTime).toFloat() / (durationMs - 300)).coerceIn(0f, 1f)
+                val interval = spinStart + (spinEnd - spinStart) * progress.pow(3)
+                delay(interval.toLong().milliseconds)
+                try { hapticEngine.playTick() } catch (_: Exception) {}
+            }
+
+            // 3. Coin settles — heavy thud
+            delay(100.milliseconds)
+            try { hapticEngine.playEffect(HapticEffect.THUD) } catch (_: Exception) {}
+        }
+    }
+
+    /**
      * Unified feedback: plays sound and haptic simultaneously on the same frame.
      */
     fun playFeedback(effect: SoundEffect) {
-        // WHEEL_TICK: haptic only (no sound), pure boundary click
+        // WHEEL_TICK: haptic + sound synchronized on boundary crossing
         if (effect == SoundEffect.WHEEL_TICK) {
+            val soundReady = _soundEnabled.value && audioManager.ringerMode != AudioManager.RINGER_MODE_SILENT
+            if (soundReady) {
+                try {
+                    if (!loaded) loadSounds()
+                    val soundId = soundMap[effect]
+                    if (soundId != null && soundId != 0) {
+                        soundPool.play(soundId, 0.6f, 0.6f, 1, 0, 1f)
+                    }
+                } catch (_: Exception) {}
+            }
             if (_hapticEnabled.value) {
                 try { hapticEngine.playTick() } catch (_: Exception) {}
             }
@@ -119,10 +194,8 @@ class AudioHapticManager private constructor(
                 val soundId = soundMap[effect]
                 if (soundId != null && soundId != 0) {
                     val streamId = soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
-                    if (streamId == 0) {
-                        scope.launch {
-                            kotlinx.coroutines.delay(50)
-                            try { soundPool.play(soundId, 1f, 1f, 1, 0, 1f) } catch (_: Exception) {}
+                    when (streamId) {
+                        0 -> {
                         }
                     }
                 }
@@ -130,23 +203,21 @@ class AudioHapticManager private constructor(
         }
 
         if (hapticReady) {
-            try { hapticEngine.playEffect(mapToHapticEffect(effect)) } catch (_: Exception) {}
+            val hapticEffect = mapToHapticEffect(effect)
+            if (hapticEffect != null) {
+                try { hapticEngine.playEffect(hapticEffect) } catch (_: Exception) {}
+            }
         }
     }
 
-    private fun mapToHapticEffect(effect: SoundEffect): HapticEffect = when (effect) {
+    private fun mapToHapticEffect(effect: SoundEffect): HapticEffect? = when (effect) {
         SoundEffect.WHEEL_TICK -> HapticEffect.TICK
         SoundEffect.SPIN_DING -> HapticEffect.CLICK
         SoundEffect.YESNO_CHIME -> HapticEffect.RISE
         SoundEffect.ELIMINATION_DRUM -> HapticEffect.CLICK
         SoundEffect.WINNER_CHEER -> HapticEffect.CELEBRATION
-        SoundEffect.DICE_ROLL -> HapticEffect.THUD
-        SoundEffect.COIN_BUTTON -> HapticEffect.CELEBRATION
-        SoundEffect.COIN_DRAG -> HapticEffect.CELEBRATION
+        SoundEffect.DICE_ROLL -> null  // Haptic driven by waveform-synced ticks in Dice3DComposable
+        SoundEffect.COIN_BUTTON -> null  // Haptic driven by playCoinSpinHaptic in Coin3DComposable
     }
 
-    fun release() {
-        soundPool.release()
-        hapticEngine.release()
-    }
 }

@@ -1,5 +1,6 @@
 package com.choiceparalysis.turntable.ui.coin
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Palette
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,15 +51,16 @@ import com.choiceparalysis.turntable.viewmodel.CoinViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@SuppressLint("LocalContextResourcesRead")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinScreen(
     onBack: () -> Unit = {},
-    modifier: Modifier = Modifier,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     viewModel: CoinViewModel = hiltViewModel(),
 ) {
     val coinResult by viewModel.coinResult.collectAsState()
-    val pendingCoinResult by viewModel.pendingCoinResult.collectAsState()
+    val flipTrigger by viewModel.flipTrigger.collectAsState()
     val isAnimating by viewModel.isAnimating.collectAsState()
     val isFling by viewModel.isFling.collectAsState()
     val customCoinHeadsUri by viewModel.customCoinHeadsUri.collectAsState()
@@ -70,6 +72,7 @@ fun CoinScreen(
                 viewModel.onCoinFlipAnimationComplete()
             }
             viewModel.setFling(false)
+            viewModel.clearDisplayResult()
         }
     }
     val customCoinTailsUri by viewModel.customCoinTailsUri.collectAsState()
@@ -104,14 +107,15 @@ fun CoinScreen(
         } ?: defaultTailsBitmap
     }
 
+    val toastHeads = stringResource(R.string.toast_coin_heads)
+    val toastTails = stringResource(R.string.toast_coin_tails)
     val toastMessage = coinResult?.let {
-        if (it == CoinSide.HEADS) "正面朝上" else "反面朝上"
+        if (it == CoinSide.HEADS) toastHeads else toastTails
     }
 
-    LaunchedEffect(toastMessage) {
-        toastMessage?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            viewModel.clearResult()
+    LaunchedEffect(flipTrigger) {
+        if (flipTrigger > 0) {
+            toastMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
         }
     }
 
@@ -125,7 +129,7 @@ fun CoinScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "抛硬币",
+                    text = stringResource(R.string.coin_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -135,13 +139,13 @@ fun CoinScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             },
             actions = {
                 IconButton(onClick = { showCustomizationSheet = true }) {
-                    Icon(Icons.Default.Palette, contentDescription = "自定义图片")
+                    Icon(Icons.Default.Palette, contentDescription = stringResource(R.string.cd_customize_images))
                 }
             }
         )
@@ -150,11 +154,9 @@ fun CoinScreen(
 
         Coin3DFlip(
             result = coinResult,
-            pendingResult = pendingCoinResult,
             isAnimating = isAnimating,
             headsImage = headsBitmap,
             tailsImage = tailsBitmap,
-            onAnimationComplete = { viewModel.onCoinFlipAnimationComplete() },
             onDragFlipComplete = { viewModel.flipCoinDirectly(it) },
             onFlingChanged = { viewModel.setFling(it) },
             modifier = Modifier.padding(bottom = 24.dp)
@@ -168,7 +170,7 @@ fun CoinScreen(
                 .height(56.dp)
         ) {
             Text(
-                text = if (isAnimating) "翻转中..." else "抛硬币",
+                text = if (isAnimating) stringResource(R.string.btn_flipping) else stringResource(R.string.btn_flip_coin),
                 style = MaterialTheme.typography.titleMedium
             )
         }

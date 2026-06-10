@@ -1,10 +1,11 @@
 package com.choiceparalysis.turntable.ui.home
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import com.choiceparalysis.turntable.R
 
 enum class WheelDesign(
-    val displayName: String,
-    val description: String,
+    @StringRes val displayNameRes: Int,
     val emoji: String,
     val colors: List<Color>,
     val borderColor: Color,
@@ -12,8 +13,7 @@ enum class WheelDesign(
     val indicatorColor: Color,
 ) {
     CLASSIC_RAINBOW(
-        displayName = "经典彩虹",
-        description = "丰富多彩的经典配色",
+        displayNameRes = R.string.design_classic_rainbow,
         emoji = "🌈",
         colors = listOf(
             Color(0xFFE91E63),
@@ -32,8 +32,7 @@ enum class WheelDesign(
         indicatorColor = Color(0xFFE91E63),
     ),
     MONOCHROME(
-        displayName = "单色渐变",
-        description = "紫色系深浅渐变",
+        displayNameRes = R.string.design_monochrome,
         emoji = "🎨",
         colors = listOf(
             Color(0xFF7C4DFF),
@@ -52,8 +51,7 @@ enum class WheelDesign(
         indicatorColor = Color(0xFF6200EA),
     ),
     WARM_SUNSET(
-        displayName = "温暖日落",
-        description = "橙红色暖色调",
+        displayNameRes = R.string.design_warm_sunset,
         emoji = "🌅",
         colors = listOf(
             Color(0xFFFF6B6B),
@@ -72,8 +70,7 @@ enum class WheelDesign(
         indicatorColor = Color(0xFFFF6B6B),
     ),
     OCEAN_BREEZE(
-        displayName = "海洋微风",
-        description = "蓝绿色清凉配色",
+        displayNameRes = R.string.design_ocean_breeze,
         emoji = "🌊",
         colors = listOf(
             Color(0xFF00BCD4),
@@ -92,8 +89,7 @@ enum class WheelDesign(
         indicatorColor = Color(0xFF00BCD4),
     ),
     MINIMAL(
-        displayName = "极简风格",
-        description = "黑白灰简约设计",
+        displayNameRes = R.string.design_minimal,
         emoji = "⚪",
         colors = listOf(
             Color(0xFF424242),

@@ -24,9 +24,13 @@ class DataMigration @Inject constructor(
         val preferences = dataStore.data.first()
         if (preferences[MIGRATION_DONE] == true) return
 
-        migrateHistory()
-
-        dataStore.edit { it[MIGRATION_DONE] = true }
+        try {
+            migrateHistory()
+            dataStore.edit { it[MIGRATION_DONE] = true }
+        } catch (e: Exception) {
+            // Migration failed - don't set flag so it retries next launch
+            e.printStackTrace()
+        }
     }
 
     private suspend fun migrateHistory() {
@@ -34,24 +38,19 @@ class DataMigration @Inject constructor(
         val json = preferences[DataStoreKeys.HISTORY] ?: return
         if (json == "[]") return
 
-        try {
-            val entries = Json.decodeFromString<List<HistoryEntry>>(json)
-            if (entries.isEmpty()) return
+        val entries = Json.decodeFromString<List<HistoryEntry>>(json)
+        if (entries.isEmpty()) return
 
-            val entities = entries.map { entry ->
-                HistoryEntity(
-                    legacyId = entry.id,
-                    method = entry.method.name,
-                    result = entry.result,
-                    optionsSnapshot = Json.encodeToString(entry.options),
-                    listName = entry.listName,
-                    timestamp = entry.timestamp
-                )
-            }
-            historyDao.insertAll(entities)
-        } catch (e: Exception) {
-            // Migration failed silently - data preserved in DataStore
-            e.printStackTrace()
+        val entities = entries.map { entry ->
+            HistoryEntity(
+                legacyId = entry.id,
+                method = entry.method.name,
+                result = entry.result,
+                optionsSnapshot = Json.encodeToString(entry.options),
+                listName = entry.listName,
+                timestamp = entry.timestamp
+            )
         }
+        historyDao.insertAll(entities)
     }
 }

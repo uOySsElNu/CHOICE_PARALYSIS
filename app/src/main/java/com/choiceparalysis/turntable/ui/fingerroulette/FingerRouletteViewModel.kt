@@ -2,11 +2,14 @@ package com.choiceparalysis.turntable.ui.fingerroulette
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class FingerInfo(
     val id: Int,
@@ -23,7 +26,8 @@ enum class RoulettePhase {
     FINISHED,
 }
 
-class FingerRouletteViewModel : ViewModel() {
+@HiltViewModel
+class FingerRouletteViewModel @Inject constructor() : ViewModel() {
 
     private val _fingers = MutableStateFlow<List<FingerInfo>>(emptyList())
     val fingers: StateFlow<List<FingerInfo>> = _fingers.asStateFlow()
@@ -34,7 +38,12 @@ class FingerRouletteViewModel : ViewModel() {
     private val _winnerId = MutableStateFlow<Int?>(null)
     val winnerId: StateFlow<Int?> = _winnerId.asStateFlow()
 
+    // Incremented each time a target is highlighted (for haptic feedback)
+    private val _targetFlash = MutableStateFlow(0)
+    val targetFlash: StateFlow<Int> = _targetFlash.asStateFlow()
+
     private var nextId = 0
+    private var autoStartJob: Job? = null
 
     fun addFinger(x: Float, y: Float): Int {
         val id = nextId++
@@ -63,10 +72,24 @@ class FingerRouletteViewModel : ViewModel() {
 
     private fun updatePhase() {
         val activeFingers = _fingers.value.filter { !it.isEliminated }
-        _phase.value = when {
+        val newPhase = when {
             _winnerId.value != null -> RoulettePhase.FINISHED
             activeFingers.size < 2 -> RoulettePhase.WAITING
             else -> RoulettePhase.READY
+        }
+        _phase.value = newPhase
+
+        // Auto-start after 2s of no new fingers when READY
+        if (newPhase == RoulettePhase.READY) {
+            autoStartJob?.cancel()
+            autoStartJob = viewModelScope.launch {
+                delay(2000)
+                if (_phase.value == RoulettePhase.READY) {
+                    startElimination()
+                }
+            }
+        } else {
+            autoStartJob?.cancel()
         }
     }
 
@@ -98,6 +121,7 @@ class FingerRouletteViewModel : ViewModel() {
             if (index >= 0) {
                 current[index] = current[index].copy(isCurrentlyTargeted = true)
                 _fingers.value = current
+                _targetFlash.value++
             }
 
             delay(800) // Flash duration

@@ -9,5 +9,4 @@ object StandardEasing {
     val EaseInQuart = CubicBezierEasing(0.5f, 0.0f, 0.75f, 0.0f)
     val EaseInOutQuart = CubicBezierEasing(0.76f, 0.0f, 0.24f, 1.0f)
     val EaseInOutCubic = CubicBezierEasing(0.65f, 0.0f, 0.35f, 1.0f)
-    val EaseOutBack = CubicBezierEasing(0.34f, 1.56f, 0.64f, 1.0f)
 }

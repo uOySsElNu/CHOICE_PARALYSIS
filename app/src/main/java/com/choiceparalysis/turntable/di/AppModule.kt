@@ -8,7 +8,6 @@ import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.local.DataMigration
 import com.choiceparalysis.turntable.data.local.dao.HistoryDao
 import com.choiceparalysis.turntable.data.repository.HistoryRepository
-import com.choiceparalysis.turntable.data.repository.OptionListRepository
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import dagger.Module
 import dagger.Provides
@@ -44,11 +43,6 @@ object AppModule {
         dataStore: DataStore<Preferences>,
         historyDao: HistoryDao
     ): DataMigration = DataMigration(dataStore, historyDao)
-
-    @Provides
-    @Singleton
-    fun provideOptionListRepository(dataStore: DataStore<Preferences>): OptionListRepository =
-        OptionListRepository(dataStore)
 
     @Provides
     @Singleton

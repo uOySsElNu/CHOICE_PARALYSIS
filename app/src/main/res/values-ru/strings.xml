@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Это ты!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_history">История</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Common -->
+    <string name="cd_back">Назад</string>
+    <string name="cd_delete">Удалить</string>
+    <string name="btn_confirm">ОК</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_save">Сохранить</string>
+    <string name="btn_close">Закрыть</string>
+    <string name="btn_load">Загрузить</string>
+
+    <!-- Hub -->
+    <string name="hub_card_spin_wheel">Колесо</string>
+    <string name="hub_card_spin_wheel_desc">Вращай колесо судьбы</string>
+    <string name="hub_card_coin">Монета</string>
+    <string name="hub_card_coin_desc">Подбрось монету судьбы</string>
+    <string name="hub_card_dice">Кубик</string>
+    <string name="hub_card_dice_desc">Брось свой ответ</string>    <string name="hub_card_yes_no_desc">Пусть вселенная решит</string>
+    <string name="hub_card_finger_roulette">Пальцевая рулетка</string>
+    <string name="hub_card_finger_roulette_desc">Игра на выбывание, кто избранный</string>
+
+    <!-- Decision Methods -->
+    <string name="method_spin_wheel">Колесо</string>
+    <string name="method_coin_flip">Монета</string>
+    <string name="method_dice_roll">Кубик</string>    <string name="method_random_pick">Случайно</string>
+    <string name="method_finger_roulette">Пальцевая рулетка</string>
+
+    <!-- Spin Wheel -->
+    <string name="spin_wheel_title">Колесо</string>
+    <string name="cd_wheel_settings">Настройки колеса</string>
+    <string name="toast_what_are_you_doing">Что ты делаешь?!</string>
+    <string name="btn_spinning">Вращается…</string>
+    <string name="btn_start_spin">Крутить</string>
+    <string name="btn_edit_options">Редактировать</string>
+    <string name="toast_dynamic_color_on">Динамический цвет включён</string>
+    <string name="option_weight_label">Вес: </string>
+    <string name="btn_add_option">+ Добавить</string>
+    <string name="btn_save_group">Сохранить группу</string>
+    <string name="btn_load_group">Загрузить группу</string>
+    <string name="dialog_save_option_group">Сохранить группу опций</string>
+    <string name="label_group_name">Название группы</string>
+    <string name="dialog_load_option_group">Загрузить группу опций</string>
+    <string name="dialog_no_saved_groups">Нет сохранённых групп</string>
+
+    <!-- Coin -->
+    <string name="coin_title">Монета</string>
+    <string name="cd_customize_images">Настроить изображения</string>
+    <string name="btn_flipping">Подбрасывается…</string>
+    <string name="btn_flip_coin">Подбросить монету</string>
+    <string name="toast_coin_heads">Орёл!</string>
+    <string name="toast_coin_tails">Решка!</string>
+
+    <!-- Dice -->
+    <string name="dice_title">Кубик</string>
+    <string name="btn_rolling">Бросается…</string>
+    <string name="btn_roll_dice">Бросить кубик</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="toast_dice_value">Выпало: %d</string>
+
+    <!-- Yes/No -->
+    <string name="yesno_title">Yes / No Решение</string>
+    <string name="yesno_question_label">Введите ваш вопрос (необязательно)</string>
+    <string name="btn_deciding">Решаю…</string>
+    <string name="btn_decide">Реши за меня!</string>
+    <string name="yesno_result_yes">Да!</string>
+    <string name="yesno_result_no">Нет!</string>
+    <string name="yesno_result_maybe">Может быть</string>
+
+    <!-- Answer Book -->
+    <string name="answer_book_title">Книга Ответов</string>
+    <string name="answer_book_question_hint">Напишите ваш вопрос (необязательно)</string>
+    <string name="answer_book_reveal">Открыть ответ</string>
+    <string name="answer_book_revealing">Ответ появляется…</string>
+    <string name="method_answer_book">Книга Ответов</string>
+    <string name="hub_card_answer_book">Книга Ответов</string>
+    <string name="hub_card_answer_book_desc">Откройте книгу, позвольте вдохновению прийти</string>
+
+    <!-- Answer Book — Food -->
+    <string name="answer_food_1">Попробуйте то, что ещё не ели</string>
+    <string name="answer_food_2">Следуйте своей первой интуиции</string>
+    <string name="answer_food_3">Спросите свой желудок, чего он хочет</string>
+    <string name="answer_food_4">Выберите то, что вызывает больше волнения</string>
+
+    <!-- Answer Book — Outing -->
+    <string name="answer_outing_1">Отправляйтесь, ответ придёт в пути</string>
+    <string name="answer_outing_2">Остаться дома и отдохнуть — тоже хороший выбор</string>
+    <string name="answer_outing_3">Попробуйте место, где ещё не были</string>
+    <string name="answer_outing_4">Спросите себя, чего вы хотите больше всего прямо сейчас</string>
+
+    <!-- Answer Book — Shopping -->
+    <string name="answer_shopping_1">Подождите три дня, если всё ещё хотите — покупайте</string>
+    <string name="answer_shopping_2">Если сомневаетесь — не покупайте</string>
+    <string name="answer_shopping_3">Поищите лучшую альтернативу</string>
+    <string name="answer_shopping_4">Представьте, как вы будете чувствовать себя через месяц</string>
+
+    <!-- Answer Book — Work/Study -->
+    <string name="answer_work_1">Сделайте первый шаг</string>
+    <string name="answer_work_2">Дайте себе время подумать</string>
+    <string name="answer_work_3">Поговорите с тем, кому доверяете</string>
+    <string name="answer_work_4">Составьте список за и против перед решением</string>
+
+    <!-- Answer Book — Love -->
+    <string name="answer_love_1">Позвольте всему идти естественным путём</string>
+    <string name="answer_love_2">Будьте честны со своими чувствами</string>
+    <string name="answer_love_3">Время даст вам ответ</string>
+    <string name="answer_love_4">Доверьтесь своей интуиции</string>
+
+    <!-- Answer Book — General -->
+    <string name="answer_general_1">Сделайте это</string>
+    <string name="answer_general_2">Подумайте ещё немного</string>
+    <string name="answer_general_3">Позвольте всему идти естественным путём</string>
+    <string name="answer_general_4">Доверьтесь своей интуиции</string>
+    <string name="answer_general_5">Ответ в вашем сердце</string>
+    <string name="answer_general_6">Выберите то, что кажется легче</string>
+    <string name="answer_general_7">Не торопитесь, не спешите</string>
+    <string name="answer_general_8">В момент броска монеты вы узнаете ответ</string>
+    <string name="answer_general_9">Закройте глаза, ваша первая мысль — это ответ</string>
+    <string name="answer_general_10">Спросите своё будущее «я», что бы оно выбрало</string>
+
+    <!-- Finger Roulette -->
+    <string name="finger_roulette_title">Пальцевая рулетка</string>
+    <string name="winner_chosen_one">Избранный!</string>
+    <string name="btn_play_again">Ещё раз</string>
+    <string name="status_waiting_fingers">Поставьте 2–6 пальцев</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_ready_count">Обнаружено %d пальцев, старт через 2с</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="status_eliminating">Выбывание… осталось %d</string>
+    <string name="status_game_over">Игра окончена</string>
+    <string name="btn_start_now">Начать</string>
+
+    <!-- History -->
+    <string name="history_title">История</string>
+    <string name="history_clear">Очистить</string>
+    <string name="history_data_insights">Аналитика</string>
+    <string name="history_empty_title">Пока нет решений</string>
+    <string name="history_empty_subtitle">Ваши результаты появятся здесь после принятия решения</string>
+    <string name="history_result_prefix">Результат: %s</string>
+    <string name="history_clear_confirm">Вы уверены, что хотите очистить всю историю? Это действие нельзя отменить.</string>
+    <string name="history_delete_entry">Удалить запись</string>
+    <string name="history_delete_entry_confirm">Вы уверены, что хотите удалить эту запись?</string>
+
+    <!-- Stats -->
+    <string name="stats_decision_overview">Обзор</string>
+    <string name="stats_total_decisions">Всего решений</string>
+    <string name="stats_most_used">Самое частое</string>
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="stats_count_suffix">%d раз</string>
+    <string name="stats_last_decision">Последнее решение</string>
+    <string name="stats_method_distribution">Распределение по методам</string>
+    <string name="stats_top_results">Топ 5 результатов</string>
+    <string name="stats_hourly_distribution">Распределение по часам</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_sound_haptic_section">Звук и вибрация</string>
+    <string name="settings_sound">Звук</string>
+    <string name="settings_sound_description">Воспроизводить звук при решении</string>
+    <string name="settings_haptic">Вибрация</string>
+    <string name="settings_haptic_description">Вибрация при решении</string>
+    <string name="settings_display_section">Экран</string>
+    <string name="settings_follow_system_theme">Следовать тёмной теме системы</string>
+    <string name="settings_follow_system_theme_description">Отключено: ручное переключение светлая/тёмная</string>
+    <string name="settings_dark_mode">Тёмная тема</string>
+    <string name="settings_dark_mode_on">Тёмная тема включена</string>
+    <string name="settings_light_mode_on">Светлая тема включена</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_about_section">О приложении</string>
+    <string name="settings_version">Версия</string>
+    <string name="settings_privacy_policy">Политика конфиденциальности</string>
+    <string name="settings_terms_of_use">Условия использования</string>
+    <string name="settings_open_source_licenses">Лицензии открытого кода</string>
+
+    <!-- Language names -->
+    <string name="locale_follow_system">Следовать системе</string>    <string name="dialog_select_language">Выберите язык</string>
+
+    <!-- Wheel Settings -->
+    <string name="wheel_settings_title">Настройки колеса</string>
+    <string name="settings_dynamic_color">Динамический цвет</string>
+    <string name="settings_dynamic_color_desc">Автоматическая настройка цветов по времени</string>
+    <string name="settings_preset_themes">Готовые темы</string>
+    <string name="settings_option_colors">Цвета опций</string>
+    <string name="settings_dynamic_color_active_hint">Динамический цвет включён, цвета меняются автоматически</string>
+
+    <!-- Wheel Design -->
+    <string name="design_classic_rainbow">Классическая радуга</string>
+    <string name="design_monochrome">Монохром</string>
+    <string name="design_warm_sunset">Тёплый закат</string>
+    <string name="design_ocean_breeze">Морской бриз</string>
+    <string name="design_minimal">Минимализм</string>
+
+    <!-- Coin Customization -->
+    <string name="coin_presets_title">Пресеты монеты</string>
+    <string name="btn_restore_default">Сбросить</string>
+    <string name="preset_custom">Своё</string>
+    <string name="custom_coin_title">Своя монета</string>
+    <string name="custom_coin_drag_hint">Перетащите для предпросмотра обеих сторон</string>
+    <string name="coin_heads">Орёл</string>
+    <string name="coin_tails">Решка</string>
+    <string name="btn_save_as_preset">Сохранить как пресет</string>
+    <string name="btn_apply_directly">Применить</string>
+    <string name="cd_select_image">Выбрать изображение</string>
+    <string name="preset_default">По умолчанию</string>
+    <string name="dialog_save_coin_preset">Сохранить пресет монеты</string>
+    <string name="label_preset_name">Название пресета</string>
+
+    <!-- Color Picker -->
+    <string name="dialog_select_color">Выбрать цвет</string>
+    <string name="label_color_code">Код цвета</string>
+    <string name="error_invalid_color_code">Введите допустимый код цвета, напр. FF6200</string>
+    <string name="color_picker_common_colors">Популярные цвета</string>
+
+    <!-- AnimatedResult -->
+    <string name="result_is">Результат</string>
+
+    <!-- CircularCropDialog -->
+    <string name="dialog_crop_coin_image">Обрезать изображение монеты</string>
+    <string name="crop_instructions">Перетащите для перемещения, щипок для масштабирования</string>
+    <string name="btn_processing">Обработка…</string>
+
+    <!-- Stats Screen -->
+    <string name="stats_title">Аналитика</string>
+    <string name="stats_empty_title">Пока нет решений</string>
+    <string name="stats_empty_subtitle">Попробуйте колесо!</string>
+
+    <!-- Coin ViewModel -->
+    <string name="coin_heads_label">Орёл</string>
+    <string name="coin_tails_label">Решка</string>
+
+    <!-- YesNo ViewModel -->
+    <string name="yesno_default_yes">Да</string>
+    <string name="yesno_default_no">Нет</string>
+    <string name="yesno_default_maybe">Может быть</string>
+
+    <!-- OptionsVM -->
+    <!-- lint: ignore PluralsCandidate -->
+    <string name="default_option_name">Вариант %d</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">Последнее обновление: 8 июня 2026 г.</string>
+    <string name="privacy_intro">Choice Paralysis Helper (\"это приложение\") — программное обеспечение с открытым исходным кодом, которое уважает и защищает вашу конфиденциальность.</string>
+    <string name="privacy_s1_title">1. Сбор информации</string>
+    <string name="privacy_s1_body">Это приложение не собирает, не хранит и не передаёт никакой личной информации. Все данные решений (такие как варианты колеса и история) хранятся локально только на вашем устройстве.</string>
+    <string name="privacy_s2_title">2. Хранение данных</string>
+    <string name="privacy_s2_body">• Все данные хранятся локально с использованием Android DataStore и базы данных Room\n• Данные не загружаются на какой-либо сервер\n• Удаление приложения удалит все данные</string>
+    <string name="privacy_s3_title">3. Безопасность данных</string>
+    <string name="privacy_s3_body">Поскольку все данные хранятся локально, ваша конфиденциальность полностью защищена механизмами безопасности Android.</string>
+    <string name="privacy_s4_title">4. Сторонние сервисы</string>
+    <string name="privacy_s4_body">Это приложение не интегрирует никаких сторонних сервисов аналитики, рекламы или отслеживания.</string>
+    <string name="privacy_s5_title">5. Использование разрешений</string>
+    <string name="privacy_s5_body">• Разрешение на вибрацию: только для тактильной обратной связи при решениях\n• Не требуются разрешения на сеть, хранилище, камеру или другие</string>
+    <string name="privacy_s6_title">6. Прозрачность открытого кода</string>
+    <string name="privacy_s6_body">Это приложение полностью имеет открытый исходный код. Вы можете просмотреть весь исходный код на GitHub.</string>
+    <string name="privacy_s7_title">7. Обновления политики</string>
+    <string name="privacy_s7_body">Любые обновления политики будут уведомлены в приложении.</string>
+    <string name="privacy_s8_title">8. Свяжитесь с нами</string>
+    <string name="privacy_s8_body">По вопросам конфиденциальности, пожалуйста, свяжитесь с нами через GitHub Issues.</string>
+
+    <!-- Terms of Use -->
+    <string name="terms_last_updated">Последнее обновление: 8 июня 2026 г.</string>
+    <string name="terms_intro">Добро пожаловать в Choice Paralysis Helper. Это приложение с открытым исходным кодом, созданное для помощи нерешительным пользователям в принятии решений.</string>
+    <string name="terms_s1_title">1. Описание сервиса</string>
+    <string name="terms_s1_body">Это приложение предоставляет следующие инструменты решений: Колесо, Монета, Кубик, Yes/No и Пальцевая рулетка. Все функции бесплатны без встроенных покупок.</string>
+    <string name="terms_s2_title">2. Рекомендации по использованию</string>
+    <string name="terms_s2_body">Пожалуйста, используйте это приложение ответственно. Оно предназначено только для повседневных решений и не подходит для сценариев высокого риска.</string>
+    <string name="terms_s3_title">3. Отказ от ответственности</string>
+    <string name="terms_s3_body">Это приложение предоставляется «как есть» без каких-либо гарантий относительно точности или пригодности результатов решений.</string>
+    <string name="terms_s4_title">4. Интеллектуальная собственность</string>
+    <string name="terms_s4_body">Это приложение выпущено под лицензией Apache License 2.0.</string>
+    <string name="terms_s5_title">5. Права пользователя</string>
+    <string name="terms_s5_body">Вы можете свободно использовать, изменять и распространять это приложение в соответствии с условиями Apache License 2.0.</string>
+    <string name="terms_s6_title">6. Ограничение ответственности</string>
+    <string name="terms_s6_body">В максимально допустимой законом степени разработчик не несёт ответственности за любой ущерб, возникший в результате использования этого приложения.</string>
+    <string name="terms_s7_title">7. Применимое право</string>
+    <string name="terms_s7_body">Настоящие условия регулируются законодательством Китайской Народной Республики.</string>
+
+    <!-- Open Source Licenses -->
+    <string name="oss_intro">Это приложение использует следующие библиотеки с открытым исходным кодом:</string>    <string name="oss_compose_desc">Jetpack Compose — современный инструментарий Android для создания нативных интерфейсов.</string>    <string name="oss_hilt_desc">Hilt — библиотека внедрения зависимостей для Android, упрощающая использование Dagger.</string>    <string name="oss_room_desc">Room предоставляет уровень абстракции над SQLite для обеспечения удобного доступа к базе данных с использованием всех возможностей SQLite.</string>    <string name="oss_coil_desc">Coil — библиотека загрузки изображений для Android на основе корутин Kotlin.</string>    <string name="oss_navigation_desc">Navigation Compose обеспечивает поддержку навигации в Compose.</string>    <string name="oss_datastore_desc">DataStore — решение для хранения данных, позволяющее асинхронно и последовательно хранить пары ключ-значение или объекты буфера протокола с использованием корутин и Flow.</string>
+    <string name="oss_copyright">Все права защищены</string>    <string name="oss_apache_intro">Вы можете свободно:</string>
+    <string name="oss_apache_use">• Использовать программное обеспечение в коммерческих или некоммерческих целях</string>
+    <string name="oss_apache_modify">• Изменять программное обеспечение</string>
+    <string name="oss_apache_distribute">• Распространять программное обеспечение</string>
+    <string name="oss_apache_conditions">Условия:</string>
+    <string name="oss_apache_copyright_notice">• Сохранять уведомление об авторских правах и лицензию</string>
+    <string name="oss_apache_changes">• Отмечать внесённые изменения</string>
+    <string name="oss_apache_link">Полный текст лицензии доступен по адресу:</string>
+
+    <!-- AI translation disclaimer -->
+    <string name="ai_translation_disclaimer">⚠ Это перевод, выполненный ИИ. Официальной является китайская версия.</string>
+</resources>

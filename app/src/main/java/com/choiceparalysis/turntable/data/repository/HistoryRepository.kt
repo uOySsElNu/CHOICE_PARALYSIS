@@ -18,7 +18,10 @@ class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) 
 
     suspend fun addEntry(entry: HistoryEntry) {
         historyDao.insert(entry.toEntity())
-        historyDao.trimOld()
+        // Only trim when we have more than 100 entries (avoids subquery on every insert)
+        if (historyDao.count() > 100) {
+            historyDao.trimOld()
+        }
     }
 
     suspend fun clearHistory() {
@@ -26,7 +29,14 @@ class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) 
     }
 
     suspend fun deleteEntry(id: String) {
-        historyDao.deleteById(legacyId = id, id = 0L)
+        // Try numeric ID first (for entries with numeric PK)
+        val numericId = id.toLongOrNull()
+        if (numericId != null) {
+            historyDao.deleteById(numericId)
+        } else {
+            // UUID-based legacy entries
+            historyDao.deleteByLegacyId(id)
+        }
     }
 
     private fun HistoryEntity.toHistoryEntry(): HistoryEntry {

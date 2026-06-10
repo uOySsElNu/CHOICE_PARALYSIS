@@ -1,5 +1,7 @@
 package com.choiceparalysis.turntable
 
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,28 +17,54 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.choiceparalysis.turntable.data.datastore.dataStore
 import com.choiceparalysis.turntable.data.repository.SettingsRepository
 import com.choiceparalysis.turntable.navigation.AppNavGraph
 import com.choiceparalysis.turntable.navigation.BottomNavDestinations
 import com.choiceparalysis.turntable.ui.theme.CHOICEPARALYSISTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var settingsRepository: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Apply saved locale before rendering UI (runBlocking is acceptable here —
+        // this is a one-shot DataStore read that must complete before setContent)
+        val savedLocale = runBlocking { settingsRepository.appLocale.first() }
+        if (savedLocale == "system") {
+            // Get the REAL system locale (Resources.getSystem() bypasses app-overridden config)
+            val sysLocale = Resources.getSystem().configuration.locales[0]
+            Locale.setDefault(sysLocale)
+            val config = Configuration(Resources.getSystem().configuration)
+            config.setLocale(sysLocale)
+            @Suppress("DEPRECATION")
+            resources.updateConfiguration(config, resources.displayMetrics)
+        } else {
+            val locale = Locale.forLanguageTag(savedLocale)
+            Locale.setDefault(locale)
+            val config = Configuration(resources.configuration)
+            config.setLocale(locale)
+            @Suppress("DEPRECATION")
+            resources.updateConfiguration(config, resources.displayMetrics)
+        }
+
         setContent {
-            val context = LocalContext.current
-            val followSystem by SettingsRepository(context.dataStore, context).followSystemTheme
-                .collectAsState(initial = true)
-            val darkTheme = if (followSystem) isSystemInDarkTheme() else false
+            val followSystem by settingsRepository.followSystemTheme.collectAsState(initial = true)
+            val manualDark by settingsRepository.darkMode.collectAsState(initial = false)
+            val darkTheme = if (followSystem) isSystemInDarkTheme() else manualDark
             CHOICEPARALYSISTheme(darkTheme = darkTheme) {
                 ChoiceParalysisMainScreen()
             }
@@ -55,8 +83,8 @@ fun ChoiceParalysisMainScreen() {
         navigationSuiteItems = {
             BottomNavDestinations.entries.forEach { dest ->
                 item(
-                    icon = { Icon(dest.icon, contentDescription = dest.label) },
-                    label = { Text(dest.label) },
+                    icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
+                    label = { Text(stringResource(dest.labelRes)) },
                     selected = currentDestination?.hasRoute(dest.route::class) == true,
                     onClick = {
                         if (currentDestination?.hasRoute(dest.route::class) != true) {
