@@ -26,91 +26,33 @@
             </intent-filter>
         </activity>
 
-        <!-- ==================== Quick Decision Widget ==================== -->
+        <!-- Quick Decision Widget -->
         <receiver
             android:name=".widget.QuickDecisionWidgetProvider"
             android:exported="true"
-            android:process=":widgetprovider"
             android:label="@string/widget_quick_decision_title">
-
-            <!-- Standard Android widget update -->
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
-            <!-- Custom action: tap to decide -->
             <intent-filter>
                 <action android:name="com.choiceparalysis.turntable.ACTION_DECIDE" />
             </intent-filter>
-
-            <!-- Xiaomi HyperOS: clear-data refresh -->
-            <intent-filter>
-                <action android:name="miui.intent.action.MIUI_WIDGET_REFRESH_APP_DATA" />
-            </intent-filter>
-
-            <!-- Standard widget provider metadata -->
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/quick_decision_widget_info" />
-
-            <!-- Xiaomi HyperOS: widget center identifier (lowercase!) -->
-            <meta-data
-                android:name="miuiwidget"
-                android:value="true" />
-
-            <!-- Xiaomi HyperOS: exposure refresh (lowercase!) -->
-            <meta-data
-                android:name="miuiwidgetrefreshtype"
-                android:value="exposure" />
-            <meta-data
-                android:name="miuiwidgetrefreshmininterval"
-                android:value="10000" />
-
-            <!-- vivo OriginOS: atomic component version -->
-            <meta-data
-                android:name="vivoWidgetVersion"
-                android:value="1" />
         </receiver>
 
-        <!-- ==================== Last Result Widget ==================== -->
+        <!-- Last Result Widget -->
         <receiver
             android:name=".widget.LastResultWidgetProvider"
             android:exported="true"
-            android:process=":widgetprovider"
             android:label="@string/widget_last_result_title">
-
-            <!-- Standard Android widget update -->
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
-            <!-- Xiaomi HyperOS: clear-data refresh -->
-            <intent-filter>
-                <action android:name="miui.intent.action.MIUI_WIDGET_REFRESH_APP_DATA" />
-            </intent-filter>
-
-            <!-- Standard widget provider metadata -->
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/last_result_widget_info" />
-
-            <!-- Xiaomi HyperOS: widget center identifier (lowercase!) -->
-            <meta-data
-                android:name="miuiwidget"
-                android:value="true" />
-
-            <!-- Xiaomi HyperOS: exposure refresh (lowercase!) -->
-            <meta-data
-                android:name="miuiwidgetrefreshtype"
-                android:value="exposure" />
-            <meta-data
-                android:name="miuiwidgetrefreshmininterval"
-                android:value="10000" />
-
-            <!-- vivo OriginOS: atomic component version -->
-            <meta-data
-                android:name="vivoWidgetVersion"
-                android:value="1" />
         </receiver>
     </application>
 
